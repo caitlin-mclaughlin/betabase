@@ -1,0 +1,28 @@
+.header-title {
+    -fx-cursor: hand;
+}
+
+.dashboard-button {
+    -fx-background-color: linear-gradient(to bottom, #057A03, #055401);
+    -fx-text-fill: white;
+    -fx-font-size: 50px;
+    -fx-font-family: "Noto Sans", "Arial", sans-serif;
+    -fx-font-weight: bold;
+    -fx-background-radius: 20;
+    -fx-padding: 15 30 15 30;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.4), 15, 0.2, 0, 8);
+    -fx-border-color: transparent;
+    -fx-border-radius: 20;
+    -fx-transition: all 0.2s ease-in-out;
+}
+
+.dashboard-button:hover {
+    -fx-background-color: linear-gradient(to bottom, #066102, #044201);
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.5), 18, 0.3, 0, 10);
+}
+
+.dashboard-button:pressed {
+    -fx-translate-y: 3;
+    -fx-effect: innershadow(gaussian, rgba(0, 0, 0, 0.6), 6, 0.5, 0, 2);
+}

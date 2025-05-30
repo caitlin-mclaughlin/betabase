@@ -8,9 +8,22 @@ group = 'com.betabase'
 version = '0.0.1-SNAPSHOT'
 
 java {
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
 	toolchain {
 		languageVersion = JavaLanguageVersion.of(21)
 	}
+}
+
+sourceSets {
+    main {
+        java {
+            srcDirs = ['src/main/java']
+        }
+        resources {
+            srcDirs = ['src/main/resources']
+        }
+    }
 }
 
 repositories {

@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.geometry.Pos?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane fx:id="mainPane"
+            xmlns="http://javafx.com/javafx/23.0.1"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.betabase.controllers.DashboardController"
+            prefHeight="900.0" prefWidth="1200.0"
+            stylesheets="@/com/betabase/styles.css">
+
+    <center>
+        <StackPane fx:id="stack" alignment="CENTER">
+            <padding>
+                <Insets top="25" right="30" bottom="30" left="30"/>
+            </padding>
+            <GridPane fx:id="grid" alignment="CENTER" hgap="30" vgap="30">
+                <columnConstraints>
+                    <ColumnConstraints hgrow="ALWAYS"/>
+                    <ColumnConstraints hgrow="ALWAYS"/>
+                </columnConstraints>
+                <rowConstraints>
+                    <RowConstraints vgrow="ALWAYS"/>
+                    <RowConstraints vgrow="ALWAYS"/>
+                </rowConstraints>
+
+                <Button fx:id="checkInBtn" text="Member Check In" wrapText="true"
+                        GridPane.rowIndex="0" GridPane.columnIndex="0"
+                        onAction="#handleCheckInClick"
+                        styleClass="dashboard-button"/>
+                <Button fx:id="calendarBtn" text="Calendar" wrapText="true"
+                        GridPane.rowIndex="0" GridPane.columnIndex="1"
+                        onAction="#handleCalendarClick"
+                        styleClass="dashboard-button"/>
+                <Button fx:id="posBtn" text="Point of Sale" wrapText="true"
+                        GridPane.rowIndex="1" GridPane.columnIndex="0"
+                        onAction="#handlePosClick"
+                        styleClass="dashboard-button"/>
+                <Button fx:id="analyticsBtn" text="Reports" wrapText="true"
+                        GridPane.rowIndex="1" GridPane.columnIndex="1"
+                        onAction="#handleAnalyticsClick"
+                        styleClass="dashboard-button"/>
+            </GridPane>
+        </StackPane>
+    </center>
+</BorderPane>
