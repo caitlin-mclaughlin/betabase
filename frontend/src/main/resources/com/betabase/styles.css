@@ -1,28 +1,48 @@
-.header-title {
+.sidebar {
+    -fx-background-color: #17341a;
+    -fx-pref-width: 220px;
+}
+
+.dashboard {
+    -fx-background-color: #d9c7ad;
+}
+
+.dashboard-hbox:hover {
+    -fx-background-color: #225247;
+}
+
+.clock-in-button {
+    -fx-background-color: #17341a;
+    -fx-text-fill: #d9c7ad;
+    -fx-font-size: 30px;
+    -fx-max-width: 200px;
+    -fx-background-radius: 10;
     -fx-cursor: hand;
 }
 
-.dashboard-button {
-    -fx-background-color: linear-gradient(to bottom, #057A03, #055401);
-    -fx-text-fill: white;
-    -fx-font-size: 50px;
-    -fx-font-family: "Noto Sans", "Arial", sans-serif;
+.clock-out-button {
+    -fx-background-color: #482020;
+    -fx-text-fill: #d9c7ad;
+    -fx-font-size: 30px;
+    -fx-max-width: 200px;
+    -fx-background-radius: 10;
+    -fx-cursor: hand;
+}
+
+.nav-label {
+    -fx-text-fill: #d9c7ad;
+    -fx-font-size: 18px;
     -fx-font-weight: bold;
-    -fx-background-radius: 20;
-    -fx-padding: 15 30 15 30;
+    -fx-padding: 10 15 10 15;
+    -fx-background-radius: 10;
     -fx-cursor: hand;
-    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.4), 15, 0.2, 0, 8);
-    -fx-border-color: transparent;
-    -fx-border-radius: 20;
-    -fx-transition: all 0.2s ease-in-out;
+    -fx-transition: background-color 0.3s ease;
 }
 
-.dashboard-button:hover {
-    -fx-background-color: linear-gradient(to bottom, #066102, #044201);
-    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.5), 18, 0.3, 0, 10);
-}
-
-.dashboard-button:pressed {
-    -fx-translate-y: 3;
-    -fx-effect: innershadow(gaussian, rgba(0, 0, 0, 0.6), 6, 0.5, 0, 2);
+.welcome-label {
+    -fx-text-fill: #17341a;
+    -fx-font-size: 75px;
+    -fx-font-weight: bold;
+    -fx-font-style: oblique;
+    -fx-padding: 20 15 10 15;
 }

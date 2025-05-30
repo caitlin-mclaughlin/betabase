@@ -1,50 +1,100 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
-<?import javafx.geometry.Pos?>
 <?import javafx.scene.control.Button?>
-<?import javafx.scene.layout.*?>
-<?import javafx.scene.text.Font?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
 
-<BorderPane fx:id="mainPane"
-            xmlns="http://javafx.com/javafx/23.0.1"
-            xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="com.betabase.controllers.DashboardController"
-            prefHeight="900.0" prefWidth="1200.0"
-            stylesheets="@/com/betabase/styles.css">
+<BorderPane fx:id="mainPane" prefHeight="900.0" prefWidth="1200.0" stylesheets="@/com/betabase/styles.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.betabase.controllers.DashboardController">
+    
+    <left>
+        <VBox fx:id="sidebar" alignment="TOP_CENTER" spacing="20" styleClass="sidebar">
+            <padding>
+                <Insets bottom="20" top="10" />
+            </padding>
+            <children>
+                <ImageView fx:id="logo" fitWidth="170.0" preserveRatio="true">
+                    <image>
+                        <Image url="@/com/betabase/images/logo.png" />
+                    </image>
+                </ImageView>
+                <HBox spacing="15" styleClass="dashboard-hbox" alignment="CENTER_LEFT">
+                    <padding>
+                        <Insets left="20" right="10" />
+                    </padding>
+                    <children>
+                        <ImageView fx:id="pos_logo" fitWidth="50.0" preserveRatio="true">
+                            <image>
+                                <Image url="@/com/betabase/images/pos.png" />
+                            </image>
+                        </ImageView>
+                        <Label onMouseClicked="#handlePosClick" styleClass="nav-label" text="Point of Sale" />
+                    </children>
+                </HBox>
+                <HBox spacing="15" styleClass="dashboard-hbox" alignment="CENTER_LEFT">
+                    <padding>
+                        <Insets left="20" right="10" />
+                    </padding>
+                    <children>
+                        <ImageView fx:id="cal_logo" fitWidth="50.0" preserveRatio="true">
+                            <image>
+                                <Image url="@/com/betabase/images/cal.png" />
+                            </image>
+                        </ImageView>
+                        <Label onMouseClicked="#handleCalendarClick" styleClass="nav-label" text="Calendar" />
+                    </children>
+                </HBox>
+                <HBox spacing="15" styleClass="dashboard-hbox" alignment="CENTER_LEFT">
+                    <padding>
+                        <Insets left="20" right="10" />
+                    </padding>
+                    <children>
+                        <ImageView fx:id="chart_logo" fitWidth="50.0" preserveRatio="true">
+                            <image>
+                                <Image url="@/com/betabase/images/chart.png" />
+                            </image>
+                        </ImageView>
+                        <Label onMouseClicked="#handleAnalyticsClick" styleClass="nav-label" text="Analytics" />
+                    </children>
+                </HBox>
+                <HBox spacing="15" styleClass="dashboard-hbox" alignment="CENTER_LEFT">
+                    <padding>
+                        <Insets left="20" right="10" />
+                    </padding>
+                    <children>
+                        <ImageView fx:id="gear_logo" fitWidth="50.0" preserveRatio="true">
+                            <image>
+                                <Image url="@/com/betabase/images/gear.png" />
+                            </image>
+                        </ImageView>
+                        <Label onMouseClicked="#handleSettingsClick" styleClass="nav-label" text="Settings" />
+                    </children>
+                </HBox>
+            </children>
+        </VBox>
+    </left>
 
     <center>
-        <StackPane fx:id="stack" alignment="CENTER">
+        <VBox fx:id="dashboard" alignment="TOP_CENTER" spacing="20" styleClass="dashboard">
             <padding>
-                <Insets top="25" right="30" bottom="30" left="30"/>
+                <Insets left="20" right="20" top="10" />
             </padding>
-            <GridPane fx:id="grid" alignment="CENTER" hgap="30" vgap="30">
-                <columnConstraints>
-                    <ColumnConstraints hgrow="ALWAYS"/>
-                    <ColumnConstraints hgrow="ALWAYS"/>
-                </columnConstraints>
-                <rowConstraints>
-                    <RowConstraints vgrow="ALWAYS"/>
-                    <RowConstraints vgrow="ALWAYS"/>
-                </rowConstraints>
-
-                <Button fx:id="checkInBtn" text="Member Check In" wrapText="true"
-                        GridPane.rowIndex="0" GridPane.columnIndex="0"
-                        onAction="#handleCheckInClick"
-                        styleClass="dashboard-button"/>
-                <Button fx:id="calendarBtn" text="Calendar" wrapText="true"
-                        GridPane.rowIndex="0" GridPane.columnIndex="1"
-                        onAction="#handleCalendarClick"
-                        styleClass="dashboard-button"/>
-                <Button fx:id="posBtn" text="Point of Sale" wrapText="true"
-                        GridPane.rowIndex="1" GridPane.columnIndex="0"
-                        onAction="#handlePosClick"
-                        styleClass="dashboard-button"/>
-                <Button fx:id="analyticsBtn" text="Reports" wrapText="true"
-                        GridPane.rowIndex="1" GridPane.columnIndex="1"
-                        onAction="#handleAnalyticsClick"
-                        styleClass="dashboard-button"/>
-            </GridPane>
-        </StackPane>
+            <children>
+                <HBox alignment="CENTER" spacing="50" prefHeight="100.0">
+                <children>
+                        <Label text="Welcome, Caitlin" styleClass="welcome-label"/>
+                        <Button mnemonicParsing="false" text="Clock In" 
+                                styleClass="clock-in-button" HBox.hgrow="ALWAYS"/>
+                        <Button mnemonicParsing="false" text="Clock Out"
+                                styleClass="clock-out-button" HBox.hgrow="ALWAYS"/>
+                </children>
+                </HBox>
+            </children>
+        </VBox>
     </center>
 </BorderPane>
