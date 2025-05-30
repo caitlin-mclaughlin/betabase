@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<VBox xmlns="http://javafx.com/javafx/23.0.1"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.betabase.controllers.HeaderController"
+      stylesheets="@/com/betabase/styles.css"
+      spacing="5">
+   
+   <StackPane>
+      <HBox alignment="CENTER_LEFT" prefWidth="Infinity" style="-fx-padding: 10;">
+         <Label fx:id="appTitleLabel" text="BETABASE"
+                onMouseClicked="#handleTitleClick"
+                styleClass="header-title">
+            <font>
+               <Font name="DejaVu Sans Mono Bold Oblique" size="20.0" />
+            </font>
+         </Label>
+         <Region HBox.hgrow="ALWAYS"/>
+         <Button text="Staff Clock In/Out">
+            <font>
+               <Font size="16.0" />
+            </font>
+         </Button>
+      </HBox>
+
+      <Label fx:id="titleLabel" text="Default Title" StackPane.alignment="CENTER">
+         <font>
+            <Font name="Noto Sans Bold" size="20.0" />
+         </font>
+      </Label>
+   </StackPane>
+
+   <Separator prefHeight="2.0" maxWidth="Infinity" />
+</VBox>

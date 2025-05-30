@@ -1,13 +1,20 @@
 package com.betabase.controllers;
 
 import javafx.event.ActionEvent;
+import javafx.animation.PauseTransition;
+import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.scene.layout.*;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 
@@ -20,6 +27,7 @@ public class DashboardController implements Initializable {
     @FXML private BorderPane mainPane;
     @FXML private VBox sidebar;
     @FXML private ImageView logoImage;
+    @FXML private TextField search;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -30,13 +38,28 @@ public class DashboardController implements Initializable {
                 mainPane.widthProperty()
             )
         );
+        Platform.runLater(() -> {
+            search.requestFocus();
+            setupActivityListeners(search.getScene());
+        });
     }
-/* 
-    private void bindButtonToGrid(Button button) {
-        button.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
-        button.prefWidthProperty().bind(grid.widthProperty().multiply(0.5).subtract(30));
-        button.prefHeightProperty().bind(grid.heightProperty().multiply(0.5).subtract(30));
-    }*/
+
+    private final PauseTransition inactivityTimer = new PauseTransition(Duration.seconds(20));
+
+    private void resetInactivityTimer() {
+        inactivityTimer.stop();
+        inactivityTimer.setOnFinished(event -> {
+            if (!search.isFocused()) {
+                search.requestFocus();
+            }
+        });
+        inactivityTimer.playFromStart();
+    }
+
+    public void setupActivityListeners(Scene scene) {
+        scene.addEventFilter(MouseEvent.ANY, e -> resetInactivityTimer());
+        scene.addEventFilter(KeyEvent.ANY, e -> search.requestFocus());
+    }
 
     @FXML
     private void handleCheckInClick(ActionEvent event) {
@@ -82,4 +105,11 @@ public class DashboardController implements Initializable {
         // your handling code here, e.g.:
         System.out.println("Settings button clicked!");
     }
+
+    @FXML
+    private void handleCancelClick(MouseEvent event) {
+        // your handling code here, e.g.:
+        search.clear();
+    }
+
 }
