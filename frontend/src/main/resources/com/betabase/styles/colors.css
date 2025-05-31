@@ -1,0 +1,9 @@
+/** colors.css **/
+
+.colors {
+    -fx-base-color: #17341a;
+    -fx-accent-color: #531818;
+    -fx-light-color: #225247;
+    -fx-dark-color: #415773;
+    -fx-text-primary: #d9c7ad;
+}

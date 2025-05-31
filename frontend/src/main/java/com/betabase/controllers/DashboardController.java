@@ -10,12 +10,10 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
-import javafx.stage.Stage;
 import javafx.util.Duration;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
 
 import java.io.IOException;
@@ -25,19 +23,32 @@ import java.util.ResourceBundle;
 public class DashboardController implements Initializable {
 
     @FXML private BorderPane mainPane;
-    @FXML private VBox sidebar;
     @FXML private ImageView logoImage;
     @FXML private TextField search;
 
+    SidebarController sidebarController;
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        // Bind sidebar width to the smaller of 25% of total width or 300px
-        sidebar.prefWidthProperty().bind(
-            Bindings.createDoubleBinding(() -> 
-                Math.min(mainPane.getWidth() * 0.25, 300),
-                mainPane.widthProperty()
-            )
-        );
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/betabase/views/sidebar.fxml"));
+            VBox sidebar = loader.load();
+
+            sidebarController = loader.getController();
+            
+            mainPane.setLeft(sidebar);
+
+            // Bind sidebar width to the smaller of 25% of total width or 300px
+            sidebar.prefWidthProperty().bind(
+                Bindings.createDoubleBinding(() -> 
+                    Math.min(mainPane.getWidth() * 0.25, 300),
+                    mainPane.widthProperty()
+                )
+            );
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
         Platform.runLater(() -> {
             search.requestFocus();
             setupActivityListeners(search.getScene());
@@ -68,42 +79,11 @@ public class DashboardController implements Initializable {
     }
 
     @FXML
-    private void handlePosClick() {
-        try {
-            // Load the POS view
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/betabase/views/pos.fxml"));
-            Parent posRoot = loader.load();
-
-            // Get current stage from any node (e.g., mainPane)
-            Stage stage = (Stage) mainPane.getScene().getWindow();
-
-            // Create a new scene and set it
-            Scene scene = new Scene(posRoot, stage.getWidth(), stage.getHeight());
-            stage.setScene(scene);
-            stage.show();
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    @FXML
     private void handleCalendarClick(ActionEvent event) {
         // your handling code here, e.g.:
-        System.out.println("Calendar button clicked!");
-    }
-
-
-    @FXML
-    private void handleAnalyticsClick(ActionEvent event) {
-        // your handling code here, e.g.:
-        System.out.println("Analytics button clicked!");
-    }
-
-    @FXML
-    private void handleSettingsClick(ActionEvent event) {
-        // your handling code here, e.g.:
-        System.out.println("Settings button clicked!");
+        if (sidebarController != null) {
+            sidebarController.handleCalendarClick(event);
+        }
     }
 
     @FXML
