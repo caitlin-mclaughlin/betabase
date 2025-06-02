@@ -79,7 +79,7 @@ public class DashboardController implements Initializable {
     }
 
     @FXML
-    private void handleCalendarClick(ActionEvent event) {
+    private void handleCalendarClick(MouseEvent event) {
         // your handling code here, e.g.:
         if (sidebarController != null) {
             sidebarController.handleCalendarClick(event);

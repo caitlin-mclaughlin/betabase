@@ -6,7 +6,7 @@
 }
 
 .nav-label {
-    -fx-text-fill: -fx-text-primary;;
+    -fx-text-fill:  -fx-light-color;;
     -fx-font-size: 20px;
     -fx-font-weight: bold;
 }
@@ -19,5 +19,5 @@
 }
 
 .nav-hbox:hover {
-    -fx-background-color: #225247;
+    -fx-background-color: -fx-color-select;
 }

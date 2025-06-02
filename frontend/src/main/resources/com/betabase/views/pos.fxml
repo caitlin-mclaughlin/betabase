@@ -1,9 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.SplitPane?>
 <?import javafx.scene.control.Tab?>
 <?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToolBar?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
 <BorderPane fx:id="mainPane" styleClass="colors"
@@ -11,21 +25,106 @@
             xmlns="http://javafx.com/javafx/23.0.1"
             xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="com.betabase.controllers.PosController"
-            stylesheets="@../styles/colors.css, @../styles/posStyles.css">
+            stylesheets="@../styles/colors.css, @../styles/posStyles.css, @../styles/shared.css">
 
    <center>
-      <SplitPane styleClass="pos" dividerPositions="0.3" BorderPane.alignment="CENTER">
-         <items>
-            <VBox />
+      <SplitPane fx:id="splitPane" dividerPositions="0.5" BorderPane.alignment="CENTER">
+         <VBox>
+            <padding>
+               <Insets bottom="10" left="10" right="10" top="10" />
+            </padding>
+            <HBox styleClass="search-bar">
+               <Label style="-fx-text-fill: -fx-base-color; -fx-font-weight: bold;"
+                        text="Item Lookup" minWidth="110.0" maxWidth="120.0" />
+               <HBox style="-fx-border-color: -fx-base-color; -fx-border-radius: 15px;" 
+                     HBox.hgrow="ALWAYS" >
+                  <ImageView fx:id="search_logo" fitHeight="40.0" preserveRatio="true">
+                     <image>
+                        <Image url="@/com/betabase/images/search.png" />
+                     </image>
+                  </ImageView>
+                  <TextField fx:id="search" styleClass="search-field"
+                             promptText="Search items..." HBox.hgrow="ALWAYS" />
+                  <StackPane style="-fx-cursor: hand; -fx-padding: 1px;"
+                             onMouseClicked="#handleCancelClick">
+                     <ImageView fx:id="cancel_logo" fitHeight="40.0" 
+                                preserveRatio="true">
+                        <image>
+                              <Image url="@/com/betabase/images/cancel.png" />
+                        </image>
+                     </ImageView>
+                  </StackPane>
+               </HBox>
+               <Button text="Search" styleClass="search-button"
+                       minWidth="80.0" maxWidth="105.0" HBox.hgrow="ALWAYS"/>
+            </HBox>
+            <VBox>
+               <padding>
+                  <Insets bottom="10" left="10" right="10" top="10" />
+               </padding>
+               <ListView styleClass="list" VBox.vgrow="ALWAYS" />
+               <Region prefHeight="10" style="-fx-background-color: -fx-light-color" />
+               <VBox  styleClass="list" alignment="CENTER">
+                  <padding>
+                     <Insets bottom="10" left="20" right="20" top="10" />
+                  </padding>
+                  <ListView styleClass="list" prefHeight="150" />
+                  <Region prefHeight="3" style="-fx-background-color: -fx-light-color" />
+                  <HBox>
+                     <Label text="Total" styleClass="item-total" />
+                     <Region HBox.hgrow="ALWAYS" />
+                     <Label styleClass="item-total">
+                        <text><![CDATA[$]]></text>
+                     </Label>
+                  </HBox>
+                  <Button text="CHECKOUT" styleClass="checkout-button" maxWidth="Infinity"/>
+               </VBox>
+            </VBox>
+         </VBox>
+         <StackPane>
             <TabPane tabClosingPolicy="UNAVAILABLE">
                <tabs>
-                  <Tab text="Frequently Used" />
-                  <Tab text="Memberships" />
-                  <Tab text="Gear" />
-                  <Tab text="Merch" />
+                  <Tab fx:id="freq_tab" text="Frequently Used" style="-fx-cursor: hand" />
+                  <Tab fx:id="member_tab" text="Memberships" style="-fx-cursor: hand">
+                     <GridPane hgap="25" vgap="25" VBox.vgrow="NEVER">
+                        <padding>
+                           <Insets bottom="20" left="20" right="10" top="20" />
+                        </padding>
+                        <Button GridPane.rowIndex="0" GridPane.columnIndex="0"
+                              fx:id="day_pass" styleClass="item-button" 
+                              text="Day Pass" style="-fx-background-color: -fx-color-day" />
+                        <Button GridPane.rowIndex="0" GridPane.columnIndex="1"
+                              fx:id="monthly_adult" styleClass="item-button" 
+                              text="Monthly Membership (Adult)" 
+                              style="-fx-background-color: -fx-color-monthly" />
+                        <Button GridPane.rowIndex="1" GridPane.columnIndex="0"
+                              fx:id="monthly_student" styleClass="item-button"
+                              text="Monthly Membership (Student)" 
+                              style="-fx-background-color: -fx-color-monthly" />
+                        <Button GridPane.rowIndex="1" GridPane.columnIndex="1"
+                              fx:id="monthly_service" styleClass="item-button"
+                              text="Monthly Membership (Service Member)"
+                              style="-fx-background-color: -fx-color-monthly" />
+                        <Button GridPane.rowIndex="2" GridPane.columnIndex="0"
+                              fx:id="punch" styleClass="item-button"
+                              text="Punch Card" style="-fx-background-color: -fx-color-punch" />
+                        <Button GridPane.rowIndex="2" GridPane.columnIndex="1"
+                              fx:id="rental" styleClass="item-button"
+                              text="Rentals" style="-fx-background-color: -fx-color-rental" />
+                     </GridPane>
+                  </Tab>
+                  <Tab fx:id="gear_tab" text="Gear" style="-fx-cursor: hand" />
+                  <Tab fx:id="merch_tab" text="Merch" style="-fx-cursor: hand" />
                </tabs>
             </TabPane>
-         </items>
+            <StackPane fx:id="edit_button" StackPane.alignment="TOP_RIGHT" styleClass="edit-button">
+               <ImageView fx:id="edit_logo" fitHeight="40.0" preserveRatio="true">
+                  <image>
+                        <Image url="@/com/betabase/images/edit.png" />
+                  </image>
+               </ImageView>
+            </StackPane>
+         </StackPane>
       </SplitPane>
    </center>
 
