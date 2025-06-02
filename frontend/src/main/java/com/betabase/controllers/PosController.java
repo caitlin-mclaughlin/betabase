@@ -9,6 +9,7 @@ import javafx.scene.control.SplitPane;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
 import java.io.IOException;
@@ -37,7 +38,12 @@ public class PosController implements Initializable {
                 )
             );
 
+            // Highlight POS sidebar button
+            SidebarController sidebarController = loader.getController();
+            sidebarController.setActiveSection("pos");
+
             Platform.runLater(() -> {
+
                 // Set divider position between 35% and (the lower of 750px or 60%) of the screen
                 double minPosition = 0.35;
 

@@ -18,11 +18,11 @@
 .edit-button {
     -fx-background-color: -fx-base-color;
     -fx-border-color: -fx-base-color;
-    -fx-border-insets: 5px;
-    -fx-background-insets: 5px;
+    -fx-border-insets: 6px;
+    -fx-background-insets: 6px;
     -fx-border-radius: 10px;
     -fx-background-radius: 10px;
-    -fx-max-width: 40px;
+    -fx-max-width: 35px;
     -fx-max-height: 40px;
     -fx-cursor: hand;
 }
@@ -111,17 +111,17 @@
     -fx-text-base-color: -fx-base-color;
     -fx-border-color: -fx-color-shadow;
     -fx-alignment: CENTER;
-    -fx-font-size: 21px;
+    -fx-font-size: 20px;
     -fx-font-weight: bold;
     -fx-border-width: 0 0 2 0;
-    -fx-padding: 0 10 10 10;
+    -fx-padding: 0 10 5 10;
 }
 
 .tab-pane .tab:selected {
     -fx-border-color: -fx-base-color;
     -fx-focus-color: transparent;
     -fx-faint-focus-color: transparent;
-    -fx-font-size: 21px;
+    -fx-font-size: 20px;
     -fx-font-weight: bold;
     -fx-border-width: 0 0 3 0;
 }

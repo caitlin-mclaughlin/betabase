@@ -92,25 +92,25 @@
                         </padding>
                         <Button GridPane.rowIndex="0" GridPane.columnIndex="0"
                               fx:id="day_pass" styleClass="item-button" 
-                              text="Day Pass" style="-fx-background-color: -fx-color-day" />
+                              text="Day Pass" style="-fx-background-color: -fx-color-pos2" />
                         <Button GridPane.rowIndex="0" GridPane.columnIndex="1"
                               fx:id="monthly_adult" styleClass="item-button" 
                               text="Monthly Membership (Adult)" 
-                              style="-fx-background-color: -fx-color-monthly" />
+                              style="-fx-background-color: -fx-color-pos1" />
                         <Button GridPane.rowIndex="1" GridPane.columnIndex="0"
                               fx:id="monthly_student" styleClass="item-button"
                               text="Monthly Membership (Student)" 
-                              style="-fx-background-color: -fx-color-monthly" />
+                              style="-fx-background-color: -fx-color-pos1" />
                         <Button GridPane.rowIndex="1" GridPane.columnIndex="1"
                               fx:id="monthly_service" styleClass="item-button"
                               text="Monthly Membership (Service Member)"
-                              style="-fx-background-color: -fx-color-monthly" />
+                              style="-fx-background-color: -fx-color-pos1" />
                         <Button GridPane.rowIndex="2" GridPane.columnIndex="0"
                               fx:id="punch" styleClass="item-button"
-                              text="Punch Card" style="-fx-background-color: -fx-color-punch" />
+                              text="Punch Card" style="-fx-background-color: -fx-color-pos3" />
                         <Button GridPane.rowIndex="2" GridPane.columnIndex="1"
                               fx:id="rental" styleClass="item-button"
-                              text="Rentals" style="-fx-background-color: -fx-color-rental" />
+                              text="Rentals" style="-fx-background-color: -fx-color-pos4" />
                      </GridPane>
                   </Tab>
                   <Tab fx:id="gear_tab" text="Gear" style="-fx-cursor: hand" />
@@ -118,7 +118,7 @@
                </tabs>
             </TabPane>
             <StackPane fx:id="edit_button" StackPane.alignment="TOP_RIGHT" styleClass="edit-button">
-               <ImageView fx:id="edit_logo" fitHeight="40.0" preserveRatio="true">
+               <ImageView fx:id="edit_logo" fitHeight="35.0" preserveRatio="true">
                   <image>
                         <Image url="@/com/betabase/images/edit.png" />
                   </image>

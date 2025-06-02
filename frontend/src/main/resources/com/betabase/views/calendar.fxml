@@ -20,7 +20,7 @@
     <center>
         <VBox style="-fx-background-color: -fx-light-color;">
             <padding>
-                <Insets bottom="10" left="10" right="10" top="10" />
+                <Insets bottom="20" left="20" right="20" top="10" />
             </padding>
             
             <HBox spacing="10" styleClass="date-header">
@@ -30,11 +30,7 @@
                 <Button fx:id="nextButton" text="&gt;" onAction="#handleNextMonth"
                         styleClass="month-button" />
             </HBox>
-            <GridPane fx:id="calendarGrid" hgap="2" vgap="2" styleClass="cal-grid">
-                <padding>
-                    <Insets bottom="2" left="2" right="2" top="2" />
-                </padding>
-
+            <GridPane fx:id="calendarGrid" styleClass="cal-grid" VBox.vgrow="ALWAYS" style="-fx-max-height: Infinity">
                 <columnConstraints>
                     <ColumnConstraints percentWidth="14.2857" />
                     <ColumnConstraints percentWidth="14.2857" />
@@ -44,14 +40,6 @@
                     <ColumnConstraints percentWidth="14.2857" />
                     <ColumnConstraints percentWidth="14.2857" />
                 </columnConstraints>
-                <rowConstraints>
-                    <RowConstraints percentHeight="7"/>
-                    <RowConstraints percentHeight="18.6"/>
-                    <RowConstraints percentHeight="18.6"/>
-                    <RowConstraints percentHeight="18.6"/>
-                    <RowConstraints percentHeight="18.6"/>
-                    <RowConstraints percentHeight="18.6"/>
-                </rowConstraints>
             </GridPane>
         </VBox>
     </center>

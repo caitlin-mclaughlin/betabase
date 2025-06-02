@@ -3,6 +3,9 @@
 .cal-grid {
     -fx-background-color: -fx-base-color;
     -fx-text-fill: -fx-base-color;
+    -fx-hgap: 2px;
+    -fx-vgap: 2px;
+    -fx-padding: 2px;
 }
 
 .date-header {
@@ -24,11 +27,20 @@
     -fx-background-color: -fx-light-color;
     -fx-alignment: TOP_LEFT;
     -fx-padding: 5px;
-    -fx-min-height: 125px;
+    -fx-min-height: 100px;
 }
 
 .calendar-cell:hover {
     -fx-background-color: -fx-color-shadow;
+}
+
+.current-day-cell {
+    -fx-background-color: -fx-color-today;
+    -fx-text-fill: -fx-base-color;
+}
+
+.current-day-cell:hover {
+    -fx-background-color: -fx-color-today;
 }
 
 .month-button {

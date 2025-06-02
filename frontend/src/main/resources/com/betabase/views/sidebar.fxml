@@ -27,7 +27,7 @@
       </image>
    </ImageView>
    <Region prefHeight="10.0" />
-   <HBox styleClass="nav-hbox" onMouseClicked="#handlePosClick">
+   <HBox fx:id="pos" styleClass="nav-hbox" onMouseClicked="#handlePosClick">
       <ImageView fx:id="pos_logo" fitWidth="45.0" preserveRatio="true">
             <image>
                <Image url="@/com/betabase/images/pos.png" />
@@ -35,7 +35,7 @@
       </ImageView>
       <Label fx:id="pos_label" styleClass="nav-label" text="Point of Sale" />
    </HBox>
-   <HBox styleClass="nav-hbox"  onMouseClicked="#handleCalendarClick">
+   <HBox fx:id="cal" styleClass="nav-hbox"  onMouseClicked="#handleCalendarClick">
       <ImageView fx:id="cal_logo" fitWidth="45.0" preserveRatio="true">
             <image>
                <Image url="@/com/betabase/images/cal.png" />
@@ -43,7 +43,7 @@
       </ImageView>
       <Label fx:id="cal_label" styleClass="nav-label" text="Calendar" />
    </HBox>
-   <HBox styleClass="nav-hbox" onMouseClicked="#handleAnalyticsClick">
+   <HBox fx:id="analytics" styleClass="nav-hbox" onMouseClicked="#handleAnalyticsClick">
       <ImageView fx:id="chart_logo" fitWidth="45.0" preserveRatio="true">
             <image>
                <Image url="@/com/betabase/images/chart.png" />
@@ -51,7 +51,7 @@
       </ImageView>
       <Label fx:id="analytics_label" styleClass="nav-label" text="Analytics" />
    </HBox>
-   <HBox styleClass="nav-hbox" onMouseClicked="#handleSettingsClick">
+   <HBox fx:id="settings" styleClass="nav-hbox" onMouseClicked="#handleSettingsClick">
       <ImageView fx:id="gear_logo" fitWidth="45.0" preserveRatio="true">
             <image>
                <Image url="@/com/betabase/images/gear.png" />

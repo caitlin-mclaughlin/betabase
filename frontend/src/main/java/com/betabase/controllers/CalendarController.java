@@ -10,15 +10,15 @@ import javafx.beans.binding.Bindings;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
+import javafx.scene.layout.RowConstraints;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
-import javafx.scene.text.Text;
 
 public class CalendarController implements Initializable {
 
@@ -46,6 +46,10 @@ public class CalendarController implements Initializable {
                 )
             );
 
+            // Highlight Calendar sidebar button
+            SidebarController sidebarController = loader.getController();
+            sidebarController.setActiveSection("cal");
+
             currentYearMonth = YearMonth.now();
             drawCalendar(currentYearMonth);
 
@@ -69,6 +73,8 @@ public class CalendarController implements Initializable {
 
     private void drawCalendar(YearMonth yearMonth) {
         calendarGrid.getChildren().clear();
+        calendarGrid.getRowConstraints().clear();
+
         monthYearLabel.setText(yearMonth.getMonth() + " " + yearMonth.getYear());
 
         // Add day labels
@@ -78,28 +84,48 @@ public class CalendarController implements Initializable {
             StackPane wrapper = new StackPane(dayLabel);
             wrapper.getStyleClass().add("week-header");
             calendarGrid.add(wrapper, col, 0);
+            GridPane.setHgrow(wrapper, Priority.ALWAYS);
+            GridPane.setVgrow(wrapper, Priority.ALWAYS);
         }
 
         LocalDate firstOfMonth = yearMonth.atDay(1);
         int dayOfWeek = firstOfMonth.getDayOfWeek().getValue() % 7; // Sunday = 0
         int daysInMonth = yearMonth.lengthOfMonth();
 
+        int startCol = dayOfWeek;
+        int totalCells = dayOfWeek + daysInMonth;
+        int totalRows = (int) Math.ceil(totalCells / 7.0);
+
+        // Add RowConstraints for each row (including header)
+        RowConstraints headerRow = new RowConstraints();
+        headerRow.setMinHeight(35);
+        headerRow.setPrefHeight(35);
+        headerRow.setMaxHeight(35);
+        headerRow.setVgrow(Priority.NEVER);
+        calendarGrid.getRowConstraints().add(headerRow);
+
+        for (int i = 0; i < totalRows; i++) {
+            RowConstraints rc = new RowConstraints();
+            rc.setVgrow(Priority.ALWAYS);
+            calendarGrid.getRowConstraints().add(rc);
+        }
+
         int row = 1;
-        int col = dayOfWeek;
+        int col = startCol;
+        LocalDate today = LocalDate.now();
 
         for (int day = 1; day <= daysInMonth; day++) {
-            // Create container for cell
             VBox cell = new VBox();
             cell.getStyleClass().add("calendar-cell");
 
-            // Add day number
+            LocalDate thisDate = yearMonth.atDay(day);
+            if (thisDate.equals(today)) {
+                cell.getStyleClass().add("current-day-cell");
+            }
+
             Label dayLabel = new Label(String.valueOf(day));
             dayLabel.getStyleClass().add("day-label");
             cell.getChildren().add(dayLabel);
-
-            // Make cell grow to fill available space
-            GridPane.setHgrow(cell, Priority.ALWAYS);
-            GridPane.setVgrow(cell, Priority.ALWAYS);
 
             calendarGrid.add(cell, col, row);
 
