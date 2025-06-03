@@ -81,7 +81,7 @@
                     </HBox>
                     <Button text="Search" styleClass="search-button" />
                 </HBox>
-                <ListView styleClass="list" VBox.vgrow="ALWAYS" />
+                <ListView fx:id="memberList" styleClass="list" VBox.vgrow="ALWAYS" />
             </VBox>
         </VBox>
     </center>

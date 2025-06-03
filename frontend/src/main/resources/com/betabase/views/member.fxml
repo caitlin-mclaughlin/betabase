@@ -34,76 +34,72 @@
 
    <center>
       <VBox prefHeight="800.0" prefWidth="333.0" BorderPane.alignment="CENTER">
-         <children>
-            <HBox prefHeight="50.0" prefWidth="333.0">
-               <children>
-                  <Label text="Name (Last, First): ">
-                     <font>
-                        <Font size="18.0" />
-                     </font>
-                  </Label>
-                  <Label text=",">
-                     <font>
-                        <Font size="18.0" />
-                     </font>
-                  </Label>
-               </children>
-            </HBox>
-            <HBox prefHeight="50.0" prefWidth="333.0">
-               <children>
-                  <Label text="Phone Number: ">
-                     <font>
-                        <Font size="18.0" />
-                     </font>
-                  </Label>
-                  <Label text="Label">
-                     <font>
-                        <Font size="18.0" />
-                     </font>
-                  </Label>
-               </children>
-            </HBox>
-            <HBox prefHeight="50.0" prefWidth="333.0">
-               <children>
-                  <Label text="Date of Birth: ">
-                     <font>
-                        <Font size="18.0" />
-                     </font>
-                  </Label>
-                  <Label text="Label">
-                     <font>
-                        <Font size="18.0" />
-                     </font>
-                  </Label>
-               </children>
-            </HBox>
-            <HBox prefHeight="50.0" prefWidth="333.0">
-               <children>
-                  <Label text="Member Since: ">
-                     <font>
-                        <Font size="18.0" />
-                     </font>
-                  </Label>
-                  <Label text="Label">
-                     <font>
-                        <Font size="18.0" />
-                     </font>
-                  </Label>
-               </children>
-            </HBox>
-         </children>
+         <HBox prefHeight="50.0" prefWidth="333.0">
+            <Label text="Name (Last, First): ">
+               <font>
+                  <Font size="18.0" />
+               </font>
+            </Label>
+            <Label fx:id="name" />
+         </HBox>
+         <HBox prefHeight="50.0" prefWidth="333.0">
+            <Label text="Phone Number: ">
+               <font>
+                  <Font size="18.0" />
+               </font>
+            </Label>
+            <Label text="Label">
+               <font>
+                  <Font size="18.0" />
+               </font>
+            </Label>
+         </HBox>
+         <HBox prefHeight="50.0" prefWidth="333.0">
+            <Label text="Date of Birth: ">
+               <font>
+                  <Font size="18.0" />
+               </font>
+            </Label>
+            <Label text="Label">
+               <font>
+                  <Font size="18.0" />
+               </font>
+            </Label>
+         </HBox>
+         <HBox prefHeight="50.0" prefWidth="333.0">
+            <Label text="Member ID: ">
+               <font>
+                  <Font size="18.0" />
+               </font>
+            </Label>
+            <Label fx:id="memberId" text="Label">
+               <font>
+                  <Font size="18.0" />
+               </font>
+            </Label>
+         </HBox>
+         <HBox prefHeight="50.0" prefWidth="333.0">
+            <Label text="Member Since: ">
+               <font>
+                  <Font size="18.0" />
+               </font>
+            </Label>
+            <Label text="Label">
+               <font>
+                  <Font size="18.0" />
+               </font>
+            </Label>
+         </HBox>
       </VBox>
    </center>
 
    <right>
       <VBox prefHeight="800.0" prefWidth="333.0" BorderPane.alignment="CENTER">
-         <children>
-            <Label text="Address: ">
-               <font>
-                  <Font size="18.0" />
-               </font>
-            </Label>
-         </children>
+         <Label text="Address: ">
+            <font>
+               <Font size="18.0" />
+            </font>
+         </Label>
       </VBox>
    </right>
 </BorderPane>
