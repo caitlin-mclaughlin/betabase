@@ -1,105 +1,120 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
+<?import javafx.scene.layout.Priority?>
 
-<BorderPane prefHeight="800.0" prefWidth="999.0" 
-            xmlns="http://javafx.com/javafx/23.0.1" 
-            xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="com.betabase.controllers.MemberController">
-   <left>
-      <VBox prefHeight="800.0" prefWidth="333.0" BorderPane.alignment="CENTER">
-         <children>
-            <ImageView fitHeight="361.0" fitWidth="325.0" pickOnBounds="true" preserveRatio="true" />
-            <HBox prefHeight="100.0" prefWidth="333.0">
-               <children>
-                  <Region HBox.hgrow="ALWAYS" />
-                  <Button mnemonicParsing="false" text="Change Photo" wrapText="true">
-                     <font>
-                        <Font size="20.0" />
-                     </font>
-                  </Button>
-                  <Region HBox.hgrow="ALWAYS" />
-               </children>
-            </HBox>
-         </children>
-      </VBox>
-   </left>
+<VBox fx:id="mainPane" styleClass="colors"
+      prefHeight="800.0" prefWidth="1000.0" 
+      xmlns="http://javafx.com/javafx/23.0.1" 
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.betabase.controllers.MemberController"
+      stylesheets="@../styles/colors.css, @../styles/memberStyles.css, @../styles/shared.css">
 
-   <center>
-      <VBox prefHeight="800.0" prefWidth="333.0" BorderPane.alignment="CENTER">
-         <HBox prefHeight="50.0" prefWidth="333.0">
-            <Label text="Name (Last, First): ">
-               <font>
-                  <Font size="18.0" />
-               </font>
-            </Label>
-            <Label fx:id="name" />
-         </HBox>
-         <HBox prefHeight="50.0" prefWidth="333.0">
-            <Label text="Phone Number: ">
-               <font>
-                  <Font size="18.0" />
-               </font>
-            </Label>
-            <Label text="Label">
-               <font>
-                  <Font size="18.0" />
-               </font>
-            </Label>
-         </HBox>
-         <HBox prefHeight="50.0" prefWidth="333.0">
-            <Label text="Date of Birth: ">
-               <font>
-                  <Font size="18.0" />
-               </font>
-            </Label>
-            <Label text="Label">
-               <font>
-                  <Font size="18.0" />
-               </font>
-            </Label>
-         </HBox>
-         <HBox prefHeight="50.0" prefWidth="333.0">
-            <Label text="Member ID: ">
-               <font>
-                  <Font size="18.0" />
-               </font>
-            </Label>
-            <Label fx:id="memberId" text="Label">
-               <font>
-                  <Font size="18.0" />
-               </font>
-            </Label>
-         </HBox>
-         <HBox prefHeight="50.0" prefWidth="333.0">
-            <Label text="Member Since: ">
-               <font>
-                  <Font size="18.0" />
-               </font>
-            </Label>
-            <Label text="Label">
-               <font>
-                  <Font size="18.0" />
-               </font>
-            </Label>
-         </HBox>
-      </VBox>
-   </center>
+   <HBox style="-fx-background-color: -fx-base-color;" alignment="CENTER">
+      <padding>
+         <Insets bottom="10" left="10" right="10" top="10" />
+      </padding>
+      <Label styleClass="user-header" text="Name [ Last, First &quot;Preferred&quot; ]:" />
+      <Region prefWidth = "25.0" />
+      <Label styleClass="user-header" fx:id="nameLabel" style="-fx-font-weight: bold;" />
+   </HBox>
 
-   <right>
-      <VBox prefHeight="800.0" prefWidth="333.0" BorderPane.alignment="CENTER">
-         <Label text="Address: ">
-            <font>
-               <Font size="18.0" />
-            </font>
-         </Label>
+   <HBox style="-fx-max-height: Infinity;" VBox.vgrow="ALWAYS">
+      <VBox style="-fx-background-color: -fx-color-shadow;" spacing="20"
+            alignment="TOP_CENTER">
+         <padding>
+            <Insets bottom="10" left="25" right="25" top="25" />
+         </padding>
+
+         <StackPane style="-fx-border-color: -fx-base-color; -fx-border-width: 2px;"
+              prefWidth="225.0" prefHeight="275.0" alignment="CENTER">
+            <ImageView fx:id="memberPhoto" fitWidth="225.0" fitHeight="275.0"
+                     pickOnBounds="true" preserveRatio="true" />
+         </StackPane>
+         <Button styleClass="photo-button" mnemonicParsing="false" text="Change Photo" />
       </VBox>
-   </right>
-</BorderPane>
+      
+      <VBox style="-fx-background-color: -fx-light-color;" HBox.hgrow="ALWAYS">
+         <padding>
+            <Insets bottom="10" left="10" right="10" top="10" />
+         </padding>
+
+         <Label styleClass="user-prompt" text="Gender:" />
+         <Label styleClass="user-info" fx:id="genderLabel" text="Label" alignment="CENTER" />
+         <Region styleClass="separator" style="-fx-background-color: -fx-color-shadow;" />
+
+         <Label styleClass="user-prompt" text="Phone Number:" />
+         <Label styleClass="user-info" fx:id="phoneLabel" text="Label" alignment="CENTER" />
+         <Region styleClass="separator" style="-fx-background-color: -fx-color-shadow;" />
+
+         <Label styleClass="user-prompt" text="Email:" />
+         <Label styleClass="user-info" fx:id="emailLabel" text="Label" alignment="CENTER" />
+         <Region styleClass="separator" style="-fx-background-color: -fx-color-shadow;" />
+
+         <Label styleClass="user-prompt" text="Date of Birth:" />
+         <Label styleClass="user-info" fx:id="dobLabel" text="Label" alignment="CENTER" />
+         <Region styleClass="separator" style="-fx-background-color: -fx-color-shadow;" />
+
+         <Label styleClass="user-prompt" text="Member ID:" />
+         <Label styleClass="user-info" fx:id="memberIdLabel" text="Label" alignment="CENTER" />
+         <Region styleClass="separator" style="-fx-background-color: -fx-color-shadow;" />
+
+         <Label styleClass="user-prompt" text="Member Since:" />
+         <Label styleClass="user-info" fx:id="memberSinceLabel" text="Label" alignment="CENTER" />
+         <Region styleClass="separator" style="-fx-background-color: -fx-color-shadow;" />
+      </VBox>
+      
+      <VBox style="-fx-background-color: -fx-light-color;" HBox.hgrow="ALWAYS">
+         <padding>
+            <Insets bottom="10" left="10" right="10" top="10" />
+         </padding>
+
+         <Label styleClass="user-prompt" text="Billing Preference:" />
+         <Label styleClass="user-info" fx:id="billingLabel" text="Label" alignment="CENTER" />
+         <Region styleClass="separator" style="-fx-background-color: -fx-color-shadow;" />
+      
+         <Label styleClass="user-prompt" text="Address:" />
+         <Label styleClass="user-info" fx:id="addressLabel" text="Label" alignment="CENTER" />
+         <Region styleClass="separator" style="-fx-background-color: -fx-color-shadow;" />
+
+         <Label styleClass="user-prompt" text="Emergency Contact Name: " />
+         <Label styleClass="user-info" fx:id="eNameLabel" text="Label" alignment="CENTER" />
+         <Region styleClass="separator" style="-fx-background-color: -fx-color-shadow;" />
+
+         <Label styleClass="user-prompt" text="Emergency Contact Phone Number: " />
+         <Label styleClass="user-info" fx:id="ePhoneLabel" text="Label" alignment="CENTER" />
+         <Region styleClass="separator" style="-fx-background-color: -fx-color-shadow;" />
+
+         <Label styleClass="user-prompt" text="Emergency Contact Email: " />
+         <Label styleClass="user-info" fx:id="eEmailLabel" text="Label" alignment="CENTER" />
+         <Region styleClass="separator" style="-fx-background-color: -fx-color-shadow;" />
+
+         <Region VBox.vgrow="ALWAYS" />
+         <HBox alignment="CENTER_RIGHT">
+            <Button text="Check In" styleClass="check-in-button" />
+            <Region prefWidth="20" />
+            <Button text="Check Out" styleClass="check-out-button" />
+            <Region prefWidth="20" />
+            <Button fx:id="edit_button" styleClass="edit-button">
+               <graphic> 
+                  <ImageView fx:id="edit_logo" fitHeight="40.0" preserveRatio="true">
+                     <image>
+                           <Image url="@/com/betabase/images/edit.png" />
+                     </image>
+                  </ImageView>
+               </graphic>
+            </Button>
+         </HBox>
+      </VBox>
+   </HBox>
+</VBox>

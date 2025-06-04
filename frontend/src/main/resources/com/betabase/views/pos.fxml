@@ -62,14 +62,14 @@
                <padding>
                   <Insets bottom="10" left="10" right="10" top="10" />
                </padding>
-               <ListView styleClass="list" VBox.vgrow="ALWAYS" />
+               <ListView VBox.vgrow="ALWAYS" />
                <Region prefHeight="10" style="-fx-background-color: -fx-light-color" />
-               <VBox  styleClass="list" alignment="CENTER">
+               <VBox styleClass="list-view" alignment="CENTER">
                   <padding>
                      <Insets bottom="10" left="20" right="20" top="10" />
                   </padding>
-                  <ListView styleClass="list" prefHeight="150" />
-                  <Region prefHeight="3" style="-fx-background-color: -fx-light-color" />
+                  <ListView prefHeight="150" />
+                  <Region styleClass="separator" />
                   <HBox>
                      <Label text="Total" styleClass="item-total" />
                      <Region HBox.hgrow="ALWAYS" />
@@ -118,6 +118,9 @@
                </tabs>
             </TabPane>
             <StackPane fx:id="edit_button" StackPane.alignment="TOP_RIGHT" styleClass="edit-button">
+               <StackPane.margin>
+                  <Insets top="5" right="5" />
+               </StackPane.margin>
                <ImageView fx:id="edit_logo" fitHeight="35.0" preserveRatio="true">
                   <image>
                         <Image url="@/com/betabase/images/edit.png" />

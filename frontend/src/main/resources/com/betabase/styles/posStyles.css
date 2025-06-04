@@ -15,23 +15,6 @@
     -fx-background-color: -fx-color-selecta;
 }
 
-.edit-button {
-    -fx-background-color: -fx-base-color;
-    -fx-border-color: -fx-base-color;
-    -fx-border-insets: 6px;
-    -fx-background-insets: 6px;
-    -fx-border-radius: 10px;
-    -fx-background-radius: 10px;
-    -fx-max-width: 35px;
-    -fx-max-height: 40px;
-    -fx-cursor: hand;
-}
-
-.edit-button:hover {
-    -fx-background-color: -fx-color-select;
-    -fx-border-color: -fx-color-select;
-}
-
 .item-button {
     -fx-text-fill: -fx-light-color;
     -fx-font-size: 20px;

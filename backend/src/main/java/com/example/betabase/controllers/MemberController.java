@@ -25,16 +25,20 @@ public class MemberController {
             .orElse(ResponseEntity.notFound().build());
     }
 
-    @GetMapping("/search")
-    public ResponseEntity<List<Member>> searchMembers(@RequestParam String q) {
-        List<Member> results = service.search(q);
-        return ResponseEntity.ok(results);
-    }
-
-
     @PostMapping
     public Member createMember(@RequestBody Member member) {
         return service.save(member);
+    }
+
+    @GetMapping
+    public ResponseEntity<List<Member>> getAllMembers() {
+        return ResponseEntity.ok(service.getAllMembers());
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<List<Member>> searchMembers(@RequestParam String query) {
+        List<Member> results = service.search(query);
+        return ResponseEntity.ok(results);
     }
 
 }

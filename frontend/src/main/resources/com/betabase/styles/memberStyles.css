@@ -1,0 +1,67 @@
+/** memberStyles.css **/
+
+.check-in-button {
+    -fx-background-color: -fx-base-color;
+    -fx-text-fill: -fx-light-color;
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 10px;
+    -fx-border-radius: 10px;
+    -fx-min-height: 40px;
+    -fx-min-width: 125px;
+}
+
+.check-in-button:hover {
+    -fx-background-color: -fx-color-select;
+}
+
+.check-out-button {
+    -fx-background-color: -fx-accent-color;
+    -fx-text-fill: -fx-light-color;
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 10px;
+    -fx-border-radius: 10px;
+    -fx-min-height: 40px;
+    -fx-min-width: 125px;
+}
+
+.check-out-button:hover {
+    -fx-background-color: -fx-color-selecta;
+}
+
+.photo-button {
+    -fx-background-color: -fx-base-color;
+    -fx-text-fill: -fx-color-shadow;
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 10px;
+    -fx-border-radius: 10px;
+    -fx-padding: 5 20 5 20;
+    -fx-min-height: 40px;
+    -fx-alignment: CENTER;
+}
+
+.photo-button:hover {
+    -fx-background-color: -fx-color-select;
+    -fx-wrap-text: true;
+}
+
+
+.user-info {
+    -fx-text-fill: -fx-base-color;
+    -fx-font-size: 18px;
+}
+
+.user-prompt {
+    -fx-text-fill: -fx-base-color;
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+    -fx-min-width: 250px;
+}
+
+.user-header {
+    -fx-text-fill: -fx-light-color;
+    -fx-font-size: 22px;
+    -fx-font-weight: bold;
+}

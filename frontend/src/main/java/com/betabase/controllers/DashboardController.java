@@ -1,60 +1,112 @@
 package com.betabase.controllers;
-import com.betabase.models.Member;
 
-import javafx.event.ActionEvent;
+import com.betabase.models.Member;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import javafx.animation.PauseTransition;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.geometry.Insets;
+import javafx.scene.Scene;
+import javafx.scene.control.Label;
+import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.VBox;
-import javafx.util.Duration;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.Scene;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Region;
+import javafx.scene.layout.VBox;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
+import javafx.util.Duration;
 
 import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.net.URL;
+import java.net.URI;
 import java.net.URLEncoder;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
+import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
-
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class DashboardController implements Initializable {
 
     @FXML private BorderPane mainPane;
     @FXML private ImageView logoImage;
     @FXML private TextField search;
-    @FXML private ListView<String> memberList;
+    @FXML private ListView<Member> memberList;
 
-    SidebarController sidebarController;
+    private SidebarController sidebarController;
+    private final HttpClient httpClient = HttpClient.newHttpClient();
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/betabase/views/sidebar.fxml"));
             VBox sidebar = loader.load();
-
             sidebarController = loader.getController();
-            
             mainPane.setLeft(sidebar);
 
-            // Bind sidebar width to the smaller of 25% of total width or 300px
             sidebar.prefWidthProperty().bind(
-                Bindings.createDoubleBinding(() -> 
+                Bindings.createDoubleBinding(() ->
                     Math.min(mainPane.getWidth() * 0.25, 300),
                     mainPane.widthProperty()
                 )
             );
+
+            // ListView setup to maintain style during backend integration
+            memberList.setCellFactory(lv -> new ListCell<>() {
+                private final Label nameLabel = new Label();
+                private final Label phoneLabel = new Label();
+                private final Label emailLabel = new Label();
+                private final Region separator = new Region();
+                private final HBox content = new HBox(50);
+                private final VBox container = new VBox();
+
+                {
+                    // Consistent column widths (optional: use fixed width or HGrow)
+                    nameLabel.setMinWidth(150);
+                    phoneLabel.setMinWidth(125);
+                    emailLabel.setMinWidth(200);
+
+                    // Add style classes if desired
+                    nameLabel.getStyleClass().add("list-label");
+                    phoneLabel.getStyleClass().add("list-label");
+                    emailLabel.getStyleClass().add("list-label");
+
+                    // Add labels to row
+                    content.getChildren().addAll(nameLabel, phoneLabel, emailLabel);
+                    content.setPadding(new Insets(5));
+
+                    separator.getStyleClass().add("separator");
+                    container.getChildren().addAll(content, separator);
+                }
+
+                @Override
+                protected void updateItem(Member member, boolean empty) {
+                    super.updateItem(member, empty);
+                    if (empty || member == null) {
+                        setText(null);
+                        setGraphic(null);
+                    } else {
+                        nameLabel.setText(member.getLastName() + ", " + member.getFirstName()
+                                          + " (" + member.getPrefName() + ")");
+                        phoneLabel.setText(member.getPhoneNumber());
+                        emailLabel.setText(member.getEmail());
+
+                        setText(null);
+                        setGraphic(container);
+                    }
+                }
+            });
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -63,14 +115,22 @@ public class DashboardController implements Initializable {
             search.requestFocus();
             setupActivityListeners(search.getScene());
 
-            search.textProperty().addListener((observable, oldValue, newValue) -> {
-                if (!newValue.isEmpty()) {
-                    performSearch(newValue);
+            search.textProperty().addListener((obs, oldVal, newVal) -> {
+                if (!newVal.isEmpty()) {
+                    performSearch(newVal);
                 } else {
                     memberList.getItems().clear();
                 }
             });
 
+            memberList.setOnMouseClicked(event -> {
+                if (event.getClickCount() == 2) { // double-click
+                    Member selected = memberList.getSelectionModel().getSelectedItem();
+                    if (selected != null) {
+                        openMemberWindow(selected);
+                    }
+                }
+            });
         });
     }
 
@@ -92,14 +152,12 @@ public class DashboardController implements Initializable {
     }
 
     @FXML
-    private void handleCheckInClick(ActionEvent event) {
-        // your handling code here, e.g.:
+    private void handleCheckInClick(javafx.event.ActionEvent event) {
         System.out.println("Check In button clicked!");
     }
 
     @FXML
     private void handleCalendarClick(MouseEvent event) {
-        // your handling code here, e.g.:
         if (sidebarController != null) {
             sidebarController.handleCalendarClick(event);
         }
@@ -107,25 +165,30 @@ public class DashboardController implements Initializable {
 
     @FXML
     private void handleCancelClick(MouseEvent event) {
-        // your handling code here, e.g.:
         search.clear();
     }
 
     private void performSearch(String query) {
         new Thread(() -> {
             try {
-                String encodedQuery = URLEncoder.encode(query, StandardCharsets.UTF_8);
-                URL url = new URL("http://localhost:8080/api/members/search?query=" + encodedQuery);
-                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-                conn.setRequestMethod("GET");
+                String encoded = URLEncoder.encode(query, StandardCharsets.UTF_8);
+                URI uri = URI.create("http://localhost:8080/api/members/search?query=" + encoded);
 
-                if (conn.getResponseCode() == 200) {
+                HttpRequest request = HttpRequest.newBuilder()
+                        .uri(uri)
+                        .GET()
+                        .build();
+
+                HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+
+                if (response.statusCode() == 200) {
                     ObjectMapper mapper = new ObjectMapper();
-                    List<Member> members = mapper.readValue(conn.getInputStream(), new TypeReference<>() {});
+                    List<Member> members = mapper.readValue(response.body(), new TypeReference<>() {});
                     Platform.runLater(() -> updateListView(members));
                 } else {
-                    System.err.println("Search failed with code: " + conn.getResponseCode());
+                    System.err.println("Search failed with code: " + response.statusCode());
                 }
+
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -134,13 +197,25 @@ public class DashboardController implements Initializable {
 
     private void updateListView(List<Member> members) {
         memberList.getItems().clear();
-        for (Member member : members) {
-            String display = String.format("%s, %s (%s)", 
-                member.getLastName(), 
-                member.getFirstName(), 
-                member.getPrefName() != null ? member.getPrefName() : "");
-            memberList.getItems().add(display);
-        }
+        memberList.getItems().addAll(members);
     }
 
+    private void openMemberWindow(Member member) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/betabase/views/member.fxml"));
+            VBox root = loader.load();
+
+            MemberController controller = loader.getController();
+            controller.setMember(member);
+
+            Stage stage = new Stage();
+            stage.setTitle("Member Details");
+            stage.setScene(new Scene(root));
+            stage.initModality(Modality.APPLICATION_MODAL); // Block input to other windows
+            stage.showAndWait();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 }

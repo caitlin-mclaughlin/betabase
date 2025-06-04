@@ -32,6 +32,10 @@ public class MemberService {
         return repo.save(member);
     }
 
+    public List<Member> getAllMembers() {
+        return repo.findAll();
+    }
+
     public Member getMemberById(String memberId) throws IOException {
         try {
             URI uri = new URI("http", null, "localhost", 8080, "/api/members/checkin/" + memberId, null, null);

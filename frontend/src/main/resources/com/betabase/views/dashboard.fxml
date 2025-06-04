@@ -46,7 +46,7 @@
                     </ImageView>
                     <Label onMouseClicked="#handleCalendarClick" styleClass="schedule-label" text="Today's Schedule" />
                 </HBox>
-                <ListView styleClass="list" style="-fx-max-height: 200px;" />
+                <ListView style="-fx-max-height: 200px;" />
             </VBox>
             <VBox VBox.vgrow="ALWAYS">
                 <HBox alignment="CENTER_LEFT" spacing="20">
@@ -81,7 +81,7 @@
                     </HBox>
                     <Button text="Search" styleClass="search-button" />
                 </HBox>
-                <ListView fx:id="memberList" styleClass="list" VBox.vgrow="ALWAYS" />
+                <ListView fx:id="memberList" VBox.vgrow="ALWAYS" />
             </VBox>
         </VBox>
     </center>
