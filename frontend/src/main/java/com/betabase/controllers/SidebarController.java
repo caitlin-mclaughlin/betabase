@@ -3,6 +3,8 @@ package com.betabase.controllers;
 import java.io.IOException;
 import java.util.List;
 
+import com.betabase.utils.SceneManager;
+
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -19,10 +21,10 @@ public class SidebarController {
     
     @FXML private VBox sidebar;
     @FXML private ImageView logo;
-    @FXML private Label analytics_label;
-    @FXML private Label cal_label;
-    @FXML private Label pos_label;
-    @FXML private Label settings_label;
+    @FXML private Label analyticsLabel;
+    @FXML private Label calLabel;
+    @FXML private Label posLabel;
+    @FXML private Label settingsLabel;
     @FXML private HBox analytics;
     @FXML private HBox cal;
     @FXML private HBox pos;
@@ -30,18 +32,8 @@ public class SidebarController {
 
     @FXML
     private void handleLogoClick(MouseEvent event) {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/betabase/views/dashboard.fxml"));
-            Parent dashRoot = loader.load();
-
-            Stage stage = (Stage) ((ImageView) event.getSource()).getScene().getWindow();
-            Scene scene = new Scene(dashRoot, stage.getWidth(), stage.getHeight());
-            stage.setScene(scene);
-            stage.show();
-            
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        SceneManager.switchScene((Stage) ((ImageView) event.getSource()).getScene().getWindow(), 
+                        "/com/betabase/views/dashboard.fxml");
     }
 
     public void setActiveSection(String section) {
@@ -68,66 +60,26 @@ public class SidebarController {
 
     @FXML
     private void handlePosClick(MouseEvent event) {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/betabase/views/pos.fxml"));
-            Parent posRoot = loader.load();
-
-            Stage stage = (Stage) pos_label.getScene().getWindow();
-            Scene scene = new Scene(posRoot, stage.getWidth(), stage.getHeight());
-            stage.setScene(scene);
-            stage.show();
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        SceneManager.switchScene((Stage) posLabel.getScene().getWindow(), 
+                        "/com/betabase/views/pos.fxml");
     }
 
     @FXML
     protected void handleCalendarClick(MouseEvent event) {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/betabase/views/calendar.fxml"));
-            Parent calRoot = loader.load();
-
-            Stage stage = (Stage) cal_label.getScene().getWindow();
-            Scene scene = new Scene(calRoot, stage.getWidth(), stage.getHeight());
-            stage.setScene(scene);
-            stage.show();
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        SceneManager.switchScene((Stage) calLabel.getScene().getWindow(),
+                        "/com/betabase/views/calendar.fxml");
     }
 
     @FXML
     private void handleAnalyticsClick(MouseEvent event) {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/betabase/views/analytics.fxml"));
-            Parent analyticsRoot = loader.load();
-
-            Stage stage = (Stage) analytics_label.getScene().getWindow();
-            Scene scene = new Scene(analyticsRoot, stage.getWidth(), stage.getHeight());
-            stage.setScene(scene);
-            stage.show();
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        SceneManager.switchScene((Stage) analyticsLabel.getScene().getWindow(),
+                        "/com/betabase/views/analytics.fxml");
     }
 
     @FXML
     private void handleSettingsClick(MouseEvent event) {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/betabase/views/settings.fxml"));
-            Parent settingsRoot = loader.load();
-
-            Stage stage = (Stage) settings_label.getScene().getWindow();
-            Scene scene = new Scene(settingsRoot, stage.getWidth(), stage.getHeight());
-            stage.setScene(scene);
-            stage.show();
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        SceneManager.switchScene((Stage) settingsLabel.getScene().getWindow(),
+                        "/com/betabase/views/settings.fxml");
     }
 
 }

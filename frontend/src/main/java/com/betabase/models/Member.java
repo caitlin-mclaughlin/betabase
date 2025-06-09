@@ -1,6 +1,8 @@
 package com.betabase.models;
 
 import java.time.LocalDate;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Member {
     private Long id;
@@ -27,7 +29,7 @@ public class Member {
     private String emergencyContactPhone;
     private String emergencyContactEmail;
 
-    // Getters and setters
+    // Validated getters and setters (EXCEPT DATES)
     public Long getId() { return (id != null ? id : 0); }
     public void setId(Long id) { this.id = id; }
 
@@ -41,17 +43,61 @@ public class Member {
     public void setPrefName(String prefName) { this.prefName = prefName; }
 
     public String getPronouns() { return (pronouns != null ? pronouns : " / "); }
-    public void setPronouns(String pronouns) { this.pronouns = pronouns; }
+    public void setPronouns(String pronouns) { 
+        if (pronouns == null || pronouns.isBlank()) {
+            this.pronouns = "Prefer Not to Answer";
+        } else {
+            this.pronouns = switch (pronouns.toLowerCase()) {
+                case "she / her" -> "she / her";
+                case "he / him" -> "he / him";
+                case "they / them" -> "they / them";
+                case "she / they" -> "she / they";
+                case "he / they" -> "he / they";
+                default -> "Prefer Not to Answer";
+            };
+        }
+     }
 
-    public String getGender() { return (gender != null ? gender : ""); }
-    public void setGender(String gender) { this.gender = gender; }
+    public String getGender() { return gender; }
+    public void setGender(String gender) { 
+        if (gender == null || gender.isBlank()) {
+            this.gender = "Prefer Not to Answer";
+        } else {
+            this.gender = switch (gender.toLowerCase()) {
+                case "female" -> "Female";
+                case "male" -> "Male";
+                case "nonbinary" -> "Nonbinary";
+                default -> "Prefer Not to Answer";
+            };
+        } 
+    }
 
-    public String getPhoneNumber() { return (phoneNumber != null ? phoneNumber : ""); }
-    public void setPhoneNumber(String phoneNumber) { this.phoneNumber = phoneNumber; }
+    public String getPhoneNumber() { 
+        return phoneNumber.equals("Invalid") ? phoneNumber :
+                                            "(" + phoneNumber.substring(0,3) +
+                                            ") " + phoneNumber.substring(3,6) +
+                                            "-" + phoneNumber.substring(6); }
+    public void setPhoneNumber(String phoneNumber) { 
+        String digits = phoneNumber.replaceAll("[^\\d]", "");
+        if (!Pattern.compile("\\d{10}").matcher(digits).matches()) {
+            this.phoneNumber = "Invalid";
+        } else {
+            this.phoneNumber = digits;
+        }
+    }
 
-    public String getEmail() { return (email != null ? email : ""); }
-    public void setEmail(String email) { this.email = email; }
+    public String getEmail() { return email; }
+    public void setEmail(String email) { 
+        if (email == null || email.isBlank()) {
+            this.email = "Unset";
+        } else  if (!Pattern.compile("^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$").matcher(email).matches()) {
+            this.email = "Invalid";
+        } else {
+            this.email = email;
+        } 
+     }
 
+    // UNVALIDATED
     public LocalDate getDateOfBirth() { return dateOfBirth; }
     public void setDateOfBirth(LocalDate dateOfBirth) { this.dateOfBirth = dateOfBirth; }
 
@@ -61,14 +107,37 @@ public class Member {
     public String getMemberId() { return (memberId != null ? memberId : ""); }
     public void setMemberId(String memberId) { this.memberId = memberId; }
 
+    // UNVALIDATED
     public LocalDate getMemberSince() { return (memberSince);}// != null ? memberSince : ""); }
     public void setMemberSince(LocalDate memberSince) { this.memberSince = memberSince; }
 
-    public String getStatus() { return (status != null ? status : ""); }
-    public void setStatus(String status) { this.status = status; }
+    public String getStatus() { return status; }
+    public void setStatus(String status) { 
+        if (status == null || status.isBlank()) {
+            this.status = "UNSET";
+        } else {
+            this.status = switch (status.toUpperCase()) {
+                case "ADMIN" -> "ADMIN";
+                case "STAFF" -> "STAFF";
+                case "MEMBER" -> "MEMBER";
+                case "VISITOR" -> "VISITOR";
+                default -> "UNSET";
+            };
+        }
+    }
 
-    public String getBillingMethod() { return (billingMethod != null ? billingMethod : ""); }
-    public void setBillingMethod(String billingMethod) { this.billingMethod = billingMethod; }
+    public String getBillingMethod() { return billingMethod; }
+    public void setBillingMethod(String billingMethod) { 
+        if (billingMethod == null || billingMethod.isBlank()) {
+            this.billingMethod = "Unset";
+        } else {
+            this.billingMethod = switch (billingMethod.toLowerCase()) {
+                case "card" -> "Card";
+                case "cash" -> "Cash";
+                default -> "Unset";
+            };
+        } 
+    }
 
     public String getAddress() { return (address != null ? address : ""); }
     public void setAddress(String address) { this.address = address; }
@@ -76,9 +145,24 @@ public class Member {
     public String getEmergencyContactName() { return (emergencyContactName != null ? emergencyContactName : ""); }
     public void setEmergencyContactName(String emergencyContactName) { this.emergencyContactName = emergencyContactName; }
 
-    public String getEmergencyContactPhone() { return (emergencyContactPhone != null ? emergencyContactPhone : ""); }
-    public void setEmergencyContactPhone(String emergencyContactPhone) { this.emergencyContactPhone = emergencyContactPhone; }
+    public String getEmergencyContactPhone() { return emergencyContactPhone; }
+    public void setEmergencyContactPhone(String emergencyContactPhone) { 
+        String digits = emergencyContactPhone.replaceAll("[^\\d]", "");
+        if (!Pattern.compile("\\d{10}").matcher(digits).matches()) {
+            this.emergencyContactPhone = "Invalid";
+        } else {
+            this.emergencyContactPhone = digits;
+        }
+     }
 
-    public String getEmergencyContactEmail() { return (emergencyContactEmail != null ? emergencyContactEmail : ""); }
-    public void setEmergencyContactEmail(String emergencyContactEmail) { this.emergencyContactEmail = emergencyContactEmail; }
+    public String getEmergencyContactEmail() { return emergencyContactEmail; }
+    public void setEmergencyContactEmail(String emergencyContactEmail) { 
+        if (emergencyContactEmail == null || emergencyContactEmail.isBlank()) {
+            this.emergencyContactEmail = "Unset";
+        } else  if (!Pattern.compile("^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$").matcher(emergencyContactEmail).matches()) {
+            this.emergencyContactEmail = "Invalid";
+        } else {
+            this.emergencyContactEmail = emergencyContactEmail;
+        } 
+     }
 }

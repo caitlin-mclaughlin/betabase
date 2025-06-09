@@ -16,8 +16,8 @@ public class Main extends Application {
 
         // Get screen bounds
         Rectangle2D screenBounds = Screen.getPrimary().getVisualBounds();
-        double width = screenBounds.getWidth() * 0.75;
-        double height = screenBounds.getHeight() * 0.75;
+        double width = screenBounds.getWidth() * 0.8;
+        double height = screenBounds.getHeight() * 0.8;
 
         // Set scene with calculated dimensions
         Scene scene = new Scene(root, width, height);

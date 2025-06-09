@@ -35,5 +35,19 @@ public class MemberApiService {
             return null;
         }
     }
+
+    public boolean updateMember(Member member) throws Exception {
+        String requestBody = mapper.writeValueAsString(member);
+
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(BASE_URL + "/" + member.getMemberId()))
+                .POST(HttpRequest.BodyPublishers.ofString(requestBody))
+                .header("Content-Type", "application/json")
+                .build();
+
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        return response.statusCode() == 200;
+    }
+
 }
 

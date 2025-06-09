@@ -1,0 +1,27 @@
+/** sidebarStyles.css **/
+
+.sidebar {
+    -fx-background-color: -fx-base-color;
+    -fx-pref-width: 220px;
+}
+
+.sidebar-active {
+    -fx-background-color: -fx-color-select;
+}
+
+.nav-label {
+    -fx-text-fill:  -fx-light-color;;
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+}
+
+.nav-hbox {
+    -fx-alignment: CENTER_LEFT;
+    -fx-padding: 15 20 15 20;
+    -fx-spacing: 15px;
+    -fx-cursor: hand;
+}
+
+.nav-hbox:hover {
+    -fx-background-color: -fx-color-select;
+}

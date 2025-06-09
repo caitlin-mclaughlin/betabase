@@ -1,0 +1,81 @@
+/** dashStyles.css **/
+
+.dashboard {
+    -fx-background-color:  -fx-light-color;
+}
+
+.clock-in-button {
+    -fx-background-color: -fx-base-color;
+    -fx-text-fill:  -fx-light-color;
+    -fx-font-size: 30px;
+    -fx-font-weight: bold;
+    -fx-max-width: 200px;
+    -fx-background-radius: 10;
+    -fx-cursor: hand;
+}
+
+.clock-in-button:hover {
+    -fx-background-color:-fx-color-select;
+}
+
+.clock-out-button {
+    -fx-background-color: -fx-accent-color;
+    -fx-text-fill:  -fx-light-color;
+    -fx-font-size: 30px;
+    -fx-font-weight: bold;
+    -fx-max-width: 200px;
+    -fx-background-radius: 10;
+    -fx-cursor: hand;
+}
+
+.clock-out-button:hover {
+    -fx-background-color: -fx-color-selecta;
+}
+
+.welcome-label {
+    -fx-text-fill: -fx-base-color;
+    -fx-font-size: 60px;
+    -fx-font-weight: bold;
+    -fx-font-style: oblique;
+    -fx-padding: 15 15 5 15;
+}
+
+.schedule-label {
+    -fx-text-fill: -fx-base-color;
+    -fx-font-size: 35px;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+}
+
+.search-bar {
+    -fx-background-color:  -fx-light-color;
+    -fx-text-fill: -fx-base-color;
+    -fx-font-size: 20px;
+    -fx-max-height: 50px;
+    -fx-padding: 0 0 10 10;
+    -fx-spacing: 10px;
+    -fx-alignment: CENTER_LEFT;
+}
+
+.search-field {
+    -fx-background-color:  -fx-light-color;
+    -fx-prompt-text-fill: -fx-color-prompt;
+    -fx-text-fill: -fx-base-color;
+    -fx-font-size: 20px;
+    -fx-max-height: 30px;
+}
+
+.search-button {
+    -fx-background-color: -fx-base-color;
+    -fx-text-fill:  -fx-light-color;
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+    -fx-max-height: 30px;
+    -fx-border-radius: 15px;
+    -fx-background-radius: 15px;
+    -fx-cursor: hand;
+}
+
+.search-button:hover {
+    -fx-background-color:-fx-color-select;
+}

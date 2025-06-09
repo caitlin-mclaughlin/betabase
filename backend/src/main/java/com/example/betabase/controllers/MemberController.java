@@ -41,4 +41,17 @@ public class MemberController {
         return ResponseEntity.ok(results);
     }
 
+
+    @PostMapping("/{memberId}")
+    public ResponseEntity<Member> updateMember(@PathVariable String memberId, @RequestBody Member updatedMember) {
+        Member existing = service.getMemberById(memberId);
+        if (existing != null) {
+            updatedMember.setId(existing.getId()); // Keep same Member ID
+            Member saved = service.save(updatedMember);
+            return ResponseEntity.ok(saved);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
 }

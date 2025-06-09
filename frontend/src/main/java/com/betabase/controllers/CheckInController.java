@@ -9,7 +9,7 @@ import java.io.IOException;
 
 public class CheckInController {
 
-    MemberApiService apiService = new MemberApiService();
+    MemberApiService apiService;
     private Label memberId;
     private Label name;
 

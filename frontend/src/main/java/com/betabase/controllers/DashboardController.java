@@ -1,6 +1,8 @@
 package com.betabase.controllers;
 
 import com.betabase.models.Member;
+import com.betabase.services.MemberApiService;
+import com.betabase.utils.SceneManager;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import javafx.animation.PauseTransition;
@@ -65,6 +67,7 @@ public class DashboardController implements Initializable {
             // ListView setup to maintain style during backend integration
             memberList.setCellFactory(lv -> new ListCell<>() {
                 private final Label nameLabel = new Label();
+                private final Label memberIdLabel = new Label();
                 private final Label phoneLabel = new Label();
                 private final Label emailLabel = new Label();
                 private final Region separator = new Region();
@@ -72,18 +75,24 @@ public class DashboardController implements Initializable {
                 private final VBox container = new VBox();
 
                 {
-                    // Consistent column widths (optional: use fixed width or HGrow)
-                    nameLabel.setMinWidth(150);
-                    phoneLabel.setMinWidth(125);
-                    emailLabel.setMinWidth(200);
-
-                    // Add style classes if desired
+                    // Add style classes
                     nameLabel.getStyleClass().add("list-label");
+                    memberIdLabel.getStyleClass().add("list-label");
                     phoneLabel.getStyleClass().add("list-label");
                     emailLabel.getStyleClass().add("list-label");
 
+                    // Consistent column widths
+                    nameLabel.setMinWidth(150);
+                    nameLabel.setMaxWidth(200);
+                    memberIdLabel.setMinWidth(100);
+                    memberIdLabel.setMinWidth(150);
+                    phoneLabel.setMinWidth(125);
+                    phoneLabel.setMinWidth(175);
+                    emailLabel.setMinWidth(200);
+                    emailLabel.setMinWidth(250);
+
                     // Add labels to row
-                    content.getChildren().addAll(nameLabel, phoneLabel, emailLabel);
+                    content.getChildren().addAll(nameLabel, memberIdLabel, phoneLabel, emailLabel);
                     content.setPadding(new Insets(5));
 
                     separator.getStyleClass().add("separator");
@@ -107,6 +116,8 @@ public class DashboardController implements Initializable {
                     }
                 }
             });
+            memberList.setFixedCellSize(50); // Adjust based on your layout
+
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -152,8 +163,8 @@ public class DashboardController implements Initializable {
     }
 
     @FXML
-    private void handleCheckInClick(javafx.event.ActionEvent event) {
-        System.out.println("Check In button clicked!");
+    private void handleCheckInClick(MouseEvent event) {
+        System.out.println("\nDEBUG: Check In button clicked!\n");
     }
 
     @FXML
@@ -193,6 +204,7 @@ public class DashboardController implements Initializable {
                 e.printStackTrace();
             }
         }).start();
+        search.clear();
     }
 
     private void updateListView(List<Member> members) {
@@ -201,21 +213,6 @@ public class DashboardController implements Initializable {
     }
 
     private void openMemberWindow(Member member) {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/betabase/views/member.fxml"));
-            VBox root = loader.load();
-
-            MemberController controller = loader.getController();
-            controller.setMember(member);
-
-            Stage stage = new Stage();
-            stage.setTitle("Member Details");
-            stage.setScene(new Scene(root));
-            stage.initModality(Modality.APPLICATION_MODAL); // Block input to other windows
-            stage.showAndWait();
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        SceneManager.switchToMemberWindow(new Stage(), member);
     }
 }
