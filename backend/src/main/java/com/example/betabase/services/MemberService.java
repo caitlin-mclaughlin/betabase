@@ -18,8 +18,8 @@ public class MemberService {
         this.repo = repo;
     }
 
-    public Optional<Member> checkInMember(String memberId) {
-        return repo.findByMemberId(memberId);
+    public Optional<Member> checkInMember(Long id) {
+        return repo.findById(id);
     }
 
     public Member save(Member member) {
@@ -30,8 +30,8 @@ public class MemberService {
         return repo.findAll();
     }
 
-    public Member getMemberById(String memberId) {
-        return repo.findByMemberId(memberId).orElse(null);
+    public Optional<Member> getMemberById(Long id) {
+        return repo.findById(id);
     }
 
     public List<Member> search(String query) {

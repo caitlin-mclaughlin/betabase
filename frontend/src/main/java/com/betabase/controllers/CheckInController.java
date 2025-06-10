@@ -13,9 +13,9 @@ public class CheckInController {
     private Label memberId;
     private Label name;
 
-    public void checkIn() {
+  /*  public void checkIn() {
         try {
-            Member member = apiService.getMemberById("memberId.getText()");
+            Member member = apiService.getMemberById();
             if (member != null) {
                 // populate UI
                 name.setText(member.getFirstName() + " " + member.getLastName());
@@ -27,6 +27,6 @@ public class CheckInController {
             e.printStackTrace();
             // handle connection error
         }
-    }
+    }*/
 
 }

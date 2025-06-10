@@ -14,6 +14,8 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     
     Optional<Member> findByMemberId(String memberId);
 
+    Optional<Member> findById(Long id);
+
     @Query("SELECT m FROM Member m WHERE " +
            "LOWER(m.memberId) LIKE LOWER(CONCAT('%', :query, '%')) OR " +
            "LOWER(m.firstName) LIKE LOWER(CONCAT('%', :query, '%')) OR " +

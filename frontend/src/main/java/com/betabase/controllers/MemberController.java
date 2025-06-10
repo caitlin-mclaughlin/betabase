@@ -14,6 +14,8 @@ import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextFormatter;
+import javafx.scene.layout.HBox;
+import javafx.scene.text.Text;
 import javafx.util.StringConverter;
 
 public class MemberController {
@@ -42,9 +44,10 @@ public class MemberController {
     @FXML private ChoiceBox<String>  pronounsField;
     @FXML private TextField phoneField;
     @FXML private TextField emailField;
+    @FXML private TextField memberIdField;
 //    @FXML private DatePicker dobField;
 //    @FXML private DatePicker memberSinceField;
-    @FXML private TextField billingField;
+    @FXML private ChoiceBox<String> billingField;
     @FXML private TextField addressField;
     @FXML private TextField eNameField;
     @FXML private TextField ePhoneField;
@@ -57,6 +60,8 @@ public class MemberController {
     @FXML private Button saveButton;
     @FXML private Button cancelButton;
 
+    @FXML private HBox staffButtons;
+
     private MemberApiService apiService;
 
     private Member currentMember;
@@ -65,7 +70,34 @@ public class MemberController {
     public void setApiService(MemberApiService apiService) {
         this.apiService = apiService;
         setupPhoneFormatter(this.phoneField);
+        initializePhoneField();
     }
+
+    private void initializePhoneField() {
+        UnaryOperator<TextFormatter.Change> filter = change -> {
+            String text = change.getControlNewText().replaceAll("[^\\d]", ""); // Only digits
+
+            if (text.length() > 10) {
+                return null; // restrict to 10 digits
+            }
+
+            // Format: (XXX) XXX-XXXX
+            StringBuilder formatted = new StringBuilder();
+            int len = text.length();
+
+            if (len > 0) formatted.append("(").append(text.substring(0, Math.min(3, len)));
+            if (len >= 4) formatted.append(") ").append(text.substring(3, Math.min(6, len)));
+            if (len >= 7) formatted.append("-").append(text.substring(6));
+
+            change.setText(formatted.toString());
+            change.setRange(0, change.getControlText().length()); // overwrite whole field
+            return change;
+        };
+
+        TextFormatter<String> formatter = new TextFormatter<>(filter);
+        phoneField.setTextFormatter(formatter);
+    }
+
 
     private void setupPhoneFormatter(TextField phoneField) {
         TextFormatter<String> formatter = new TextFormatter<>(new StringConverter<>() {
@@ -100,13 +132,22 @@ public class MemberController {
         return "(" + digits.substring(0, 3) + ") " + digits.substring(3, 6) + "-" + digits.substring(6);
     }
 
-
     public void setMember(Member member) {
         this.currentMember = member;
         editing = false;
         updateDisplayFromMember(member);
     }
 
+    @FXML
+    private void handleClockIn() {
+        System.out.println("\nDEBUG: Clock in pressed\n");
+    }
+
+    @FXML
+    private void handleClockOut() {
+        System.out.println("\nDEBUG: Clock out pressed\n");
+    }
+    
     @FXML
     private void handleEdit() {
         editing = true;
@@ -166,21 +207,28 @@ public class MemberController {
         switch (status) {
             case "ADMIN": {
                 statusLabel.setStyle("-fx-background-color: -fx-color-pos3;");
+                staffButtons.setVisible(true);
                 break;
             }
             case "MEMBER": {
                 statusLabel.setStyle("-fx-background-color: -fx-color-pos1;");
+                staffButtons.setVisible(false);
                 break;
             }
             case "STAFF": {
                 statusLabel.setStyle("-fx-background-color: -fx-color-pos4;");
+                staffButtons.setVisible(true);
                 break;
             }
             case "VISITOR": {
                 statusLabel.setStyle("-fx-background-color: -fx-color-pos2;");
+                staffButtons.setVisible(false);
                 break;
             }
-            default: statusLabel.setStyle("-fx-background-color: -fx-accent-color;");
+            default: {
+                statusLabel.setStyle("-fx-background-color: -fx-accent-color;");
+                staffButtons.setVisible(false);
+            }
         }
         statusLabel.setText(status);
     }
@@ -215,6 +263,10 @@ public class MemberController {
         emailLabel.setManaged(!editable);
         emailField.setVisible(editable);
         emailField.setManaged(editable);
+        memberIdLabel.setVisible(!editable);
+        memberIdLabel.setManaged(!editable);
+        memberIdField.setVisible(editable);
+        memberIdField.setManaged(editable);
         dobLabel.setVisible(!editable);
         dobLabel.setManaged(!editable);
 //        dobField.setVisible(editable);
@@ -274,9 +326,9 @@ public class MemberController {
                                                           emailField.getPromptText());
 //        member.setDateOfBirth(dobField.getValue());
 //        member.setMemberSince(memberSinceField.getValue());
-        member.setMemberId(currentMember.getMemberId());
-        member.setBillingMethod(!billingField.getText().isBlank() ? billingField.getText() : 
-                                                                    billingField.getPromptText());
+        member.setMemberId(!memberIdField.getText().isBlank() ? memberIdField.getText() : 
+                                                                memberIdField.getPromptText());
+        member.setBillingMethod(billingField.getValue().toString());
         member.setAddress(!addressField.getText().isBlank() ? addressField.getText() : 
                                                               addressField.getPromptText());
         member.setEmergencyContactName(!eNameField.getText().isBlank() ? eNameField.getText() : 
@@ -294,9 +346,10 @@ public class MemberController {
         pronounsField.setValue(member.getPronouns());
         statusField.setValue(member.getStatus());
         genderField.setValue(member.getGender());
-        phoneField.setPromptText(formatPhoneNumber(member.getPhoneNumber()));
+        phoneField.setPromptText(member.getPhoneNumber());
         emailField.setPromptText(member.getEmail());
-        billingField.setPromptText(member.getBillingMethod());
+        memberIdField.setPromptText(member.getMemberId());
+        billingField.setValue(member.getBillingMethod());
         addressField.setPromptText(member.getAddress());
         eNameField.setPromptText(member.getEmergencyContactName());
         ePhoneField.setPromptText(member.getEmergencyContactPhone());

@@ -18,9 +18,16 @@ public class MemberController {
         this.service = service;
     }
 
-    @GetMapping("/checkin/{memberId}")
-    public ResponseEntity<Member> checkIn(@PathVariable String memberId) {
-        return service.checkInMember(memberId)
+    @GetMapping("/checkin/{id}")
+    public ResponseEntity<Member> checkIn(@PathVariable Long id) {
+        return service.checkInMember(id)
+            .map(ResponseEntity::ok)
+            .orElse(ResponseEntity.notFound().build());
+    }
+    
+    @GetMapping("/{id}")
+    public ResponseEntity<Member> getMemberById(@PathVariable Long id) {
+        return service.getMemberById(id)
             .map(ResponseEntity::ok)
             .orElse(ResponseEntity.notFound().build());
     }
@@ -42,11 +49,11 @@ public class MemberController {
     }
 
 
-    @PostMapping("/{memberId}")
-    public ResponseEntity<Member> updateMember(@PathVariable String memberId, @RequestBody Member updatedMember) {
-        Member existing = service.getMemberById(memberId);
+    @PostMapping("/{id}")
+    public ResponseEntity<Member> updateMember(@PathVariable Long id, @RequestBody Member updatedMember) {
+        Member existing = service.getMemberById(id).orElse(null);
         if (existing != null) {
-            updatedMember.setId(existing.getId()); // Keep same Member ID
+            updatedMember.setId(existing.getId()); // Keep same ID
             Member saved = service.save(updatedMember);
             return ResponseEntity.ok(saved);
         } else {

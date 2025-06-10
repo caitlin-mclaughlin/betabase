@@ -20,9 +20,9 @@ public class MemberApiService {
         this.mapper = new ObjectMapper();
     }
 
-    public Member getMemberById(String memberId) throws Exception {
+    public Member getMemberById(Long id) throws Exception {
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(BASE_URL + "/checkin/" + memberId))
+                .uri(URI.create(BASE_URL + "/" + id))
                 .GET()
                 .header("Accept", "application/json")
                 .build();
@@ -40,7 +40,7 @@ public class MemberApiService {
         String requestBody = mapper.writeValueAsString(member);
 
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(BASE_URL + "/" + member.getMemberId()))
+                .uri(URI.create(BASE_URL + "/" + member.getId()))
                 .POST(HttpRequest.BodyPublishers.ofString(requestBody))
                 .header("Content-Type", "application/json")
                 .build();

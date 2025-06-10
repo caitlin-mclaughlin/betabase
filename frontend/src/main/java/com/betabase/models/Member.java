@@ -19,6 +19,9 @@ public class Member {
     private String memberId;
     private LocalDate memberSince;
     private String status;
+    private Boolean clocked;
+    private Boolean checked;
+    private Boolean loggedIn;
 
     // Billing Info
     private String billingMethod;
@@ -72,8 +75,7 @@ public class Member {
         } 
     }
 
-    public String getPhoneNumber() { 
-        return phoneNumber.equals("Invalid") ? phoneNumber :
+    public String getPhoneNumber() { return phoneNumber.equals("Invalid") ? "Invalid" :
                                             "(" + phoneNumber.substring(0,3) +
                                             ") " + phoneNumber.substring(3,6) +
                                             "-" + phoneNumber.substring(6); }
@@ -104,7 +106,7 @@ public class Member {
     public String getPhotoUrl() { return (photoUrl != null ? photoUrl : ""); }
     public void setPhotoUrl(String photoUrl) { this.photoUrl = photoUrl; }
 
-    public String getMemberId() { return (memberId != null ? memberId : ""); }
+    public String getMemberId() { return (memberId != null ? memberId : "000000000"); }
     public void setMemberId(String memberId) { this.memberId = memberId; }
 
     // UNVALIDATED
@@ -125,6 +127,21 @@ public class Member {
             };
         }
     }
+
+    public Boolean getClocked() { return clocked; }
+    public void setClocked(Boolean clocked) { 
+        this.clocked = clocked;
+        // Log current time;
+    }
+
+    public Boolean getChecked() { return checked; }
+    public void setChecked(Boolean checked) { 
+        this.checked = checked;
+        // Log current time;
+    }
+
+    public void Login() { loggedIn = true; }
+    public void Logout() { loggedIn = false; }
 
     public String getBillingMethod() { return billingMethod; }
     public void setBillingMethod(String billingMethod) { 
