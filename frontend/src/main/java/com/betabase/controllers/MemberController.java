@@ -22,7 +22,7 @@ public class MemberController {
     
     // Member information fields
     @FXML private Label nameLabel;
-    @FXML private Label statusLabel;
+    @FXML private Label typeLabel;
     @FXML private Label genderLabel;
     @FXML private Label phoneLabel;
     @FXML private Label emailLabel;
@@ -39,7 +39,7 @@ public class MemberController {
     @FXML private TextField firstNameField;
     @FXML private TextField lastNameField;
     @FXML private TextField prefNameField;
-    @FXML private ChoiceBox<String>  statusField;
+    @FXML private ChoiceBox<String>  typeField;
     @FXML private ChoiceBox<String> genderField;
     @FXML private ChoiceBox<String>  pronounsField;
     @FXML private TextField phoneField;
@@ -188,8 +188,13 @@ public class MemberController {
 
     private void updateDisplayFromMember(Member member) {
         // validate and display data
-        nameLabel.setText(member.getLastName() + ",  " + member.getFirstName() + "  \"" + 
-                          member.getPrefName() + "\"  (" + member.getPronouns() + ")");
+        if (member.getPrefName().isBlank()) {
+            nameLabel.setText(member.getLastName() + ", " + member.getFirstName() +
+                              "  (" + member.getPronouns() + ")");
+        } else {
+            nameLabel.setText(member.getLastName() + ",  " + member.getFirstName() + "  \"" + 
+                              member.getPrefName() + "\"  (" + member.getPronouns() + ")");
+        }
         genderLabel.setText(member.getGender());
         phoneLabel.setText(member.getPhoneNumber());
         emailLabel.setText(member.getEmail());
@@ -202,35 +207,35 @@ public class MemberController {
         ePhoneLabel.setText(member.getEmergencyContactPhone());
         eEmailLabel.setText(member.getEmergencyContactEmail());
 
-        // style and display member status
-        String status = member.getStatus().toUpperCase();
-        switch (status) {
+        // style and display member type
+        String type = member.getType().toUpperCase();
+        switch (type) {
             case "ADMIN": {
-                statusLabel.setStyle("-fx-background-color: -fx-color-pos3;");
+                typeLabel.setStyle("-fx-background-color: -fx-color-pos3;");
                 staffButtons.setVisible(true);
                 break;
             }
             case "MEMBER": {
-                statusLabel.setStyle("-fx-background-color: -fx-color-pos1;");
+                typeLabel.setStyle("-fx-background-color: -fx-color-pos1;");
                 staffButtons.setVisible(false);
                 break;
             }
             case "STAFF": {
-                statusLabel.setStyle("-fx-background-color: -fx-color-pos4;");
+                typeLabel.setStyle("-fx-background-color: -fx-color-pos4;");
                 staffButtons.setVisible(true);
                 break;
             }
             case "VISITOR": {
-                statusLabel.setStyle("-fx-background-color: -fx-color-pos2;");
+                typeLabel.setStyle("-fx-background-color: -fx-color-pos2;");
                 staffButtons.setVisible(false);
                 break;
             }
             default: {
-                statusLabel.setStyle("-fx-background-color: -fx-accent-color;");
+                typeLabel.setStyle("-fx-background-color: -fx-accent-color;");
                 staffButtons.setVisible(false);
             }
         }
-        statusLabel.setText(status);
+        typeLabel.setText(type);
     }
 
     private void setEditableState(boolean editable) {
@@ -247,10 +252,10 @@ public class MemberController {
         pronounsField.setManaged(editable);
 
         // Member info
-        statusLabel.setVisible(!editable);
-        statusLabel.setManaged(!editable);
-        statusField.setVisible(editable);
-        statusField.setManaged(editable);
+        typeLabel.setVisible(!editable);
+        typeLabel.setManaged(!editable);
+        typeField.setVisible(editable);
+        typeField.setManaged(editable);
         genderLabel.setVisible(!editable);
         genderLabel.setManaged(!editable);
         genderField.setVisible(editable);
@@ -319,7 +324,7 @@ public class MemberController {
                                                                 prefNameField.getPromptText());
         member.setPronouns(pronounsField.getValue().toString());
         member.setGender(genderField.getValue().toString());
-        member.setStatus(statusField.getValue().toString());
+        member.setType(typeField.getValue().toString());
         member.setPhoneNumber(!phoneField.getText().isBlank() ? phoneField.getText().replaceAll("[^\\d]", "") : 
                                                                 phoneField.getPromptText());
         member.setEmail(!emailField.getText().isBlank() ? emailField.getText() : 
@@ -340,11 +345,25 @@ public class MemberController {
     }
 
     private void setFieldPrompts(Member member) {
+        // type
+        String type = member.getType().toUpperCase();
+        typeField.setValue(type);
+        String bgColor = switch (type) {
+            case "ADMIN" -> "-fx-color-pos3";
+            case "MEMBER" -> "-fx-color-pos1";
+            case "STAFF" -> "-fx-color-pos4";
+            case "VISITOR" -> "-fx-color-pos2";
+            default -> "-fx-accent-color";
+        };
+        typeField.setStyle(String.format(
+            "-fx-background-color: %s;", bgColor
+        ));
+
+        // other fields
         firstNameField.setPromptText(member.getFirstName());
         lastNameField.setPromptText(member.getLastName());
         prefNameField.setPromptText(member.getPrefName());
         pronounsField.setValue(member.getPronouns());
-        statusField.setValue(member.getStatus());
         genderField.setValue(member.getGender());
         phoneField.setPromptText(member.getPhoneNumber());
         emailField.setPromptText(member.getEmail());

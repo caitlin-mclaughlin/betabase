@@ -7,6 +7,8 @@ import java.util.regex.Pattern;
 public class Member {
     private Long id;
 
+    private Long gymId;
+
     private String firstName;
     private String prefName;
     private String lastName;
@@ -18,7 +20,7 @@ public class Member {
     private String photoUrl;
     private String memberId;
     private LocalDate memberSince;
-    private String status;
+    private String type;
     private Boolean clocked;
     private Boolean checked;
     private Boolean loggedIn;
@@ -33,8 +35,11 @@ public class Member {
     private String emergencyContactEmail;
 
     // Validated getters and setters (EXCEPT DATES)
-    public Long getId() { return (id != null ? id : 0); }
+    public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
+
+    public Long getGymId() { return (gymId != null ? gymId : 0); }
+    public void setGymId(Long gymId) { this.gymId = gymId; }
 
     public String getFirstName() { return (firstName != null ? firstName : ""); }
     public void setFirstName(String firstName) { this.firstName = firstName; }
@@ -113,12 +118,12 @@ public class Member {
     public LocalDate getMemberSince() { return (memberSince);}// != null ? memberSince : ""); }
     public void setMemberSince(LocalDate memberSince) { this.memberSince = memberSince; }
 
-    public String getStatus() { return status; }
-    public void setStatus(String status) { 
-        if (status == null || status.isBlank()) {
-            this.status = "UNSET";
+    public String getType() { return type; }
+    public void setType(String type) { 
+        if (type == null || type.isBlank()) {
+            this.type = "UNSET";
         } else {
-            this.status = switch (status.toUpperCase()) {
+            this.type = switch (type.toUpperCase()) {
                 case "ADMIN" -> "ADMIN";
                 case "STAFF" -> "STAFF";
                 case "MEMBER" -> "MEMBER";

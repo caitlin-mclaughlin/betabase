@@ -1,7 +1,6 @@
 package com.betabase.controllers;
 
 import com.betabase.models.Member;
-import com.betabase.services.MemberApiService;
 import com.betabase.utils.SceneManager;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -27,8 +26,8 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
-import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.scene.text.Font;
 import javafx.util.Duration;
 
 import java.io.IOException;
@@ -48,6 +47,7 @@ public class DashboardController implements Initializable {
     @FXML private ImageView logoImage;
     @FXML private TextField search;
     @FXML private ListView<Member> memberList;
+    @FXML private Label memberLabel;
 
     private SidebarController sidebarController;
     private final HttpClient httpClient = HttpClient.newHttpClient();
@@ -76,14 +76,13 @@ public class DashboardController implements Initializable {
                 private final Label memberIdLabel = new Label();
                 private final Label phoneLabel = new Label();
                 private final Label emailLabel = new Label();
-                private final Region separator = new Region();
-                private final HBox content = new HBox(20);
-                private final VBox container = new VBox();
+                private final HBox content = new HBox(30);
+                private final VBox container = new VBox(0);
 
                 {
                     // Add style classes
-                    checkInButton.getStyleClass().add("check-in-button");
-                    checkOutButton.getStyleClass().add("check-out-button");
+                    checkInButton.getStyleClass().add("check-in-narrow");
+                    checkOutButton.getStyleClass().add("check-out-narrow");
                     nameLabel.getStyleClass().add("list-label");
                     memberIdLabel.getStyleClass().add("list-label");
                     phoneLabel.getStyleClass().add("list-label");
@@ -91,28 +90,26 @@ public class DashboardController implements Initializable {
 
                     checkInButton.setText("Check In");
                     checkOutButton.setText("Check Out");
+
                     // Consistent column widths
-                    nameLabel.setPrefWidth(180);
-                    memberIdLabel.setPrefWidth(75);
-                    phoneLabel.setPrefWidth(125);
-                    emailLabel.setPrefWidth(200);
+                    nameLabel.setPrefWidth(260);
+                    memberIdLabel.setPrefWidth(110);
+                    phoneLabel.setPrefWidth(145);
+                    emailLabel.setPrefWidth(225);
 
                     HBox.setHgrow(spacer, Priority.ALWAYS);
 
                     checkInButton.visibleProperty().bind(this.hoverProperty());
                     checkInButton.setOnMouseClicked(event -> handleCheckInOut(event, true));
+                    checkInButton.setManaged(true);
                     checkOutButton.visibleProperty().bind(this.hoverProperty());
+                    checkOutButton.setManaged(true);
                     checkOutButton.setOnMouseClicked(event -> handleCheckInOut(event, false));
                         
                     // Add labels to row
                     content.getChildren().addAll(nameLabel, memberIdLabel, phoneLabel, emailLabel,
                                                  spacer, checkInButton, checkOutButton);
-                    content.setPadding(new Insets(5));
                     content.setAlignment(Pos.CENTER_LEFT);
-
-                    separator.getStyleClass().add("separator");
-                    container.getChildren().addAll(content, separator);
-
                 }
 
                 @Override
@@ -129,11 +126,11 @@ public class DashboardController implements Initializable {
                         emailLabel.setText(member.getEmail());
 
                         setText(null);
-                        setGraphic(container);
+                        setGraphic(content);
                     }
                 }
             });
-            memberList.setFixedCellSize(50); // Adjust based on your layout
+            memberList.setFixedCellSize(40);
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -195,6 +192,13 @@ public class DashboardController implements Initializable {
     }
 
     @FXML
+    private void handleMemberClick(MouseEvent event) {
+        if (sidebarController != null) {
+            sidebarController.handleMemberClick(event);
+        }
+    }
+
+    @FXML
     private void handleCancelClick(MouseEvent event) {
         search.clear();
     }
@@ -235,4 +239,5 @@ public class DashboardController implements Initializable {
         SceneManager.switchToMemberWindow(new Stage(), member);
         search.clear();
     }
+    
 }

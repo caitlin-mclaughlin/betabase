@@ -2,10 +2,10 @@
 
 .choice-box {
     -fx-background-color: -fx-light-color;
-    -fx-text-fill: -fx-base-color;
+    -fx-border-color: transparent;
     -fx-background-radius: 10px;
     -fx-border-radius: 10px;
-    -fx-font-size: 18px;
+    -fx-font-size: 16px;
     -fx-cursor: hand;
     -fx-padding: 2 2 2 4;
     -fx-min-height: 40px;
@@ -13,12 +13,19 @@
     -fx-max-width: Infinity;
 }
 
+.choice-box.type > .label {
+    -fx-text-fill: -fx-color-shadow;
+    -fx-alignment: CENTER;
+}
+
 .choice-box .context-menu {
     -fx-background-color: -fx-color-shadow;
+    -fx-text-fill: -fx-base-color;
     -fx-border-color: -fx-base-color;
     -fx-background-radius: 10px;
     -fx-border-radius: 10px;
-    -fx-font-size: 18px;
+    -fx-font-size: 16px;
+    -fx-max-width: Infinity;
 }
 
 .choice-box .menu-item:focused {
@@ -30,49 +37,23 @@
     -fx-cursor: hand;
 }
 
-.photo-button {
-    -fx-background-color: -fx-base-color;
+.choice-box .menu-item:focused > .check-menu-item > .check,
+.choice-box .menu-item:hover > .check-menu-item > .check {
+    -fx-background-color: -fx-color-shadow; /* your shadow color */
+    -fx-border-color: -fx-color-shadow;     /* if border exists */
+}
+
+.choice-box .menu-item:focused > .label,
+.choice-box .menu-item:hover > .label {
     -fx-text-fill: -fx-color-shadow;
-    -fx-font-size: 20px;
-    -fx-font-weight: bold;
-    -fx-background-radius: 10px;
-    -fx-border-radius: 10px;
-    -fx-padding: 5 20 5 20;
-    -fx-min-height: 45px;
-    -fx-alignment: CENTER;
-    -fx-cursor: hand;
+}
+.choice-box .menu-item > .check-menu-item > .check {
+    -fx-background-color: -fx-color-shadow;
 }
 
-.photo-button:hover {
-    -fx-background-color: -fx-color-select;
-    -fx-wrap-text: true;
-}
-
-.status {
-    -fx-text-fill: -fx-color-shadow;
-    -fx-font-size: 25px;
-    -fx-font-weight: bold;
-    -fx-min-width: 275px;
-    -fx-max-width: 275px;
-    -fx-min-height: 60px;
-    -fx-background-radius: 10px;
-    -fx-border-radius: 10px;
-    -fx-alignment: CENTER;
-}
-
-.status-edit {
-    -fx-background-color: -fx-light-color;
-    -fx-text-fill: -fx-base-color;
-    -fx-border-color: -fx-base-color;
-    -fx-prompt-text-fill: -fx-color-prompt;
-    -fx-font-size: 25px;
-    -fx-font-weight: bold;
-    -fx-min-width: 275px;
-    -fx-max-width: 275px;
-    -fx-min-height: 60px;
-    -fx-background-radius: 10px;
-    -fx-border-radius: 10px;
-    -fx-alignment: CENTER;
+.choice-box.type > .open-button > .arrow {
+    -fx-background-color: -fx-color-shadow;
+    -fx-border-color: -fx-color-shadow;
 }
 
 .user-header {
@@ -92,7 +73,7 @@
     -fx-faint-focus-color: transparent;
     -fx-background-radius: 10px;
     -fx-border-radius: 10px;
-    -fx-font-size: 18px;
+    -fx-font-size: 16px;
     -fx-spacing: 10px;
     -fx-min-height: 40px;
     -fx-max-height: 40px;
@@ -100,7 +81,7 @@
 
 .user-info {
     -fx-text-fill: -fx-base-color;
-    -fx-font-size: 18px;
+    -fx-font-size: 16px;
     -fx-min-height: 40px;
     -fx-max-height: 40px;
 }
@@ -114,7 +95,7 @@
     -fx-faint-focus-color: transparent;
     -fx-background-radius: 10px;
     -fx-border-radius: 10px;
-    -fx-font-size: 18px;
+    -fx-font-size: 16px;
     -fx-spacing: 10px;
     -fx-min-height: 40px;
     -fx-max-height: 40px;
@@ -122,7 +103,7 @@
 
 .user-prompt {
     -fx-text-fill: -fx-base-color;
-    -fx-font-size: 20px;
+    -fx-font-size: 18px;
     -fx-font-weight: bold;
     -fx-min-width: 250px;
 }

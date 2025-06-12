@@ -21,7 +21,7 @@
 <?import javafx.scene.layout.VBox?>
 
 <BorderPane fx:id="mainPane" styleClass="colors"
-            prefHeight="900.0" prefWidth="1200.0"
+            prefHeight="1000.0" prefWidth="1250.0"
             xmlns="http://javafx.com/javafx/23.0.1"
             xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="com.betabase.controllers.PosController"
@@ -33,7 +33,7 @@
             <padding>
                <Insets bottom="10" left="10" right="10" top="10" />
             </padding>
-            <HBox styleClass="search-bar">
+            <HBox styleClass="search-bar-pos">
                <Label style="-fx-text-fill: -fx-base-color; -fx-font-weight: bold;"
                         text="Item Lookup" minWidth="110.0" maxWidth="120.0" />
                <HBox style="-fx-border-color: -fx-base-color; -fx-border-radius: 15px;" 
@@ -43,7 +43,7 @@
                         <Image url="@/com/betabase/images/search.png" />
                      </image>
                   </ImageView>
-                  <TextField fx:id="search" styleClass="search-field"
+                  <TextField fx:id="search" styleClass="search-field-pos"
                              promptText="Search items..." HBox.hgrow="ALWAYS" />
                   <StackPane style="-fx-cursor: hand; -fx-padding: 1px;"
                              onMouseClicked="#handleCancelClick">
@@ -55,7 +55,7 @@
                      </ImageView>
                   </StackPane>
                </HBox>
-               <Button text="Search" styleClass="search-button"
+               <Button text="Search" styleClass="search-button-pos"
                        minWidth="80.0" maxWidth="105.0" HBox.hgrow="ALWAYS"/>
             </HBox>
             <VBox>

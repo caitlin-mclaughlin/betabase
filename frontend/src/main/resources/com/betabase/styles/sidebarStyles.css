@@ -2,7 +2,8 @@
 
 .sidebar {
     -fx-background-color: -fx-base-color;
-    -fx-pref-width: 220px;
+    -fx-min-width: 275px;
+    -fx-max-width: 275px;
 }
 
 .sidebar-active {

@@ -2,7 +2,7 @@ spring:
   datasource:
     url: jdbc:postgresql://localhost:5433/betabase_db
     username: betabase
-    password: B3taBa$3
+    password: "B3taBa$3"
   jpa:
     hibernate:
       ddl-auto: update

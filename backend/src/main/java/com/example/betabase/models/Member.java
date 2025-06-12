@@ -19,6 +19,9 @@ public class Member {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false)
+    private Long gymId;
+
     private String firstName;
     private String prefName;
     private String lastName;
@@ -30,7 +33,7 @@ public class Member {
     private String photoUrl;
     private String memberId;
     private LocalDate memberSince;
-    private String status;
+    private String type;
 
     // Billing Info
     private String billingMethod;
@@ -40,7 +43,6 @@ public class Member {
     private String emergencyContactName;
     private String emergencyContactPhone;
     private String emergencyContactEmail;
-
     
     // Getters and setters
     public Long getId() { return id; }
@@ -76,8 +78,8 @@ public class Member {
     public LocalDate getMemberSince() { return memberSince; }
     public void setMemberSince(LocalDate memberSince) { this.memberSince = memberSince; }
 
-    public String getStatus() { return status; }
-    public void setStatus(String status) { this.status = status; }
+    public String getType() { return type; }
+    public void setType(String type) { this.type = type; }
 
     public String getAddress() { return address; }
     public void setAddress(String address) { this.address = address; }

@@ -62,8 +62,8 @@
             <Button text="Clock In" onMouseClicked="#handleClockIn" styleClass="check-in-button" />
             <Button text="Clock Out" onMouseClicked="#handleClockOut" styleClass="check-out-button" />
          </HBox>
-         <Label fx:id="statusLabel" styleClass="status" text="label" />
-         <ChoiceBox fx:id="statusField" value="Unset" styleClass="status-edit" visible="false" managed="false">
+         <Label fx:id="typeLabel" styleClass="type" text="label" />
+         <ChoiceBox fx:id="typeField" value="Unset" styleClass="type" visible="false" managed="false">
             <items>
                <FXCollections fx:factory="observableArrayList">
                      <String fx:value="ADMIN" />
@@ -191,7 +191,7 @@
                     visible="false" managed="false" />
             <Button fx:id="editButton" onMouseClicked="#handleEdit" styleClass="edit-button">
                <graphic> 
-                  <ImageView fx:id="editLogo" fitHeight="40.0" preserveRatio="true">
+                  <ImageView fx:id="editLogo" fitHeight="35.0" preserveRatio="true">
                      <image>
                            <Image url="@/com/betabase/images/edit.png" />
                      </image>

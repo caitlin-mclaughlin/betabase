@@ -24,9 +24,11 @@ public class SidebarController {
     @FXML private Label analyticsLabel;
     @FXML private Label calLabel;
     @FXML private Label posLabel;
+    @FXML private Label memberLabel;
     @FXML private Label settingsLabel;
     @FXML private HBox analytics;
     @FXML private HBox cal;
+    @FXML private HBox member;
     @FXML private HBox pos;
     @FXML private HBox settings;
 
@@ -38,6 +40,7 @@ public class SidebarController {
 
     public void setActiveSection(String section) {
         switch (section.toLowerCase()) {
+            case "member" -> highlightActiveButton(member);
             case "pos" -> highlightActiveButton(pos);
             case "cal" -> highlightActiveButton(cal);
             case "analytics" -> highlightActiveButton(analytics);
@@ -56,6 +59,12 @@ public class SidebarController {
         if (!activeButton.getStyleClass().contains("sidebar-active")) {
             activeButton.getStyleClass().add("sidebar-active");
         }
+    }
+
+    @FXML
+    protected void handleMemberClick(MouseEvent event) {
+        SceneManager.switchScene((Stage) memberLabel.getScene().getWindow(),
+                        "/com/betabase/views/checkIn.fxml");
     }
 
     @FXML

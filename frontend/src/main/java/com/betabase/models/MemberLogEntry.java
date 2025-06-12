@@ -1,0 +1,76 @@
+package com.betabase.models;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+
+import javafx.beans.property.SimpleStringProperty;
+
+public class MemberLogEntry {
+    private final LocalDate date;
+    private final SimpleStringProperty name;
+    private final SimpleStringProperty membershipType;
+    private final SimpleStringProperty phoneNumber;
+    private final SimpleStringProperty email;
+
+    private LocalDateTime checkInTime;
+    private LocalDateTime checkOutTime;
+
+    private static final DateTimeFormatter TIME_FORMAT_12HR = DateTimeFormatter.ofPattern("h:mm a");
+    private static final DateTimeFormatter TIME_FORMAT_24HR = DateTimeFormatter.ofPattern("H:mm a");
+    private boolean format_12Hr;
+
+    public MemberLogEntry(Member member) {
+        name = new SimpleStringProperty(member.getFirstName());
+        checkInTime = LocalDateTime.now();
+        checkOutTime = null;
+        membershipType = new SimpleStringProperty(member.getType());
+        phoneNumber = new SimpleStringProperty(member.getPhoneNumber());
+        email = new SimpleStringProperty(member.getEmail());
+        date = LocalDate.now();
+
+        format_12Hr = true; // Default to 12Hr clock
+    }
+
+    public void changeTo12Hr() {
+        format_12Hr = true;
+    }
+
+    public void changeTo24Hr() {
+        format_12Hr = false;
+    }
+
+    public void setCheckInTime(LocalDateTime checkInTime) { 
+        this.checkInTime = checkInTime;
+    }
+
+    public void setCheckOutTime(LocalDateTime checkOutTime) { 
+        this.checkOutTime = checkOutTime;
+    }
+
+    public String getCheckInTime() { 
+        String formatted;
+        if (checkInTime != null) {
+            formatted = format_12Hr ? checkInTime.format(TIME_FORMAT_12HR) : checkInTime.format(TIME_FORMAT_24HR);
+        } else {
+            formatted = " — ";
+        }
+        return formatted; 
+    }
+    public String getCheckOutTime() {
+        String formatted;
+        if (checkOutTime != null) {
+            formatted = format_12Hr ? checkOutTime.format(TIME_FORMAT_12HR) : checkOutTime.format(TIME_FORMAT_24HR);
+        } else {
+            formatted = " — ";
+        }
+        return formatted; 
+    }
+
+    // Getters
+    public String getName() { return name.get(); }
+    public String getMembershipType() { return membershipType.get(); }
+    public String getPhoneNumber() { return phoneNumber.get(); }
+    public String getEmail() { return email.get(); }
+}
