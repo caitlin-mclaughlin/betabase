@@ -3,6 +3,7 @@ package com.betabase.controllers;
 import java.io.IOException;
 import java.util.List;
 
+import com.betabase.services.MemberApiService;
 import com.betabase.utils.SceneManager;
 
 import javafx.fxml.FXML;
@@ -63,8 +64,14 @@ public class SidebarController {
 
     @FXML
     protected void handleMemberClick(MouseEvent event) {
-        SceneManager.switchScene((Stage) memberLabel.getScene().getWindow(),
-                        "/com/betabase/views/checkIn.fxml");
+        SceneManager.switchToAPIWindow(
+            (Stage) memberLabel.getScene().getWindow(), 
+            (CheckInController controller) -> {
+                controller.setApiService(new MemberApiService());
+                // Optionally: controller.setInitialMember(someMember);
+            },
+            "/com/betabase/views/checkIn.fxml"
+        );
     }
 
     @FXML

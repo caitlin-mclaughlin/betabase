@@ -29,7 +29,7 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.Region;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.util.Duration;
 
@@ -44,7 +44,6 @@ import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Year;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.ResourceBundle;
 
@@ -54,13 +53,15 @@ public class CheckInController implements Initializable {
     @FXML private ImageView logoImage;
     @FXML private TextField search;
     @FXML private HBox searchBox;
-    @FXML private ListView<Member> memberList;
+    @FXML private Button checkInHeaderButton;
+    @FXML private Button checkOutHeaderButton;
     @FXML private Label memberLabel;
 
     private VBox sidebar;
     private SidebarController sidebarController;
     private final HttpClient httpClient = HttpClient.newHttpClient();
 
+    @FXML private Pane floatingPane;
     @FXML private ListView<Member> floatingListView;
     @FXML private TableView<MemberLogEntry> checkInTable;
 
@@ -81,9 +82,12 @@ public class CheckInController implements Initializable {
     @FXML private Button checkInButton;
     @FXML private Button checkOutButton;
 
-    private Member display;
+    private Member currentMember;
     private final ObservableList<MemberLogEntry> logEntries = FXCollections.observableArrayList();
 
+    public void setApiService(MemberApiService apiService) {
+        this.apiService = apiService;
+    }
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -139,13 +143,14 @@ public class CheckInController implements Initializable {
             floatingListView.setOnMouseClicked(event -> {
                 Member selected = floatingListView.getSelectionModel().getSelectedItem();
                 if (selected != null) {
-                    floatingListView.setVisible(false);
+                    showFloatingList(false);
                     displayMember(selected);
 
-                    // Force focus back to the search box and move cursor to the end
+                    // Force focus back to the search box and highlight text
                     Platform.runLater(() -> {
                         search.requestFocus();
-                        search.selectAll();
+                        search.setText(selected.getPrefName());
+                        search.positionCaret(search.getText().length());
                     });
                 }
             });
@@ -154,25 +159,42 @@ public class CheckInController implements Initializable {
             // Create columns
             TableColumn<MemberLogEntry, String> nameCol = new TableColumn<>("Name");
             nameCol.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getName()));
+            nameCol.getStyleClass().add("left-rounded-cell");
 
             TableColumn<MemberLogEntry, String> checkInCol = new TableColumn<>("Check In");
             checkInCol.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getCheckInTime()));
 
             TableColumn<MemberLogEntry, String> checkOutCol = new TableColumn<>("Check Out");
-            checkInCol.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getCheckOutTime()));
+            checkOutCol.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getCheckOutTime()));
 
             TableColumn<MemberLogEntry, String> membershipCol = new TableColumn<>("Membership");
             membershipCol.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getMembershipType()));
 
             TableColumn<MemberLogEntry, String> phoneCol = new TableColumn<>("Phone");
             phoneCol.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getPhoneNumber()));
-
+            phoneCol.getStyleClass().add("right-rounded-cell");
+            
             // Optional column resizing behavior
-            checkInTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN);
+            checkInTable.setColumnResizePolicy(TableView.UNCONSTRAINED_RESIZE_POLICY);
 
             // Add columns to the table
             checkInTable.getColumns().addAll(nameCol, checkInCol, checkOutCol, membershipCol, phoneCol);
             checkInTable.setItems(logEntries);
+
+            checkInTable.getItems()
+
+            if (checkInTable.getItems().isEmpty()) {
+                MemberLogEntry nullMember = new MemberLogEntry();
+                logEntries.add(nullMember);
+            }
+
+            checkInTable.widthProperty().addListener((obs, oldVal, newVal) -> {
+                double totalWidth = newVal.doubleValue();
+                int columnCount = checkInTable.getColumns().size();
+                for (TableColumn<?, ?> column : checkInTable.getColumns()) {
+                    column.setPrefWidth((totalWidth - 20) / columnCount); // -25 for borders/padding
+                }
+            });
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -206,8 +228,10 @@ public class CheckInController implements Initializable {
                 if (!newVal.isEmpty()) {
                     positionFloatingList();
                     performSearch(newVal);
+                } else if (!oldVal.isEmpty()) {
+                    search.positionCaret(search.getText().length());
                 } else {
-                    floatingListView.setVisible(false);
+                    showFloatingList(false);
                 }
             });
         });
@@ -220,6 +244,7 @@ public class CheckInController implements Initializable {
         inactivityTimer.setOnFinished(event -> {
             if (!search.isFocused()) {
                 search.requestFocus();
+                search.positionCaret(search.getText().length());
             }
         });
         inactivityTimer.playFromStart();
@@ -233,7 +258,7 @@ public class CheckInController implements Initializable {
     @FXML
     private void handleCancelClick(MouseEvent event) {
         search.clear();
-        floatingListView.setVisible(false);
+        showFloatingList(false);
     }
 
     private void performSearch(String query) {
@@ -267,47 +292,77 @@ public class CheckInController implements Initializable {
     private void handleCheckIn(MouseEvent event) {
         // Prevent duplicate check-ins
         for (MemberLogEntry entry : logEntries) {
-            if (entry.getName().equals(display.getFirstName()) && entry.getCheckOutTime().equals(" — ")) {
+            if (entry.getName().equals(currentMember.getFirstName()) && entry.getCheckOutTime().equals(" — ")) {
                 return; // Already checked in
             }
         }
-        MemberLogEntry entry = new MemberLogEntry(display);
-        logEntries.add(entry);
+        MemberLogEntry entry = new MemberLogEntry(currentMember, LocalDateTime.now());
+        logEntries.add(0, entry);
+        checkInTable.scrollTo(0);
 
         // Update actively displayed member
-        display.setChecked(true);
+        currentMember.setChecked(true);
+        handleSave();
         
         // Swap visible button:     check in -> check out
         checkInButton.setVisible(false);
         checkInButton.setManaged(false);
+        checkInHeaderButton.setVisible(false);
+        checkInHeaderButton.setManaged(false);
         checkOutButton.setVisible(true);
         checkOutButton.setManaged(true);
+        checkOutHeaderButton.setVisible(true);
+        checkOutHeaderButton.setManaged(true);
     }
     
     @FXML
     private void handleCheckOut(MouseEvent event) {
-        for (MemberLogEntry entry : logEntries) {
-            if (entry.getName().equals(display.getFirstName()) && entry.getCheckOutTime().equals(" — ")) {
-                entry.setCheckOutTime(java.time.LocalDateTime.now());
+        MemberLogEntry entry;
+        for (int i=0; i < logEntries.size(); i++) {
+            entry = logEntries.get(i);
+            if (entry.getName().equals(currentMember.getFirstName()) && entry.getCheckOutTime().equals(" — ")) {
+                entry.setCheckOutTime(LocalDateTime.now());
 
                 // Trigger a table update
-                checkInTable.refresh();
-                return;
+                logEntries.set(i, entry);
+                checkInTable.scrollTo(i);
+                break;
             }
         }
 
         // Update actively displayed member
-        display.setChecked(false);
+        currentMember.setChecked(false);
+        handleSave();
 
         // Swap visible button
         checkInButton.setVisible(true);
         checkInButton.setManaged(true);
+        checkInHeaderButton.setVisible(true);
+        checkInHeaderButton.setManaged(true);
         checkOutButton.setVisible(false);
         checkOutButton.setManaged(false);
+        checkOutHeaderButton.setVisible(false);
+        checkOutHeaderButton.setManaged(false);
+    }
+
+    private void handleSave() {
+        try {
+            boolean success = apiService.updateMember(currentMember);
+            if (success) {
+                // maybe show a confirmation
+                System.out.println("\nDEBUG: SUCCESS - member info saved\n");
+            } else {
+                // show error
+                System.out.println("\nDEBUG: member info could not be saved\n");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            // show error dialog
+        }
     }
 
     private void displayMember(Member member) {
-        display = member;
+        currentMember = member;
         // Display sidebar
         memberDisplay.setVisible(true);
         memberDisplay.setManaged(true);
@@ -361,10 +416,14 @@ public class CheckInController implements Initializable {
     private void updateListView(List<Member> members) {
         floatingListView.getItems().setAll(members);
         if (!members.isEmpty()) {
-            floatingListView.setVisible(true);
+            showFloatingList(true);
         } else {
-            floatingListView.setVisible(false);
+            showFloatingList(false);
         }
     }
 
+    private void showFloatingList(Boolean show) {
+        floatingPane.setMouseTransparent(!show);
+        floatingListView.setVisible(show);
+    }
 }

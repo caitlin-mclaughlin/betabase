@@ -3,13 +3,13 @@ package com.betabase.utils;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.util.function.Consumer;
 
-import com.betabase.controllers.MemberController;
-import com.betabase.models.Member;
+import java.net.URL;
+
 import com.betabase.services.MemberApiService;
 
 public class SceneManager {
@@ -31,29 +31,27 @@ public class SceneManager {
         }
     }
 
-    public static void switchToMemberWindow(Stage stage, Member member) {
+    public static <T> void switchToAPIWindow(Stage stage, Consumer<T> controllerConfigurator, String fxmlPath) {
         try {
-            // Load fxml scene and show next stage
-            FXMLLoader loader = new FXMLLoader(SceneManager.class.getResource("/com/betabase/views/member.fxml"));
-            Parent root = loader.load();
-
-            // Set member and api Service
-            MemberController controller = loader.getController();
-            if (controller != null) {
-                controller.setMember(member);
-                controller.setApiService(apiService);
-            } else {
-                System.out.println("\nDEBUG: Null member controller\n");
+            URL location = SceneManager.class.getResource(fxmlPath);
+            if (location == null) {
+                throw new IllegalArgumentException("FXML file not found: " + fxmlPath);
             }
-            
-            // Show stage
-            stage.setTitle("Member Details");
-            stage.setScene(new Scene(root));
-            stage.initModality(Modality.APPLICATION_MODAL); // Block input to other windows
-            stage.showAndWait();
 
+            FXMLLoader loader = new FXMLLoader(location);
+
+            // Defer controller config until after instance is created by FXMLLoader
+            Parent root = loader.load();
+            T controller = loader.getController();
+            if (controllerConfigurator != null) {
+                controllerConfigurator.accept(controller);
+            }
+
+            Scene scene = new Scene(root);
+            stage.setScene(scene);
+            stage.show();
         } catch (IOException e) {
-            e.printStackTrace(); // Or show an error dialog
+            e.printStackTrace();
         }
     }
 }

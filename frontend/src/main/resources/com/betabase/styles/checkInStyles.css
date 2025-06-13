@@ -67,6 +67,7 @@
     -fx-min-width: 150px;
     -fx-min-height: 40px;
     -fx-max-height: 40px;
+    -fx-alignment: CENTER;
 }
 
 .new-member:hover {
@@ -81,8 +82,10 @@
 
 .table-view {
     -fx-background-color: -fx-color-shadow;
+    -fx-border-color: transparent;
     -fx-text-fill: -fx-base-color;
     -fx-spacing: 0px;
+    -fx-background-insets: 0;
     -fx-padding: 5px;
     -fx-font-size: 16px;
     -fx-border-radius: 15px;
@@ -90,11 +93,67 @@
 }
 
 .table-view .column-header {
-    -fx-background-color: -fx-light-color;
+    -fx-border-color: transparent -fx-base-color transparent transparent;
+    -fx-background-color: transparent;
     -fx-text-fill: -fx-base-color;
+    -fx-background-insets: 0;
+    -fx-font-size: 16px;
     -fx-font-weight: bold;
 }
 
-.table-view .row {
+.table-view .column-header:last-visible {
+    -fx-border-color: transparent;
+}
 
+.table-view .column-header-background {
+    -fx-background-color: -fx-light-color;
+    -fx-background-radius: 15px;
+    -fx-border-insets: 0;
+    -fx-background-insets: 0;
+    -fx-padding: 0;
+}
+
+.table-view .column-resize-line {
+    -fx-background-color: -fx-base-color;
+    -fx-border-color: -fx-base-color;
+    -fx-border-insets: 0;
+    -fx-background-insets: 0;
+}
+
+.table-view .column-drag-header {
+    -fx-background-color: -fx-base-color;
+    -fx-text-fill: -fx-light-color;;
+}
+
+.table-row-cell {
+    -fx-background-color: -fx-color-shadow;
+    -fx-border-color: transparent;
+    -fx-text-fill: -fx-base-color;
+    -fx-font-size: 16px;
+    -fx-border-insets: 0;
+    -fx-background-insets: 0;
+    -fx-padding: 0;
+    -fx-border-radius: 15px;
+    -fx-background-radius: 15px;
+}
+
+.table-row-cell:hover {
+    -fx-border-color: -fx-base-color;
+}
+
+.table-row-cell:odd {
+    -fx-background-color: -fx-light-color;
+}
+
+.table-cell {
+    -fx-border-color: transparent -fx-base-color transparent transparent;
+    -fx-border-insets: 0;
+    -fx-background-insets: 0;
+    -fx-padding: 0 5 0 5;
+    -fx-min-width: 115px;
+    -fx-alignment: CENTER;
+}
+
+.table-cell:last-visible {
+    -fx-border-color: transparent;
 }

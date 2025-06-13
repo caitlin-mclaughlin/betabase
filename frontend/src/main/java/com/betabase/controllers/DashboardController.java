@@ -1,6 +1,7 @@
 package com.betabase.controllers;
 
 import com.betabase.models.Member;
+import com.betabase.services.MemberApiService;
 import com.betabase.utils.SceneManager;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -10,7 +11,6 @@ import javafx.beans.binding.Bindings;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -27,7 +27,6 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import javafx.scene.text.Font;
 import javafx.util.Duration;
 
 import java.io.IOException;
@@ -77,7 +76,6 @@ public class DashboardController implements Initializable {
                 private final Label phoneLabel = new Label();
                 private final Label emailLabel = new Label();
                 private final HBox content = new HBox(30);
-                private final VBox container = new VBox(0);
 
                 {
                     // Add style classes
@@ -236,7 +234,14 @@ public class DashboardController implements Initializable {
     }
 
     private void openMemberWindow(Member member) {
-        SceneManager.switchToMemberWindow(new Stage(), member);
+        SceneManager.switchToAPIWindow(
+            new Stage(), 
+            (MemberController controller) -> {
+                controller.setApiService(new MemberApiService());
+                controller.setMember(member);
+            },
+            "/com/betabase/views/member.fxml"
+        );
         search.clear();
     }
     

@@ -51,16 +51,16 @@
                             </ImageView>
                         </StackPane>
                     </HBox>
-                    <Button styleClass="search-button" text="Check In"  onMouseClicked="#handleCheckIn" />
-                    <Button styleClass="search-button" text="Check Out"  onMouseClicked="#handleCheckOut" 
+                    <Button fx:id="checkInHeaderButton" styleClass="search-button" text="Check In"  onMouseClicked="#handleCheckIn" />
+                    <Button fx:id="checkOutHeaderButton" styleClass="search-button" text="Check Out"  onMouseClicked="#handleCheckOut" 
                             visible="false" managed="false" style="-fx-background-color: -fx-accent-color;" />
                 </HBox>
                 <TableView fx:id="checkInTable" styleClass="table-view" VBox.vgrow="ALWAYS" />
             </VBox>
-            <Pane fx:id="floatingPane">
+            <Pane fx:id="floatingPane" mouseTransparent="true">
                 <ListView fx:id="floatingListView" style="-fx-border-color: -fx-base-color; -fx-max-height: 300px;                          -fx-max-width: 600px; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 6, 0.2, 0, 2);" styleClass="list-view" visible="false" StackPane.alignment="TOP_LEFT" />
             </Pane>
-            </StackPane>
+        </StackPane>
     </center>
 
     <right>

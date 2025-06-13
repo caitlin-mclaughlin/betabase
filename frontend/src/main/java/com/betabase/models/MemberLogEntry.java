@@ -2,7 +2,6 @@ package com.betabase.models;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 
 import javafx.beans.property.SimpleStringProperty;
@@ -21,14 +20,29 @@ public class MemberLogEntry {
     private static final DateTimeFormatter TIME_FORMAT_24HR = DateTimeFormatter.ofPattern("H:mm a");
     private boolean format_12Hr;
 
-    public MemberLogEntry(Member member) {
-        name = new SimpleStringProperty(member.getFirstName());
-        checkInTime = LocalDateTime.now();
+    public MemberLogEntry() {
+        date = null;
+        name = new SimpleStringProperty("");
+        membershipType = new SimpleStringProperty("");
+        phoneNumber = new SimpleStringProperty("");
+        email = new SimpleStringProperty("");
+
+        checkInTime = null;
         checkOutTime = null;
+
+        format_12Hr = true; // Default to 12Hr clock
+    }
+
+    public MemberLogEntry(Member member, LocalDateTime checkInTime) {
+        date = checkInTime.toLocalDate();
+
+        name = new SimpleStringProperty(member.getFirstName());
         membershipType = new SimpleStringProperty(member.getType());
         phoneNumber = new SimpleStringProperty(member.getPhoneNumber());
         email = new SimpleStringProperty(member.getEmail());
-        date = LocalDate.now();
+
+        this.checkInTime = checkInTime;
+        checkOutTime = null;
 
         format_12Hr = true; // Default to 12Hr clock
     }
@@ -53,6 +67,8 @@ public class MemberLogEntry {
         String formatted;
         if (checkInTime != null) {
             formatted = format_12Hr ? checkInTime.format(TIME_FORMAT_12HR) : checkInTime.format(TIME_FORMAT_24HR);
+        } else if (name.get().isBlank()) {
+            formatted = "";
         } else {
             formatted = " — ";
         }
@@ -62,6 +78,8 @@ public class MemberLogEntry {
         String formatted;
         if (checkOutTime != null) {
             formatted = format_12Hr ? checkOutTime.format(TIME_FORMAT_12HR) : checkOutTime.format(TIME_FORMAT_24HR);
+        } else if (name.get().isBlank()) {
+            formatted = "";
         } else {
             formatted = " — ";
         }
