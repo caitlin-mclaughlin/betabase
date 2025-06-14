@@ -24,6 +24,8 @@ public class Main extends Application {
 
         primaryStage.setTitle("BetaBase");
         primaryStage.setScene(scene);
+        primaryStage.setMinWidth(width - 150);
+        primaryStage.setMinHeight(height - 100);
         primaryStage.show();
     }
 

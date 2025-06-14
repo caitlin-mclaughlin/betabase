@@ -30,7 +30,7 @@ public class MemberService {
         return repo.findAll();
     }
 
-    public Optional<Member> getMemberById(Long id) {
+    public Optional<Member> getById(Long id) {
         return repo.findById(id);
     }
 

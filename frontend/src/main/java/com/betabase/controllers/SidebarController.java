@@ -64,13 +64,14 @@ public class SidebarController {
 
     @FXML
     protected void handleMemberClick(MouseEvent event) {
-        SceneManager.switchToAPIWindow(
+        SceneManager.switchToAPIScene(
             (Stage) memberLabel.getScene().getWindow(), 
             (CheckInController controller) -> {
                 controller.setApiService(new MemberApiService());
                 // Optionally: controller.setInitialMember(someMember);
             },
-            "/com/betabase/views/checkIn.fxml"
+            "/com/betabase/views/checkIn.fxml",
+            false
         );
     }
 

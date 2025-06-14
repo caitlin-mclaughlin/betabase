@@ -113,16 +113,18 @@
 }
 
 .list-view .scroll-bar:horizontal {
-    -fx-background-color: -fx-light-color;
-    -fx-border-radius: 6px;
-    -fx-background-radius: 6px;
+    -fx-background-color: -fx-base-color;
+    -fx-padding: 1 2 1 2;
+    -fx-border-radius: 10px;
+    -fx-background-radius: 10px;
     -fx-unit-increment: 100;
 }
 
 .list-view .scroll-bar:vertical {
-    -fx-background-color: -fx-light-color;
-    -fx-border-radius: 6px;
-    -fx-background-radius: 6px;
+    -fx-background-color: -fx-base-color;
+    -fx-padding: 1 2 1 2;
+    -fx-border-radius: 10px;
+    -fx-background-radius: 10px;
     -fx-unit-increment: 100;
 }
 
@@ -141,7 +143,7 @@
 
 .list-view .scroll-bar .increment-arrow,
 .list-view .scroll-bar .decrement-arrow {
-    -fx-background-color: -fx-base-color;
+    -fx-background-color: -fx-color-shadow;
 }
 
 .photo-button {

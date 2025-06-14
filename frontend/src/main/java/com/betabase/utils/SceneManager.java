@@ -3,6 +3,7 @@ package com.betabase.utils;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import java.io.IOException;
@@ -10,6 +11,8 @@ import java.util.function.Consumer;
 
 import java.net.URL;
 
+import com.betabase.controllers.MemberController;
+import com.betabase.models.Member;
 import com.betabase.services.MemberApiService;
 
 public class SceneManager {
@@ -31,7 +34,8 @@ public class SceneManager {
         }
     }
 
-    public static <T> void switchToAPIWindow(Stage stage, Consumer<T> controllerConfigurator, String fxmlPath) {
+    public static <T> void switchToAPIScene(Stage stage, Consumer<T> controllerConfigurator, 
+                                            String fxmlPath, Boolean newWindow) {
         try {
             URL location = SceneManager.class.getResource(fxmlPath);
             if (location == null) {
@@ -47,9 +51,14 @@ public class SceneManager {
                 controllerConfigurator.accept(controller);
             }
 
-            Scene scene = new Scene(root);
-            stage.setScene(scene);
-            stage.show();
+            if (newWindow) {
+                stage.setScene(new Scene(root));
+                stage.initModality(Modality.APPLICATION_MODAL); // Block input to other windows
+                stage.showAndWait();
+            } else {
+                stage.setScene(new Scene(root, stage.getWidth(), stage.getHeight()));
+                stage.show();
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }

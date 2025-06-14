@@ -133,17 +133,11 @@ public class Member {
         }
     }
 
-    public Boolean getClocked() { return clocked; }
-    public void setClocked(Boolean clocked) { 
-        this.clocked = clocked;
-        // Log current time;
-    }
+    public Boolean getClocked() { return clocked != null ? clocked : false; }
+    public void setClocked(Boolean clocked) { this.clocked = clocked; }
 
-    public Boolean getChecked() { return checked; }
-    public void setChecked(Boolean checked) { 
-        this.checked = checked;
-        // Log current time;
-    }
+    public Boolean getChecked() { return checked != null ? checked : false; }
+    public void setChecked(Boolean checked) { this.checked = checked; }
 
     public void Login() { loggedIn = true; }
     public void Logout() { loggedIn = false; }

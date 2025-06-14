@@ -2,8 +2,7 @@ package com.example.betabase.models;
 
 import jakarta.persistence.*;
 import java.time.LocalDate;
-
-import org.springframework.cglib.core.Local;
+import java.util.List;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -20,7 +19,7 @@ public class Member {
     private Long id;
 
     @Column(nullable = false)
-    private Long gymId;
+    private List<Long> gymIds;
 
     private String firstName;
     private String prefName;
@@ -34,6 +33,8 @@ public class Member {
     private String memberId;
     private LocalDate memberSince;
     private String type;
+    private Boolean clocked;
+    private Boolean checked;
 
     // Billing Info
     private String billingMethod;
@@ -43,10 +44,19 @@ public class Member {
     private String emergencyContactName;
     private String emergencyContactPhone;
     private String emergencyContactEmail;
-    
+
+    public boolean hasMembershipAt(Long gymId) {
+        return this.getGymIds().contains(gymId);
+    }
+
     // Getters and setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
+
+    public List<Long> geGymIds() { return gymIds; }
+    public void setGymIds(List<Long> gymIds) { this.gymIds = gymIds; }
+    public void addGymId(Long gymId) { gymIds.add(gymId); }
+    public void removeGymId(Long gymId) { gymIds.remove(gymId); }
 
     public String getFirstName() { return firstName; }
     public void setFirstName(String firstName) { this.firstName = firstName; }
@@ -83,6 +93,12 @@ public class Member {
 
     public String getAddress() { return address; }
     public void setAddress(String address) { this.address = address; }
+
+    public Boolean getClocked() { return clocked; }
+    public void setClocked(Boolean clocked) { this.clocked = clocked; }
+
+    public Boolean getChecked() { return checked; }
+    public void setChecked(Boolean checked) { this.checked = checked; }
 
     public String getBillingMethod() { return billingMethod; }
     public void setBillingMethod(String billingMethod) { this.billingMethod = billingMethod; }

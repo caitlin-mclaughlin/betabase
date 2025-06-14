@@ -7,14 +7,14 @@ import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Repository;
 
 @Repository
 public interface MemberRepository extends JpaRepository<Member, Long> {
-    
-    Optional<Member> findByMemberId(String memberId);
 
-    Optional<Member> findById(Long id);
+    @NonNull
+    Optional<Member> findById(@NonNull Long id);
 
     @Query("SELECT m FROM Member m WHERE " +
            "LOWER(m.memberId) LIKE LOWER(CONCAT('%', :query, '%')) OR " +

@@ -27,7 +27,7 @@ public class MemberController {
     
     @GetMapping("/{id}")
     public ResponseEntity<Member> getMemberById(@PathVariable Long id) {
-        return service.getMemberById(id)
+        return service.getById(id)
             .map(ResponseEntity::ok)
             .orElse(ResponseEntity.notFound().build());
     }
@@ -51,7 +51,7 @@ public class MemberController {
 
     @PostMapping("/{id}")
     public ResponseEntity<Member> updateMember(@PathVariable Long id, @RequestBody Member updatedMember) {
-        Member existing = service.getMemberById(id).orElse(null);
+        Member existing = service.getById(id).orElse(null);
         if (existing != null) {
             updatedMember.setId(existing.getId()); // Keep same ID
             Member saved = service.save(updatedMember);

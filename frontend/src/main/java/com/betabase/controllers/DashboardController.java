@@ -234,13 +234,14 @@ public class DashboardController implements Initializable {
     }
 
     private void openMemberWindow(Member member) {
-        SceneManager.switchToAPIWindow(
+        SceneManager.switchToAPIScene(
             new Stage(), 
             (MemberController controller) -> {
                 controller.setApiService(new MemberApiService());
                 controller.setMember(member);
             },
-            "/com/betabase/views/member.fxml"
+            "/com/betabase/views/member.fxml",
+            true
         );
         search.clear();
     }

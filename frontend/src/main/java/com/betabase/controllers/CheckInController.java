@@ -1,6 +1,7 @@
 package com.betabase.controllers;
 
 import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import com.betabase.models.Member;
 import com.betabase.models.MemberLogEntry;
@@ -144,7 +145,7 @@ public class CheckInController implements Initializable {
                 Member selected = floatingListView.getSelectionModel().getSelectedItem();
                 if (selected != null) {
                     showFloatingList(false);
-                    displayMember(selected);
+                    displayMember(selected.getId());
 
                     // Force focus back to the search box and highlight text
                     Platform.runLater(() -> {
@@ -159,7 +160,6 @@ public class CheckInController implements Initializable {
             // Create columns
             TableColumn<MemberLogEntry, String> nameCol = new TableColumn<>("Name");
             nameCol.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getName()));
-            nameCol.getStyleClass().add("left-rounded-cell");
 
             TableColumn<MemberLogEntry, String> checkInCol = new TableColumn<>("Check In");
             checkInCol.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getCheckInTime()));
@@ -172,7 +172,6 @@ public class CheckInController implements Initializable {
 
             TableColumn<MemberLogEntry, String> phoneCol = new TableColumn<>("Phone");
             phoneCol.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getPhoneNumber()));
-            phoneCol.getStyleClass().add("right-rounded-cell");
             
             // Optional column resizing behavior
             checkInTable.setColumnResizePolicy(TableView.UNCONSTRAINED_RESIZE_POLICY);
@@ -181,12 +180,27 @@ public class CheckInController implements Initializable {
             checkInTable.getColumns().addAll(nameCol, checkInCol, checkOutCol, membershipCol, phoneCol);
             checkInTable.setItems(logEntries);
 
-            checkInTable.getItems()
+            checkInTable.setOnMouseClicked(event -> {
+                MemberLogEntry selectedLog = checkInTable.getSelectionModel().getSelectedItem();
+                if (selectedLog != null && selectedLog.getMemberId() != null) {
+                    displayMember(selectedLog.getMemberId());
+                }
+            });
 
             if (checkInTable.getItems().isEmpty()) {
                 MemberLogEntry nullMember = new MemberLogEntry();
                 logEntries.add(nullMember);
             }
+            checkInTable.getColumns().addListener((ListChangeListener<TableColumn<MemberLogEntry, ?>>) change -> {
+                while (change.next()) {
+                    if (change.wasPermutated() || change.wasReplaced() || change.wasUpdated()) {
+                        // Optional: skip, unless reordering
+                    }
+                    updateFirstColumnStyle(checkInTable);
+                }
+            });
+
+            updateFirstColumnStyle(checkInTable); // initial call
 
             checkInTable.widthProperty().addListener((obs, oldVal, newVal) -> {
                 double totalWidth = newVal.doubleValue();
@@ -228,8 +242,6 @@ public class CheckInController implements Initializable {
                 if (!newVal.isEmpty()) {
                     positionFloatingList();
                     performSearch(newVal);
-                } else if (!oldVal.isEmpty()) {
-                    search.positionCaret(search.getText().length());
                 } else {
                     showFloatingList(false);
                 }
@@ -292,10 +304,12 @@ public class CheckInController implements Initializable {
     private void handleCheckIn(MouseEvent event) {
         // Prevent duplicate check-ins
         for (MemberLogEntry entry : logEntries) {
-            if (entry.getName().equals(currentMember.getFirstName()) && entry.getCheckOutTime().equals(" — ")) {
+            if (currentMember != null && currentMember.getId().equals(entry.getMemberId())
+                    && entry.getCheckOutTime().equals(" — ")) {
                 return; // Already checked in
             }
         }
+        // Create log entry
         MemberLogEntry entry = new MemberLogEntry(currentMember, LocalDateTime.now());
         logEntries.add(0, entry);
         checkInTable.scrollTo(0);
@@ -303,16 +317,6 @@ public class CheckInController implements Initializable {
         // Update actively displayed member
         currentMember.setChecked(true);
         handleSave();
-        
-        // Swap visible button:     check in -> check out
-        checkInButton.setVisible(false);
-        checkInButton.setManaged(false);
-        checkInHeaderButton.setVisible(false);
-        checkInHeaderButton.setManaged(false);
-        checkOutButton.setVisible(true);
-        checkOutButton.setManaged(true);
-        checkOutHeaderButton.setVisible(true);
-        checkOutHeaderButton.setManaged(true);
     }
     
     @FXML
@@ -320,7 +324,8 @@ public class CheckInController implements Initializable {
         MemberLogEntry entry;
         for (int i=0; i < logEntries.size(); i++) {
             entry = logEntries.get(i);
-            if (entry.getName().equals(currentMember.getFirstName()) && entry.getCheckOutTime().equals(" — ")) {
+            if (currentMember != null && currentMember.getId().equals(entry.getMemberId())
+                    && entry.getCheckOutTime().equals(" — ")) {
                 entry.setCheckOutTime(LocalDateTime.now());
 
                 // Trigger a table update
@@ -333,16 +338,6 @@ public class CheckInController implements Initializable {
         // Update actively displayed member
         currentMember.setChecked(false);
         handleSave();
-
-        // Swap visible button
-        checkInButton.setVisible(true);
-        checkInButton.setManaged(true);
-        checkInHeaderButton.setVisible(true);
-        checkInHeaderButton.setManaged(true);
-        checkOutButton.setVisible(false);
-        checkOutButton.setManaged(false);
-        checkOutHeaderButton.setVisible(false);
-        checkOutHeaderButton.setManaged(false);
     }
 
     private void handleSave() {
@@ -351,6 +346,9 @@ public class CheckInController implements Initializable {
             if (success) {
                 // maybe show a confirmation
                 System.out.println("\nDEBUG: SUCCESS - member info saved\n");
+                if (currentMember != null) {
+                    displayMember(currentMember.getId());  // Refresh display
+                }
             } else {
                 // show error
                 System.out.println("\nDEBUG: member info could not be saved\n");
@@ -361,44 +359,63 @@ public class CheckInController implements Initializable {
         }
     }
 
-    private void displayMember(Member member) {
-        currentMember = member;
-        // Display sidebar
-        memberDisplay.setVisible(true);
-        memberDisplay.setManaged(true);
-        
-        // Validate and display member info
-        nameLabel.setText(member.getLastName() + ",  " + member.getFirstName() + "  \"" + 
-                          member.getPrefName() + "\"  (" + member.getPronouns() + ")");
-        phoneLabel.setText(member.getPhoneNumber());
-        emailLabel.setText(member.getEmail());
-        memberIdLabel.setText(member.getMemberId());
-        memberSinceLabel.setText(member.getMemberSince() != null ? member.getMemberSince().toString()  : "MM/DD/YYYY");
-        addressLabel.setText(member.getAddress());
-        eNameLabel.setText(member.getEmergencyContactName());
-        ePhoneLabel.setText(member.getEmergencyContactPhone());
+    private void displayMember(Long memberId) {
+        try {
+            currentMember = apiService.getMemberById(memberId);
 
-        // Calculate and display age and member since
-        LocalDate dob = member.getDateOfBirth();
-        String age = dob != null ? String.format("%s", Year.now().getValue() - dob.getYear()) : "Unknown";
-        ageLabel.setText(age);
-        LocalDate dom = member.getMemberSince();
-        String memSince = dom != null ? String.format("%s", Year.now().getValue() - dom.getYear()) : "N/A";
-        memberSinceLabel.setText(memSince);
+            // Display sidebar
+            memberDisplay.setVisible(true);
+            memberDisplay.setManaged(true);
+            
+            // Validate and display member info
+            nameLabel.setText(currentMember.getLastName() + ",  " + currentMember.getFirstName() + "  \"" + 
+                            currentMember.getPrefName() + "\"  (" + currentMember.getPronouns() + ")");
+            phoneLabel.setText(currentMember.getPhoneNumber());
+            emailLabel.setText(currentMember.getEmail());
+            memberIdLabel.setText(currentMember.getMemberId());
+            memberSinceLabel.setText(currentMember.getMemberSince() != null ? currentMember.getMemberSince().toString()  : "MM/DD/YYYY");
+            addressLabel.setText(currentMember.getAddress());
+            eNameLabel.setText(currentMember.getEmergencyContactName());
+            ePhoneLabel.setText(currentMember.getEmergencyContactPhone());
 
-        // Style and display member type
-        String type = member.getType().toUpperCase();
-        typeLabel.setText(type);
-        String bgColor = switch (type) {
-            case "ADMIN" -> "-fx-color-pos3";
-            case "MEMBER" -> "-fx-color-pos1";
-            case "STAFF" -> "-fx-color-pos4";
-            case "VISITOR" -> "-fx-color-pos2";
-            default -> "-fx-accent-color";
-        };
-        typeLabel.setStyle(String.format(
-            "-fx-background-color: %s;", bgColor
-        ));
+            // Calculate and display age and member since
+            LocalDate dob = currentMember.getDateOfBirth();
+            String age = dob != null ? String.format("%s", Year.now().getValue() - dob.getYear()) : "Unknown";
+            ageLabel.setText(age);
+            LocalDate dom = currentMember.getMemberSince();
+            String memSince = dom != null ? String.format("%s", Year.now().getValue() - dom.getYear()) : "N/A";
+            memberSinceLabel.setText(memSince);
+
+            // Style and display member type
+            String type = currentMember.getType().toUpperCase();
+            typeLabel.setText(type);
+            String bgColor = switch (type) {
+                case "ADMIN" -> "-fx-color-pos3";
+                case "MEMBER" -> "-fx-color-pos1";
+                case "STAFF" -> "-fx-color-pos4";
+                case "VISITOR" -> "-fx-color-pos2";
+                default -> "-fx-accent-color";
+            };
+            typeLabel.setStyle(String.format(
+                "-fx-background-color: %s;", bgColor
+            ));
+
+            // Swap visible button
+            Boolean checkedIn = currentMember.getChecked();
+
+            checkInButton.setVisible(!checkedIn);
+            checkInButton.setManaged(!checkedIn);
+            checkInHeaderButton.setVisible(!checkedIn);
+            checkInHeaderButton.setManaged(!checkedIn);
+            checkOutButton.setVisible(checkedIn);
+            checkOutButton.setManaged(checkedIn);
+            checkOutHeaderButton.setVisible(checkedIn);
+            checkOutHeaderButton.setManaged(checkedIn);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            // show error dialog
+        }
     }
 
     private void positionFloatingList() {
@@ -412,6 +429,14 @@ public class CheckInController implements Initializable {
         floatingListView.setPrefWidth(searchBox.getWidth());
     }
 
+    private void updateFirstColumnStyle(TableView<?> tableView) {
+        for (TableColumn<?, ?> column : tableView.getColumns()) {
+            column.getStyleClass().remove("first-visible-column");
+        }
+        if (!tableView.getColumns().isEmpty()) {
+            tableView.getColumns().get(0).getStyleClass().add("first-visible-column");
+        }
+    }
 
     private void updateListView(List<Member> members) {
         floatingListView.getItems().setAll(members);

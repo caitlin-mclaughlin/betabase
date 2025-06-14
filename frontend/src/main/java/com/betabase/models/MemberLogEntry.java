@@ -8,6 +8,7 @@ import javafx.beans.property.SimpleStringProperty;
 
 public class MemberLogEntry {
     private final LocalDate date;
+    private final Long memberId;
     private final SimpleStringProperty name;
     private final SimpleStringProperty membershipType;
     private final SimpleStringProperty phoneNumber;
@@ -22,6 +23,7 @@ public class MemberLogEntry {
 
     public MemberLogEntry() {
         date = null;
+        memberId = null;
         name = new SimpleStringProperty("");
         membershipType = new SimpleStringProperty("");
         phoneNumber = new SimpleStringProperty("");
@@ -35,7 +37,7 @@ public class MemberLogEntry {
 
     public MemberLogEntry(Member member, LocalDateTime checkInTime) {
         date = checkInTime.toLocalDate();
-
+        this.memberId = member.getId();
         name = new SimpleStringProperty(member.getFirstName());
         membershipType = new SimpleStringProperty(member.getType());
         phoneNumber = new SimpleStringProperty(member.getPhoneNumber());
@@ -87,6 +89,7 @@ public class MemberLogEntry {
     }
 
     // Getters
+    public Long getMemberId() { return memberId; }
     public String getName() { return name.get(); }
     public String getMembershipType() { return membershipType.get(); }
     public String getPhoneNumber() { return phoneNumber.get(); }
