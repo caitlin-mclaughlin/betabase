@@ -7,9 +7,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.TextField;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
 import java.io.IOException;
@@ -22,12 +20,18 @@ public class PosController implements Initializable {
     @FXML private TextField search;
     @FXML private SplitPane splitPane;
     
+    private SidebarController sidebarController;
+
+    public void setMenuOpen(boolean menuOpen) {
+        sidebarController.setMenuOpen(menuOpen);
+    }
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/betabase/views/sidebar.fxml"));
             VBox sidebar = loader.load();
-            
+            sidebarController = loader.getController();
             mainPane.setLeft(sidebar);
 
             // Bind sidebar width to the smaller of 25% of total width or 300px
@@ -66,7 +70,7 @@ public class PosController implements Initializable {
 
 
     @FXML
-    private void handleCancelClick(MouseEvent event) {
+    private void handleCancelClick() {
         // your handling code here, e.g.:
         search.clear();
     }

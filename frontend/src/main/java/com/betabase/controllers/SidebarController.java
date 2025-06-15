@@ -1,19 +1,13 @@
 package com.betabase.controllers;
 
-import java.io.IOException;
 import java.util.List;
 
 import com.betabase.services.MemberApiService;
 import com.betabase.utils.SceneManager;
 
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
-import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
@@ -22,21 +16,37 @@ public class SidebarController {
     
     @FXML private VBox sidebar;
     @FXML private ImageView logo;
-    @FXML private Label analyticsLabel;
-    @FXML private Label calLabel;
-    @FXML private Label posLabel;
     @FXML private Label memberLabel;
+    @FXML private Label posLabel;
+    @FXML private Label calLabel;
+    @FXML private Label analyticsLabel;
     @FXML private Label settingsLabel;
-    @FXML private HBox analytics;
-    @FXML private HBox cal;
     @FXML private HBox member;
     @FXML private HBox pos;
+    @FXML private HBox cal;
+    @FXML private HBox analytics;
     @FXML private HBox settings;
+    @FXML private HBox menu;
+
+    private boolean menuOpen;
+
+    public void setMenuOpen(boolean menuOpen) {
+        this.menuOpen = !menuOpen; // set opposite then toggle immediately
+        toggleMenuVisibility();
+    }
+
+    public boolean getMenuOpen() { return menuOpen; }
 
     @FXML
-    private void handleLogoClick(MouseEvent event) {
-        SceneManager.switchScene((Stage) ((ImageView) event.getSource()).getScene().getWindow(), 
-                        "/com/betabase/views/dashboard.fxml");
+    private void handleLogoClick() {
+        SceneManager.switchScene(
+            (Stage) logo.getScene().getWindow(),
+            (DashboardController controller) -> {
+                controller.setMenuOpen(menuOpen);
+            },
+            "/com/betabase/views/dashboard.fxml",
+            false
+        );
     }
 
     public void setActiveSection(String section) {
@@ -63,12 +73,12 @@ public class SidebarController {
     }
 
     @FXML
-    protected void handleMemberClick(MouseEvent event) {
-        SceneManager.switchToAPIScene(
+    protected void handleMemberClick() {
+        SceneManager.switchScene(
             (Stage) memberLabel.getScene().getWindow(), 
             (CheckInController controller) -> {
                 controller.setApiService(new MemberApiService());
-                // Optionally: controller.setInitialMember(someMember);
+                controller.setMenuOpen(menuOpen);
             },
             "/com/betabase/views/checkIn.fxml",
             false
@@ -76,27 +86,79 @@ public class SidebarController {
     }
 
     @FXML
-    private void handlePosClick(MouseEvent event) {
-        SceneManager.switchScene((Stage) posLabel.getScene().getWindow(), 
-                        "/com/betabase/views/pos.fxml");
+    private void handlePosClick() {
+        SceneManager.switchScene(
+            (Stage) posLabel.getScene().getWindow(),
+            (PosController controller) -> {
+                controller.setMenuOpen(menuOpen);
+            },
+            "/com/betabase/views/pos.fxml",
+            false
+        );
     }
 
     @FXML
-    protected void handleCalendarClick(MouseEvent event) {
-        SceneManager.switchScene((Stage) calLabel.getScene().getWindow(),
-                        "/com/betabase/views/calendar.fxml");
+    protected void handleCalendarClick() {
+        SceneManager.switchScene(
+            (Stage) calLabel.getScene().getWindow(),
+            (CalendarController controller) -> {
+                controller.setMenuOpen(menuOpen);
+            },
+            "/com/betabase/views/calendar.fxml",
+            false
+        );
     }
 
     @FXML
-    private void handleAnalyticsClick(MouseEvent event) {
-        SceneManager.switchScene((Stage) analyticsLabel.getScene().getWindow(),
-                        "/com/betabase/views/analytics.fxml");
+    private void handleAnalyticsClick() {
+        SceneManager.switchScene(
+            (Stage) analyticsLabel.getScene().getWindow(),
+            (AnalyticsController controller) -> {
+                controller.setMenuOpen(menuOpen);
+            },
+            "/com/betabase/views/analytics.fxml",
+            false
+        );
     }
 
     @FXML
-    private void handleSettingsClick(MouseEvent event) {
-        SceneManager.switchScene((Stage) settingsLabel.getScene().getWindow(),
-                        "/com/betabase/views/settings.fxml");
+    private void handleSettingsClick() {
+        SceneManager.switchScene(
+            (Stage) settingsLabel.getScene().getWindow(),
+            (SettingsController controller) -> {
+                controller.setMenuOpen(menuOpen);
+            },
+            "/com/betabase/views/settings.fxml",
+            false
+        );
+    }
+
+    @FXML
+    private void handleMenuClick() {
+        toggleMenuVisibility();
+    }
+
+    private void toggleMenuVisibility() {
+        if (menuOpen) {
+            sidebar.setStyle("-fx-min-width: 75px; -fx-max-width: 75px;");
+            menuOpen = false;
+        } else {
+            sidebar.setStyle("-fx-min-width: 275px; -fx-max-width: 275px;");
+            menuOpen = true;
+        }
+
+        logo.setVisible(menuOpen);
+        logo.setManaged(menuOpen);
+        memberLabel.setVisible(menuOpen);
+        memberLabel.setManaged(menuOpen);
+        posLabel.setVisible(menuOpen);
+        posLabel.setManaged(menuOpen);
+        calLabel.setVisible(menuOpen);
+        calLabel.setManaged(menuOpen);
+        analyticsLabel.setVisible(menuOpen);
+        analyticsLabel.setManaged(menuOpen);
+        settingsLabel.setVisible(menuOpen);
+        settingsLabel.setManaged(menuOpen);
     }
 
 }

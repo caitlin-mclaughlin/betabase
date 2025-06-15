@@ -15,7 +15,11 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
-<BorderPane fx:id="mainPane" prefHeight="1000.0" prefWidth="1250.0" styleClass="colors" stylesheets="@../styles/colors.css, @../styles/checkInStyles.css, @../styles/shared.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.betabase.controllers.CheckInController">
+<BorderPane fx:id="mainPane" styleClass="colors"
+            xmlns="http://javafx.com/javafx/23.0.1"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.betabase.controllers.CheckInController"
+            stylesheets="@../styles/colors.css, @../styles/checkInStyles.css, @../styles/shared.css">
 
     <center>
         <StackPane>
@@ -43,7 +47,7 @@
                             </image>
                         </ImageView>
                         <TextField fx:id="search" promptText="Search members..." styleClass="search-field" HBox.hgrow="ALWAYS" />
-                        <StackPane onMouseClicked="#handleCancelClick" style="-fx-cursor: hand; -fx-padding: 1px;">
+                        <StackPane onAction="#handleCancelClick" style="-fx-cursor: hand; -fx-padding: 1px;">
                             <ImageView fx:id="cancel_logo" fitHeight="30.0" preserveRatio="true">
                                 <image>
                                     <Image url="@/com/betabase/images/cancel.png" />
@@ -51,8 +55,8 @@
                             </ImageView>
                         </StackPane>
                     </HBox>
-                    <Button fx:id="checkInHeaderButton" styleClass="search-button" text="Check In"  onMouseClicked="#handleCheckIn" />
-                    <Button fx:id="checkOutHeaderButton" styleClass="search-button" text="Check Out"  onMouseClicked="#handleCheckOut" 
+                    <Button fx:id="checkInHeaderButton" styleClass="search-button" text="Check In"  onAction="#handleCheckIn" />
+                    <Button fx:id="checkOutHeaderButton" styleClass="search-button" text="Check Out"  onAction="#handleCheckOut" 
                             visible="false" managed="false" style="-fx-background-color: -fx-accent-color;" />
                 </HBox>
                 <TableView fx:id="checkInTable" styleClass="table-view" VBox.vgrow="ALWAYS" />
@@ -114,8 +118,8 @@
                 </VBox>
             </VBox>
             <Region VBox.vgrow="ALWAYS" />
-            <Button fx:id="checkInButton" text="Check In" styleClass="check-in-button" onMouseClicked="#handleCheckIn"/>
-            <Button fx:id="checkOutButton" text="Check Out" styleClass="check-out-button" onMouseClicked="#handleCheckOut" 
+            <Button fx:id="checkInButton" text="Check In" styleClass="check-in-button" onAction="#handleCheckIn"/>
+            <Button fx:id="checkOutButton" text="Check Out" styleClass="check-out-button" onAction="#handleCheckOut" 
                     visible="false" managed="false" />
             <Label fx:id="typeLabel" styleClass="type" />
         </VBox>

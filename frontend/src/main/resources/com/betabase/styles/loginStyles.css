@@ -1,0 +1,10 @@
+.field {
+    -fx-background-color: -fx-color-shadow;
+    -fx-border-color: -fx-base-color;
+    -fx-text-fill: -fx-base-color;
+    -fx-prompt-text-fill: -fx-color-prompt;
+    -fx-font-size: 16px;
+    -fx-padding: 0 5 0 5;
+    -fx-background-radius: 10px;
+    -fx-border-radius: 10px;
+}

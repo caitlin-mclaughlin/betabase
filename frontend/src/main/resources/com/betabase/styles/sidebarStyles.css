@@ -2,8 +2,6 @@
 
 .sidebar {
     -fx-background-color: -fx-base-color;
-    -fx-min-width: 275px;
-    -fx-max-width: 275px;
 }
 
 .sidebar-active {
@@ -18,7 +16,7 @@
 
 .nav-hbox {
     -fx-alignment: CENTER_LEFT;
-    -fx-padding: 15 20 15 20;
+    -fx-padding: 10 15 10 15;
     -fx-spacing: 15px;
     -fx-cursor: hand;
 }

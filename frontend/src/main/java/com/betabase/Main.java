@@ -1,5 +1,7 @@
 package com.betabase;
 
+import com.betabase.controllers.DashboardController;
+
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -12,7 +14,9 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
         // Load the root FXML
-        Parent root = FXMLLoader.load(getClass().getResource("/com/betabase/views/dashboard.fxml"));
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/betabase/views/dashboard.fxml"));
+        Parent root = loader.load();
+        ((DashboardController) loader.getController()).setMenuOpen(true);
 
         // Get screen bounds
         Rectangle2D screenBounds = Screen.getPrimary().getVisualBounds();

@@ -68,13 +68,6 @@
     -fx-background-color: -fx-color-selecta;
 }
 
-.welcome-label {
-    -fx-text-fill: -fx-base-color;
-    -fx-font-size: 35px;
-    -fx-font-weight: bold;
-    -fx-font-style: oblique;
-}
-
 .schedule-label {
     -fx-text-fill: -fx-base-color;
     -fx-font-size: 25px;

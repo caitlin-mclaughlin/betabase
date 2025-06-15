@@ -20,22 +20,8 @@ public class SceneManager {
     private static final MemberApiService apiService= new MemberApiService();
     private static String defaultTitle = "Betabase";
 
-    public static void switchScene(Stage stage, String fxmlPath) {
-        try {
-            // Load fxml scene and show next stage
-            FXMLLoader loader = new FXMLLoader(SceneManager.class.getResource(fxmlPath));
-
-            // Show stage
-            stage.setTitle(defaultTitle);
-            stage.setScene(new Scene(loader.load(), stage.getWidth(), stage.getHeight()));
-            stage.show();
-        } catch (IOException e) {
-            e.printStackTrace(); // Or show an error dialog
-        }
-    }
-
-    public static <T> void switchToAPIScene(Stage stage, Consumer<T> controllerConfigurator, 
-                                            String fxmlPath, Boolean newWindow) {
+    public static <T> void switchScene(Stage stage, Consumer<T> controllerConfigurator, 
+                                         String fxmlPath, Boolean newWindow) {
         try {
             URL location = SceneManager.class.getResource(fxmlPath);
             if (location == null) {

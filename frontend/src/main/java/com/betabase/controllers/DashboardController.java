@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import javafx.animation.PauseTransition;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -20,7 +21,6 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
@@ -50,6 +50,10 @@ public class DashboardController implements Initializable {
 
     private SidebarController sidebarController;
     private final HttpClient httpClient = HttpClient.newHttpClient();
+
+    public void setMenuOpen(boolean menuOpen) {
+        sidebarController.setMenuOpen(menuOpen);
+    }
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -98,11 +102,11 @@ public class DashboardController implements Initializable {
                     HBox.setHgrow(spacer, Priority.ALWAYS);
 
                     checkInButton.visibleProperty().bind(this.hoverProperty());
-                    checkInButton.setOnMouseClicked(event -> handleCheckInOut(event, true));
+                    checkInButton.setOnAction(handleCheckInOut(true));
                     checkInButton.setManaged(true);
                     checkOutButton.visibleProperty().bind(this.hoverProperty());
                     checkOutButton.setManaged(true);
-                    checkOutButton.setOnMouseClicked(event -> handleCheckInOut(event, false));
+                    checkOutButton.setOnAction(handleCheckInOut(false));
                         
                     // Add labels to row
                     content.getChildren().addAll(nameLabel, memberIdLabel, phoneLabel, emailLabel,
@@ -146,7 +150,7 @@ public class DashboardController implements Initializable {
                 }
             });
 
-            memberList.setOnMouseClicked(event -> {
+            memberList.setOnAction( {
                 if (event.getClickCount() == 2) { // double-click
                     Member selected = memberList.getSelectionModel().getSelectedItem();
                     if (selected != null) {
@@ -157,7 +161,7 @@ public class DashboardController implements Initializable {
         });
     }
 
-    private void handleCheckInOut(MouseEvent event, Boolean checked) {
+    private void handleCheckInOut(Boolean checked) {
         Member selected = memberList.getSelectionModel().getSelectedItem();
         // Only send check in/out call to backend if the member's state is different
         //  i.e. only checkIn if member is currently checked out
@@ -178,26 +182,26 @@ public class DashboardController implements Initializable {
     }
 
     public void setupActivityListeners(Scene scene) {
-        scene.addEventFilter(MouseEvent.ANY, e -> resetInactivityTimer());
-        scene.addEventFilter(KeyEvent.ANY, e -> search.requestFocus());
+        scene.addEventFilter(ActionEvent.ANY, e -> resetInactivityTimer());
+        scene.addEventFilter(ActionEvent.ANY, e -> search.requestFocus());
     }
 
     @FXML
-    private void handleCalendarClick(MouseEvent event) {
+    private void handleCalendarClick() {
         if (sidebarController != null) {
-            sidebarController.handleCalendarClick(event);
+            sidebarController.handleCalendarClick();
         }
     }
 
     @FXML
-    private void handleMemberClick(MouseEvent event) {
+    private void handleMemberClick() {
         if (sidebarController != null) {
-            sidebarController.handleMemberClick(event);
+            sidebarController.handleMemberClick();
         }
     }
 
     @FXML
-    private void handleCancelClick(MouseEvent event) {
+    private void handleCancelClick() {
         search.clear();
     }
 
@@ -234,7 +238,7 @@ public class DashboardController implements Initializable {
     }
 
     private void openMemberWindow(Member member) {
-        SceneManager.switchToAPIScene(
+        SceneManager.switchScene(
             new Stage(), 
             (MemberController controller) -> {
                 controller.setApiService(new MemberApiService());

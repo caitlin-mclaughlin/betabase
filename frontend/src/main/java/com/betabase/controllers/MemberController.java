@@ -1,13 +1,18 @@
 package com.betabase.controllers;
 
+import java.net.URL;
 import java.sql.Date;
+import java.util.ResourceBundle;
 import java.util.function.UnaryOperator;
 
+import com.betabase.enums.*;
 import com.betabase.models.Member;
 import com.betabase.services.MemberApiService;
 
 import javafx.application.Platform;
+import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.DatePicker;
@@ -18,7 +23,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.text.Text;
 import javafx.util.StringConverter;
 
-public class MemberController {
+public class MemberController implements Initializable {
     
     // Member information fields
     @FXML private Label nameLabel;
@@ -39,15 +44,15 @@ public class MemberController {
     @FXML private TextField firstNameField;
     @FXML private TextField lastNameField;
     @FXML private TextField prefNameField;
-    @FXML private ChoiceBox<String>  typeField;
-    @FXML private ChoiceBox<String> genderField;
-    @FXML private ChoiceBox<String>  pronounsField;
+    @FXML private ChoiceBox<MemberType>  typeField;
+    @FXML private ChoiceBox<GenderType> genderField;
+    @FXML private ChoiceBox<PronounsType>  pronounsField;
     @FXML private TextField phoneField;
     @FXML private TextField emailField;
     @FXML private TextField memberIdField;
 //    @FXML private DatePicker dobField;
 //    @FXML private DatePicker memberSinceField;
-    @FXML private ChoiceBox<String> billingField;
+    @FXML private ChoiceBox<BillingType> billingField;
     @FXML private TextField addressField;
     @FXML private TextField eNameField;
     @FXML private TextField ePhoneField;
@@ -69,6 +74,15 @@ public class MemberController {
 
     public void setApiService(MemberApiService apiService) {
         this.apiService = apiService;
+    }
+
+    @Override
+    public void initialize(URL location, ResourceBundle resources) {
+        typeField.setItems(FXCollections.observableArrayList(MemberType.values()));
+        genderField.setItems(FXCollections.observableArrayList(GenderType.values()));
+        pronounsField.setItems(FXCollections.observableArrayList(PronounsType.values()));
+        billingField.setItems(FXCollections.observableArrayList(BillingType.values()));
+
         setupPhoneFormatter(this.phoneField);
         initializePhoneField();
     }
@@ -190,42 +204,42 @@ public class MemberController {
         // validate and display data
         if (member.getPrefName().isBlank()) {
             nameLabel.setText(member.getLastName() + ", " + member.getFirstName() +
-                              "  (" + member.getPronouns() + ")");
+                              "  (" + member.getPronouns().toString() + ")");
         } else {
             nameLabel.setText(member.getLastName() + ",  " + member.getFirstName() + "  \"" + 
-                              member.getPrefName() + "\"  (" + member.getPronouns() + ")");
+                              member.getPrefName() + "\"  (" + member.getPronouns().toString() + ")");
         }
-        genderLabel.setText(member.getGender());
+        genderLabel.setText(member.getGender().toString());
         phoneLabel.setText(member.getPhoneNumber());
         emailLabel.setText(member.getEmail());
         dobLabel.setText(member.getDateOfBirth() != null ? member.getDateOfBirth().toString()  : "MM/DD/YYYY");
         memberIdLabel.setText(member.getMemberId());
         memberSinceLabel.setText(member.getMemberSince() != null ? member.getMemberSince().toString()  : "MM/DD/YYYY");
-        billingLabel.setText(member.getBillingMethod());
+        billingLabel.setText(member.getBillingMethod().toString());
         addressLabel.setText(member.getAddress());
         eNameLabel.setText(member.getEmergencyContactName());
         ePhoneLabel.setText(member.getEmergencyContactPhone());
         eEmailLabel.setText(member.getEmergencyContactEmail());
 
         // style and display member type
-        String type = member.getType().toUpperCase();
+        MemberType type = member.getType();
         switch (type) {
-            case "ADMIN": {
+            case ADMIN: {
                 typeLabel.setStyle("-fx-background-color: -fx-color-pos3;");
                 staffButtons.setVisible(true);
                 break;
             }
-            case "MEMBER": {
+            case MEMBER: {
                 typeLabel.setStyle("-fx-background-color: -fx-color-pos1;");
                 staffButtons.setVisible(false);
                 break;
             }
-            case "STAFF": {
+            case STAFF: {
                 typeLabel.setStyle("-fx-background-color: -fx-color-pos4;");
                 staffButtons.setVisible(true);
                 break;
             }
-            case "VISITOR": {
+            case VISITOR: {
                 typeLabel.setStyle("-fx-background-color: -fx-color-pos2;");
                 staffButtons.setVisible(false);
                 break;
@@ -235,7 +249,7 @@ public class MemberController {
                 staffButtons.setVisible(false);
             }
         }
-        typeLabel.setText(type);
+        typeLabel.setText(type.toString().toUpperCase());
     }
 
     private void setEditableState(boolean editable) {
@@ -274,12 +288,12 @@ public class MemberController {
         memberIdField.setManaged(editable);
         dobLabel.setVisible(!editable);
         dobLabel.setManaged(!editable);
-//        dobField.setVisible(editable);
-//        dobField.setManaged(editable);
+        //dobField.setVisible(editable);
+        //dobField.setManaged(editable);
         memberSinceLabel.setVisible(!editable);
         memberSinceLabel.setManaged(!editable);
-//        memberSinceField.setVisible(editable);
-//        memberSinceField.setManaged(editable);
+        //memberSinceField.setVisible(editable);
+        //memberSinceField.setManaged(editable);
         billingLabel.setVisible(!editable);
         billingLabel.setManaged(!editable);
         billingField.setVisible(editable);
@@ -346,13 +360,13 @@ public class MemberController {
 
     private void setFieldPrompts(Member member) {
         // type
-        String type = member.getType().toUpperCase();
+        MemberType type = member.getType();
         typeField.setValue(type);
         String bgColor = switch (type) {
-            case "ADMIN" -> "-fx-color-pos3";
-            case "MEMBER" -> "-fx-color-pos1";
-            case "STAFF" -> "-fx-color-pos4";
-            case "VISITOR" -> "-fx-color-pos2";
+            case ADMIN -> "-fx-color-pos3";
+            case MEMBER -> "-fx-color-pos1";
+            case STAFF -> "-fx-color-pos4";
+            case VISITOR -> "-fx-color-pos2";
             default -> "-fx-accent-color";
         };
         typeField.setStyle(String.format(

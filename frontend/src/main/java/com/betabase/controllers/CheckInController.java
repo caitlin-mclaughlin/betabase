@@ -3,6 +3,8 @@ package com.betabase.controllers;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
+
+import com.betabase.enums.MemberType;
 import com.betabase.models.Member;
 import com.betabase.models.MemberLogEntry;
 import com.betabase.services.MemberApiService;
@@ -90,6 +92,10 @@ public class CheckInController implements Initializable {
         this.apiService = apiService;
     }
 
+    public void setMenuOpen(boolean menuOpen) {
+        sidebarController.setMenuOpen(menuOpen);
+    }
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         try {
@@ -147,10 +153,11 @@ public class CheckInController implements Initializable {
                     showFloatingList(false);
                     displayMember(selected.getId());
 
-                    // Force focus back to the search box and highlight text
+                    // Force focus back to the search box
                     Platform.runLater(() -> {
                         search.requestFocus();
                         search.setText(selected.getPrefName());
+                        showFloatingList(false);
                         search.positionCaret(search.getText().length());
                     });
                 }
@@ -168,7 +175,7 @@ public class CheckInController implements Initializable {
             checkOutCol.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getCheckOutTime()));
 
             TableColumn<MemberLogEntry, String> membershipCol = new TableColumn<>("Membership");
-            membershipCol.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getMembershipType()));
+            membershipCol.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getMembershipType().toString()));
 
             TableColumn<MemberLogEntry, String> phoneCol = new TableColumn<>("Phone");
             phoneCol.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getPhoneNumber()));
@@ -387,13 +394,13 @@ public class CheckInController implements Initializable {
             memberSinceLabel.setText(memSince);
 
             // Style and display member type
-            String type = currentMember.getType().toUpperCase();
-            typeLabel.setText(type);
+            MemberType type = currentMember.getType();
+            typeLabel.setText(type.toString().toUpperCase());
             String bgColor = switch (type) {
-                case "ADMIN" -> "-fx-color-pos3";
-                case "MEMBER" -> "-fx-color-pos1";
-                case "STAFF" -> "-fx-color-pos4";
-                case "VISITOR" -> "-fx-color-pos2";
+                case ADMIN -> "-fx-color-pos3";
+                case MEMBER -> "-fx-color-pos1";
+                case STAFF -> "-fx-color-pos4";
+                case VISITOR -> "-fx-color-pos2";
                 default -> "-fx-accent-color";
             };
             typeLabel.setStyle(String.format(

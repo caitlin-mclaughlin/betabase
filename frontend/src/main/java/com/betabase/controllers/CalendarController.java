@@ -30,12 +30,18 @@ public class CalendarController implements Initializable {
 
     private YearMonth currentYearMonth;
 
+    private SidebarController sidebarController;
+
+    public void setMenuOpen(boolean menuOpen) {
+        sidebarController.setMenuOpen(menuOpen);
+    }
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/betabase/views/sidebar.fxml"));
             VBox sidebar = loader.load();
-            
+            sidebarController = loader.getController();
             mainPane.setLeft(sidebar);
 
             // Bind sidebar width to the smaller of 25% of total width or 300px

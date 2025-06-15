@@ -30,7 +30,7 @@
                 <padding>
                     <Insets right="80" />
                 </padding>
-                <Label styleClass="welcome-label" text="Welcome, Caitlin" />
+                <Label text="Welcome, Caitlin" styleClass="welcome-label" />
                 <Region HBox.hgrow="ALWAYS" />
                 <Button mnemonicParsing="false" styleClass="clock-in-button"
                         text="Clock In" HBox.hgrow="ALWAYS" />
@@ -38,7 +38,7 @@
                         text="Clock Out" HBox.hgrow="ALWAYS" />
             </HBox>
             <VBox spacing="10">
-                <HBox alignment="CENTER_LEFT" spacing="5" onMouseClicked="#handleCalendarClick" HBox.hgrow="NEVER">
+                <HBox alignment="CENTER_LEFT" spacing="5" onAction="#handleCalendarClick" HBox.hgrow="NEVER">
                     <padding>
                         <Insets left="5"/>
                     </padding>
@@ -52,7 +52,7 @@
                 <ListView style="-fx-max-height: 200px;" />
             </VBox>
             <Region prefHeight="10" />
-            <HBox alignment="CENTER_LEFT" spacing="5" onMouseClicked="#handleMemberClick">
+            <HBox alignment="CENTER_LEFT" spacing="5" onAction="#handleMemberClick">
                 <padding>
                     <Insets left="5"/>
                 </padding>
@@ -75,7 +75,7 @@
                     <TextField fx:id="search" styleClass="search-field"
                                 promptText="Search members..." HBox.hgrow="ALWAYS" />
                     <StackPane style="-fx-cursor: hand; -fx-padding: 1px;"
-                                onMouseClicked="#handleCancelClick">
+                                onAction="#handleCancelClick">
                         <ImageView fx:id="cancel_logo" fitHeight="30.0" 
                                 preserveRatio="true">
                             <image>

@@ -20,7 +20,7 @@ public class GymController {
 
     @GetMapping("/{id}")
     public ResponseEntity<Gym> getGymById(@PathVariable Long id) {
-        return service.getGymById(id)
+        return service.getById(id)
             .map(ResponseEntity::ok)
             .orElse(ResponseEntity.notFound().build());
     }

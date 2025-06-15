@@ -46,7 +46,7 @@
                   <TextField fx:id="search" styleClass="search-field-pos"
                              promptText="Search items..." HBox.hgrow="ALWAYS" />
                   <StackPane style="-fx-cursor: hand; -fx-padding: 1px;"
-                             onMouseClicked="#handleCancelClick">
+                             onAction="#handleCancelClick">
                      <ImageView fx:id="cancel_logo" fitHeight="40.0" 
                                 preserveRatio="true">
                         <image>

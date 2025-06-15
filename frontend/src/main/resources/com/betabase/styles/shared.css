@@ -215,3 +215,10 @@
     -fx-border-radius: 10px;
     -fx-alignment: CENTER;
 }
+
+.welcome-label {
+    -fx-text-fill: -fx-base-color;
+    -fx-font-size: 35px;
+    -fx-font-weight: bold;
+    -fx-font-style: oblique;
+}

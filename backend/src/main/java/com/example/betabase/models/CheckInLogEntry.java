@@ -1,13 +1,17 @@
 package com.example.betabase.models;
 
+import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-import org.springframework.data.annotation.Id;
-
-import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class CheckInLogEntry {
 
     @Id
@@ -18,6 +22,7 @@ public class CheckInLogEntry {
     private Member member;
 
     @ManyToOne
+    @JoinColumn(name = "gym_id")
     private Gym gym;
 
     @ManyToOne

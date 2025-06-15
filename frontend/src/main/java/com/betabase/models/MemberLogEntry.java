@@ -4,13 +4,16 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
+import com.betabase.enums.MemberType;
+
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 
 public class MemberLogEntry {
     private final LocalDate date;
     private final Long memberId;
     private final SimpleStringProperty name;
-    private final SimpleStringProperty membershipType;
+    private final SimpleObjectProperty<MemberType> membershipType;
     private final SimpleStringProperty phoneNumber;
     private final SimpleStringProperty email;
 
@@ -25,7 +28,7 @@ public class MemberLogEntry {
         date = null;
         memberId = null;
         name = new SimpleStringProperty("");
-        membershipType = new SimpleStringProperty("");
+        membershipType = new SimpleObjectProperty<MemberType>(MemberType.UNSET);
         phoneNumber = new SimpleStringProperty("");
         email = new SimpleStringProperty("");
 
@@ -39,7 +42,7 @@ public class MemberLogEntry {
         date = checkInTime.toLocalDate();
         this.memberId = member.getId();
         name = new SimpleStringProperty(member.getFirstName());
-        membershipType = new SimpleStringProperty(member.getType());
+        membershipType = new SimpleObjectProperty<MemberType>(member.getType());
         phoneNumber = new SimpleStringProperty(member.getPhoneNumber());
         email = new SimpleStringProperty(member.getEmail());
 
@@ -91,7 +94,7 @@ public class MemberLogEntry {
     // Getters
     public Long getMemberId() { return memberId; }
     public String getName() { return name.get(); }
-    public String getMembershipType() { return membershipType.get(); }
+    public MemberType getMembershipType() { return membershipType.get(); }
     public String getPhoneNumber() { return phoneNumber.get(); }
     public String getEmail() { return email.get(); }
 }

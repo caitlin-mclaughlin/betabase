@@ -4,7 +4,6 @@ package com.example.betabase.services;
 import com.example.betabase.models.Gym;
 import com.example.betabase.repositories.GymRepository;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -13,7 +12,6 @@ import java.util.Optional;
 @Service
 public class GymService {
 
-    @Autowired
     private final GymRepository repo;
 
     public GymService(GymRepository repo) {

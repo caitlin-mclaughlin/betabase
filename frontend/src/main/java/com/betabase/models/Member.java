@@ -1,184 +1,211 @@
 package com.betabase.models;
 
 import java.time.LocalDate;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.betabase.enums.*;
+
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleLongProperty;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.SimpleStringProperty;
+
 public class Member {
-    private Long id;
+    private SimpleLongProperty id;
 
-    private Long gymId;
+    private Gym gym;
 
-    private String firstName;
-    private String prefName;
-    private String lastName;
-    private String pronouns;
-    private String gender;
-    private LocalDate dateOfBirth;
-    private String phoneNumber;
-    private String email;
-    private String photoUrl;
-    private String memberId;
-    private LocalDate memberSince;
-    private String type;
-    private Boolean clocked;
-    private Boolean checked;
-    private Boolean loggedIn;
+    private SimpleStringProperty firstName;
+    private SimpleStringProperty prefName;
+    private SimpleStringProperty lastName;
+    private SimpleObjectProperty<PronounsType> pronouns;
+    private SimpleObjectProperty<GenderType> gender;
+    private SimpleObjectProperty<LocalDate> dateOfBirth;
+    private SimpleStringProperty phoneNumber;
+    private SimpleStringProperty email;
+    private SimpleStringProperty photoUrl;
+    private SimpleStringProperty memberId;
+    private SimpleObjectProperty<LocalDate> memberSince;
+    private SimpleObjectProperty<MemberType> type;
+    private SimpleBooleanProperty clocked;
+    private SimpleBooleanProperty checked;
+    private SimpleBooleanProperty loggedIn;
 
     // Billing Info
-    private String billingMethod;
-    private String address;
+    private SimpleObjectProperty<BillingType> billingMethod;
+    private SimpleStringProperty address;
 
     // Emergency Contact
-    private String emergencyContactName;
-    private String emergencyContactPhone;
-    private String emergencyContactEmail;
+    private SimpleStringProperty emergencyContactName;
+    private SimpleStringProperty emergencyContactPhone;
+    private SimpleStringProperty emergencyContactEmail;
 
-    // Validated getters and setters (EXCEPT DATES)
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
+    public Member() {
+        this.firstName = new SimpleStringProperty("");
+        this.prefName = new SimpleStringProperty("");
+        this.lastName = new SimpleStringProperty("");
+        this.pronouns = new SimpleObjectProperty<>(PronounsType.UNSET);
+        this.gender = new SimpleObjectProperty<>(GenderType.UNSET);
+        this.dateOfBirth = new SimpleObjectProperty<>(null);
+        this.phoneNumber = new SimpleStringProperty("");
+        this.email = new SimpleStringProperty("");
+        this.photoUrl = new SimpleStringProperty("");
+        this.memberId = new SimpleStringProperty("");
+        this.memberSince = new SimpleObjectProperty<>(null);
+        this.type = new SimpleObjectProperty<>(MemberType.UNSET);
+        this.clocked = new SimpleBooleanProperty(false);
+        this.checked = new SimpleBooleanProperty(false);
+        this.loggedIn = new SimpleBooleanProperty(false);
 
-    public Long getGymId() { return (gymId != null ? gymId : 0); }
-    public void setGymId(Long gymId) { this.gymId = gymId; }
+        this.billingMethod = new SimpleObjectProperty<>(BillingType.UNSET);
+        this.address = new SimpleStringProperty("");
 
-    public String getFirstName() { return (firstName != null ? firstName : ""); }
-    public void setFirstName(String firstName) { this.firstName = firstName; }
-
-    public String getLastName() { return (lastName != null ? lastName : ""); }
-    public void setLastName(String lastName) { this.lastName = lastName; }
-
-    public String getPrefName() { return (prefName != null ? prefName : ""); }
-    public void setPrefName(String prefName) { this.prefName = prefName; }
-
-    public String getPronouns() { return (pronouns != null ? pronouns : " / "); }
-    public void setPronouns(String pronouns) { 
-        if (pronouns == null || pronouns.isBlank()) {
-            this.pronouns = "Prefer Not to Answer";
-        } else {
-            this.pronouns = switch (pronouns.toLowerCase()) {
-                case "she / her" -> "she / her";
-                case "he / him" -> "he / him";
-                case "they / them" -> "they / them";
-                case "she / they" -> "she / they";
-                case "he / they" -> "he / they";
-                default -> "Prefer Not to Answer";
-            };
-        }
-     }
-
-    public String getGender() { return gender; }
-    public void setGender(String gender) { 
-        if (gender == null || gender.isBlank()) {
-            this.gender = "Prefer Not to Answer";
-        } else {
-            this.gender = switch (gender.toLowerCase()) {
-                case "female" -> "Female";
-                case "male" -> "Male";
-                case "nonbinary" -> "Nonbinary";
-                default -> "Prefer Not to Answer";
-            };
-        } 
+        this.emergencyContactName = new SimpleStringProperty("");
+        this.emergencyContactPhone = new SimpleStringProperty("");
+        this.emergencyContactEmail = new SimpleStringProperty("");
     }
 
-    public String getPhoneNumber() { return phoneNumber.equals("Invalid") ? "Invalid" :
-                                            "(" + phoneNumber.substring(0,3) +
-                                            ") " + phoneNumber.substring(3,6) +
-                                            "-" + phoneNumber.substring(6); }
+    /** Getters and setters  **/
+    // Id
+    public Long getId() { return id.get(); }
+    public void setId(Long id) { this.id.set(id); }
+
+    // Gym
+    public Gym getGym() { return gym; }
+    public void setGym(Gym gym) { this.gym = gym; }
+
+    // First Name
+    public String getFirstName() { return firstName.get(); }
+    public void setFirstName(String firstName) { this.firstName.set(firstName); }
+
+    // Last Name
+    public String getLastName() { return lastName.get(); }
+    public void setLastName(String lastName) { this.lastName.set(lastName); }
+
+    // Preferred Name
+    public String getPrefName() { return prefName.get(); }
+    public void setPrefName(String prefName) { this.prefName.set(prefName); }
+
+    // Pronouns
+    public PronounsType getPronouns() { return pronouns.get(); }
+    public void setPronouns(PronounsType pronouns) { this.pronouns.set(pronouns); }
+
+    public ObjectProperty<PronounsType> pronounsProperty() { return pronouns; }
+
+    public void setPronouns(String pronounsStr) {
+        this.pronouns.set(PronounsType.fromString(pronounsStr));
+    }
+
+    // Gender
+    public GenderType getGender() { return gender.get(); }
+    public void setGender(GenderType gender) { this.gender.set(gender); }
+
+    public ObjectProperty<GenderType> genderProperty() { return gender; }
+
+    public void setGender(String genderStr) {
+        this.gender.set(GenderType.fromString(genderStr));
+    }
+
+    // Phone Number (validated)
+    public String getPhoneNumber() { return phoneNumber.get(); }
     public void setPhoneNumber(String phoneNumber) { 
         String digits = phoneNumber.replaceAll("[^\\d]", "");
         if (!Pattern.compile("\\d{10}").matcher(digits).matches()) {
-            this.phoneNumber = "Invalid";
+            this.phoneNumber.set("Invalid");
         } else {
-            this.phoneNumber = digits;
+            this.phoneNumber.set(digits);
         }
     }
 
-    public String getEmail() { return email; }
+    // Email (validated)
+    public String getEmail() { return email.get(); }
     public void setEmail(String email) { 
         if (email == null || email.isBlank()) {
-            this.email = "Unset";
+            this.email.set("Unset");
         } else  if (!Pattern.compile("^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$").matcher(email).matches()) {
-            this.email = "Invalid";
+            this.email.set("Invalid");
         } else {
-            this.email = email;
+            this.email.set(email);
         } 
      }
 
-    // UNVALIDATED
-    public LocalDate getDateOfBirth() { return dateOfBirth; }
-    public void setDateOfBirth(LocalDate dateOfBirth) { this.dateOfBirth = dateOfBirth; }
+    // Birthday
+    public LocalDate getDateOfBirth() { return dateOfBirth.get(); }
+    public void setDateOfBirth(LocalDate dateOfBirth) { this.dateOfBirth.set(dateOfBirth); }
 
-    public String getPhotoUrl() { return (photoUrl != null ? photoUrl : ""); }
-    public void setPhotoUrl(String photoUrl) { this.photoUrl = photoUrl; }
+    // Photo URL
+    public String getPhotoUrl() { return photoUrl.get(); }
+    public void setPhotoUrl(String photoUrl) { this.photoUrl.set(photoUrl); }
 
-    public String getMemberId() { return (memberId != null ? memberId : "000000000"); }
-    public void setMemberId(String memberId) { this.memberId = memberId; }
+    // Member ID
+    public String getMemberId() { return memberId.get(); }
+    public void setMemberId(String memberId) { this.memberId.set(memberId); }
 
-    // UNVALIDATED
-    public LocalDate getMemberSince() { return (memberSince);}// != null ? memberSince : ""); }
-    public void setMemberSince(LocalDate memberSince) { this.memberSince = memberSince; }
+    // Member Since
+    public LocalDate getMemberSince() { return memberSince.get(); }
+    public void setMemberSince(LocalDate memberSince) { this.memberSince.set(memberSince); }
 
-    public String getType() { return type; }
-    public void setType(String type) { 
-        if (type == null || type.isBlank()) {
-            this.type = "UNSET";
-        } else {
-            this.type = switch (type.toUpperCase()) {
-                case "ADMIN" -> "ADMIN";
-                case "STAFF" -> "STAFF";
-                case "MEMBER" -> "MEMBER";
-                case "VISITOR" -> "VISITOR";
-                default -> "UNSET";
-            };
-        }
+    // Member Type
+    public MemberType getType() { return type.get(); }
+    public void setType(MemberType type) { this.type.set(type); }
+
+    public ObjectProperty<MemberType> typeProperty() { return type; }
+
+    public void setType(String typeStr) {
+        this.type.set(MemberType.fromString(typeStr));
     }
 
-    public Boolean getClocked() { return clocked != null ? clocked : false; }
-    public void setClocked(Boolean clocked) { this.clocked = clocked; }
+    // Clocked In?
+    public boolean getClocked() { return clocked.get(); }
+    public void setClocked(boolean clocked) { this.clocked.set(clocked); }
 
-    public Boolean getChecked() { return checked != null ? checked : false; }
-    public void setChecked(Boolean checked) { this.checked = checked; }
+    // Checked In?
+    public boolean getChecked() { return checked.get(); }
+    public void setChecked(boolean checked) { this.checked.set(checked); }
 
-    public void Login() { loggedIn = true; }
-    public void Logout() { loggedIn = false; }
+    // Login/out
+    public void Login() { loggedIn.set(true); }
+    public void Logout() { loggedIn.set(false); }
 
-    public String getBillingMethod() { return billingMethod; }
-    public void setBillingMethod(String billingMethod) { 
-        if (billingMethod == null || billingMethod.isBlank()) {
-            this.billingMethod = "Unset";
-        } else {
-            this.billingMethod = switch (billingMethod.toLowerCase()) {
-                case "card" -> "Card";
-                case "cash" -> "Cash";
-                default -> "Unset";
-            };
-        } 
+    // Preferred Billing Method
+    public BillingType getBillingMethod() { return billingMethod.get(); }
+    public void setBillingMethod(BillingType billingMethod) { this.billingMethod.set(billingMethod); }
+
+    public ObjectProperty<BillingType> billingProperty() { return billingMethod; }
+
+    public void setBillingMethod(String billingStr) {
+        this.billingMethod.set(BillingType.fromString(billingStr));
     }
 
-    public String getAddress() { return (address != null ? address : ""); }
-    public void setAddress(String address) { this.address = address; }
+    // Address
+    public String getAddress() { return address.get(); }
+    public void setAddress(String address) { this.address.set(address); }
 
-    public String getEmergencyContactName() { return (emergencyContactName != null ? emergencyContactName : ""); }
-    public void setEmergencyContactName(String emergencyContactName) { this.emergencyContactName = emergencyContactName; }
+    // Emergency Contact Name
+    public String getEmergencyContactName() { return emergencyContactName.get(); }
+    public void setEmergencyContactName(String emergencyContactName) { this.emergencyContactName.set(emergencyContactName); }
 
-    public String getEmergencyContactPhone() { return emergencyContactPhone; }
+    // Emergency Contact Phone Number (validated)
+    public String getEmergencyContactPhone() { return emergencyContactPhone.get(); }
     public void setEmergencyContactPhone(String emergencyContactPhone) { 
         String digits = emergencyContactPhone.replaceAll("[^\\d]", "");
         if (!Pattern.compile("\\d{10}").matcher(digits).matches()) {
-            this.emergencyContactPhone = "Invalid";
+            this.emergencyContactPhone.set("Invalid");
         } else {
-            this.emergencyContactPhone = digits;
+            this.emergencyContactPhone.set(digits);
         }
      }
 
-    public String getEmergencyContactEmail() { return emergencyContactEmail; }
+    // Emergency Contact Email (validated)
+    public String getEmergencyContactEmail() { return emergencyContactEmail.get(); }
     public void setEmergencyContactEmail(String emergencyContactEmail) { 
         if (emergencyContactEmail == null || emergencyContactEmail.isBlank()) {
-            this.emergencyContactEmail = "Unset";
+            this.emergencyContactEmail.set("Unset");
         } else  if (!Pattern.compile("^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$").matcher(emergencyContactEmail).matches()) {
-            this.emergencyContactEmail = "Invalid";
+            this.emergencyContactEmail.set("Invalid");
         } else {
-            this.emergencyContactEmail = emergencyContactEmail;
+            this.emergencyContactEmail.set(emergencyContactEmail);
         } 
      }
 }

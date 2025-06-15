@@ -21,13 +21,13 @@
    </padding>
    <ImageView fx:id="logo" fitWidth="180.0"
                preserveRatio="true" style="-fx-cursor: hand;"
-               onMouseClicked="#handleLogoClick">
+               onAction="#handleLogoClick">
       <image>
          <Image url="@/com/betabase/images/logo.png" />
       </image>
    </ImageView>
    <Region prefHeight="10.0" />
-   <HBox fx:id="member" styleClass="nav-hbox" onMouseClicked="#handleMemberClick">
+   <HBox fx:id="member" styleClass="nav-hbox" onAction="#handleMemberClick">
       <ImageView fx:id="posLogo" fitWidth="45.0" preserveRatio="true">
             <image>
                <Image url="@/com/betabase/images/person2.png" />
@@ -35,7 +35,7 @@
       </ImageView>
       <Label fx:id="memberLabel" styleClass="nav-label" text="Member Home" />
    </HBox>
-   <HBox fx:id="pos" styleClass="nav-hbox" onMouseClicked="#handlePosClick">
+   <HBox fx:id="pos" styleClass="nav-hbox" onAction="#handlePosClick">
       <ImageView fx:id="posLogo" fitWidth="45.0" preserveRatio="true">
             <image>
                <Image url="@/com/betabase/images/pos.png" />
@@ -43,7 +43,7 @@
       </ImageView>
       <Label fx:id="posLabel" styleClass="nav-label" text="Point of Sale" />
    </HBox>
-   <HBox fx:id="cal" styleClass="nav-hbox"  onMouseClicked="#handleCalendarClick">
+   <HBox fx:id="cal" styleClass="nav-hbox"  onAction="#handleCalendarClick">
       <ImageView fx:id="calLogo" fitWidth="45.0" preserveRatio="true">
             <image>
                <Image url="@/com/betabase/images/cal.png" />
@@ -51,7 +51,7 @@
       </ImageView>
       <Label fx:id="calLabel" styleClass="nav-label" text="Calendar" />
    </HBox>
-   <HBox fx:id="analytics" styleClass="nav-hbox" onMouseClicked="#handleAnalyticsClick">
+   <HBox fx:id="analytics" styleClass="nav-hbox" onAction="#handleAnalyticsClick">
       <ImageView fx:id="chartLogo" fitWidth="45.0" preserveRatio="true">
             <image>
                <Image url="@/com/betabase/images/chart.png" />
@@ -59,12 +59,20 @@
       </ImageView>
       <Label fx:id="analyticsLabel" styleClass="nav-label" text="Analytics" />
    </HBox>
-   <HBox fx:id="settings" styleClass="nav-hbox" onMouseClicked="#handleSettingsClick">
+   <HBox fx:id="settings" styleClass="nav-hbox" onAction="#handleSettingsClick">
       <ImageView fx:id="gearLogo" fitWidth="45.0" preserveRatio="true">
             <image>
                <Image url="@/com/betabase/images/gear.png" />
             </image>
       </ImageView>
       <Label fx:id="settingsLabel" styleClass="nav-label" text="Settings" />
+   </HBox>
+   <Region VBox.vgrow="ALWAYS"/>
+   <HBox fx:id="menu" styleClass="nav-hbox" onAction="#handleMenuClick">
+      <ImageView fx:id="menuLogo" fitHeight="45.0" preserveRatio="true">
+            <image>
+               <Image url="@/com/betabase/images/menu.png" />
+            </image>
+      </ImageView>
    </HBox>
 </VBox>
