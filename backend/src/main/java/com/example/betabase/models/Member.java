@@ -2,7 +2,6 @@ package com.example.betabase.models;
 
 import jakarta.persistence.*;
 import java.time.LocalDate;
-import java.util.List;
 
 import com.example.betabase.enums.*;
 

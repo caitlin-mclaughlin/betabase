@@ -21,6 +21,7 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
@@ -102,11 +103,11 @@ public class DashboardController implements Initializable {
                     HBox.setHgrow(spacer, Priority.ALWAYS);
 
                     checkInButton.visibleProperty().bind(this.hoverProperty());
-                    checkInButton.setOnAction(handleCheckInOut(true));
+                    checkInButton.setOnMouseClicked(event -> handleCheckInOut(null, true));
                     checkInButton.setManaged(true);
                     checkOutButton.visibleProperty().bind(this.hoverProperty());
                     checkOutButton.setManaged(true);
-                    checkOutButton.setOnAction(handleCheckInOut(false));
+                    checkOutButton.setOnMouseClicked(event -> handleCheckInOut(null, false));
                         
                     // Add labels to row
                     content.getChildren().addAll(nameLabel, memberIdLabel, phoneLabel, emailLabel,
@@ -150,7 +151,7 @@ public class DashboardController implements Initializable {
                 }
             });
 
-            memberList.setOnAction( {
+            memberList.setOnMouseClicked(event -> {
                 if (event.getClickCount() == 2) { // double-click
                     Member selected = memberList.getSelectionModel().getSelectedItem();
                     if (selected != null) {
@@ -158,11 +159,28 @@ public class DashboardController implements Initializable {
                     }
                 }
             });
+
+            memberList.setOnKeyPressed(event -> {
+                switch (event.getCode()) {
+                    case ENTER -> {
+                        Member selected = memberList.getSelectionModel().getSelectedItem();
+                        if (selected != null) {
+                            handleCheckInOut(selected, selected.getChecked());
+                            openMemberWindow(selected);
+                        }
+                    }
+                }
+            });
         });
     }
 
-    private void handleCheckInOut(Boolean checked) {
-        Member selected = memberList.getSelectionModel().getSelectedItem();
+    private void handleCheckInOut(Member member, Boolean checked) {
+        Member selected;
+        if (member == null) {
+            selected = memberList.getSelectionModel().getSelectedItem();
+        } else {
+            selected = member;
+        }
         // Only send check in/out call to backend if the member's state is different
         //  i.e. only checkIn if member is currently checked out
         //  Unnecessary calls will bog down the member log
@@ -187,21 +205,21 @@ public class DashboardController implements Initializable {
     }
 
     @FXML
-    private void handleCalendarClick() {
+    private void handleCalendarClick(MouseEvent event) {
         if (sidebarController != null) {
             sidebarController.handleCalendarClick();
         }
     }
 
     @FXML
-    private void handleMemberClick() {
+    private void handleMemberClick(MouseEvent event) {
         if (sidebarController != null) {
             sidebarController.handleMemberClick();
         }
     }
 
     @FXML
-    private void handleCancelClick() {
+    private void handleCancelClick(MouseEvent event) {
         search.clear();
     }
 

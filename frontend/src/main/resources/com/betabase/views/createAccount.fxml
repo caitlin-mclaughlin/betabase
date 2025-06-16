@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox fx:id="mainPane" spacing="15"
+      styleClass="default-background"
+      xmlns="http://javafx.com/javafx/23.0.1"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.betabase.controllers.CreateAccountController"
+      stylesheets="@../styles/colors.css, @../styles/loginStyles.css, @../styles/shared.css">
+    <padding>
+      <Insets bottom="15" right="15" top="15" left="15" />
+    </padding>
+
+    <Label text="Welcome to BetaBase!" styleClass="welcome-label" />
+    <TextField fx:id="nameField" promptText="Gym Name" styleClass="field" />
+    <HBox spacing="15">
+        <TextField fx:id="streetField" promptText="Gym Street Address" styleClass="field" />
+        <TextField fx:id="cityField" promptText="Gym City" styleClass="field" />
+        <TextField fx:id="zipField" promptText="Gym Zip Code" styleClass="field" />
+        <TextField fx:id="stateField" promptText="Gym State" styleClass="field" />
+    </HBox>
+    <TextField fx:id="usernameField" promptText="Gym Username" styleClass="field" />
+    <PasswordField fx:id="passwordField" promptText="Password" styleClass="field" />
+    <PasswordField fx:id="confirmPasswordField" promptText="Confirm Password" styleClass="field" />
+    <Button text="Create Account and Login" onAction="#handleLogin" styleClass="check-in-button"/>
+
+</VBox>

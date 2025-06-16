@@ -14,9 +14,8 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
         // Load the root FXML
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/betabase/views/dashboard.fxml"));
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/betabase/views/gymLogin.fxml"));
         Parent root = loader.load();
-        ((DashboardController) loader.getController()).setMenuOpen(true);
 
         // Get screen bounds
         Rectangle2D screenBounds = Screen.getPrimary().getVisualBounds();

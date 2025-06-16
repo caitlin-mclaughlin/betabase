@@ -16,7 +16,7 @@ public class GymLoginController {
         // Add validation/auth here
         SceneManager.switchScene(
             (Stage) usernameField.getScene().getWindow(),
-            (SettingsController controller) -> {
+            (DashboardController controller) -> {
                 controller.setMenuOpen(true);
             },
             "/com/betabase/views/dashboard.fxml",
@@ -24,7 +24,11 @@ public class GymLoginController {
     }
 
     @FXML
-    private void handleCreateAccount() {
-        
+    private void handleAccountCreation() {
+        SceneManager.switchScene(
+            (Stage) usernameField.getScene().getWindow(),
+            (CreateAccountController controller) -> { },
+            "/com/betabase/views/createAccount.fxml",
+            false);
     }
 }
