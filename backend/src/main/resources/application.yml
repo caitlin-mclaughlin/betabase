@@ -1,13 +1,28 @@
 spring:
+  profiles:
+    active: dev  # Change to 'prod' or 'test' as needed
+
+---
+spring:
+  config:
+    activate:
+      on-profile: dev
+
   datasource:
-    url: jdbc:postgresql://localhost:5433/betabase_db
-    username: betabase
-    password: "B3taBa$3"
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+
   jpa:
     hibernate:
       ddl-auto: update
     show-sql: true
+
   security:
     user:
-      name: ""
-      password: ""
+      name: ${SPRING_SECURITY_USER:}
+      password: ${SPRING_SECURITY_PASSWORD:}
+
+jwt:
+  secret: ${JWT_SECRET}
+  expiration-ms: ${JWT_EXPIRATION_MS}

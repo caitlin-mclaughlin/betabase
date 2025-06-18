@@ -2,31 +2,46 @@ package com.example.betabase.security;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
+import jakarta.annotation.PostConstruct;
+
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.example.betabase.models.GymUser;
 
 import java.security.Key;
+import java.util.Base64;
 import java.util.Date;
 import java.util.function.Function;
 
 @Service
 public class JwtService {
 
-    private final String SECRET_KEY = Keys.secretKeyFor(SignatureAlgorithm.HS256).toString();
-    private final long EXPIRATION_MS = 24 * 60 * 60 * 1000; // 24 hours
+    @Value("${jwt.secret}")
+    private String base64SecretKey;
+
+    @Value("${jwt.expiration-ms}")
+    private long expirationMs;
+    
+    @PostConstruct
+public void debug() {
+    System.out.println("Injected secret: " + base64SecretKey);
+    System.out.println("Injected expirationMs: " + expirationMs);
+}
 
     private Key getSignKey() {
-        return Keys.hmacShaKeyFor(SECRET_KEY.getBytes());
+        byte[] keyBytes = Base64.getDecoder().decode(base64SecretKey);
+        return Keys.hmacShaKeyFor(keyBytes);
     }
 
-    public String generateToken(String username) {
+    public String generateToken(GymUser user) {
         return Jwts.builder()
-                .setSubject(username)
-                .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_MS))
-                .signWith(getSignKey(), SignatureAlgorithm.HS256)
-                .compact();
+            .setSubject(user.getUsername())
+            .claim("gymId", user.getGym().getId())
+            .setIssuedAt(new Date(System.currentTimeMillis()))
+            .setExpiration(new Date(System.currentTimeMillis() + expirationMs))
+            .signWith(getSignKey(), SignatureAlgorithm.HS256)
+            .compact();
     }
 
     public String extractUsername(String token) {

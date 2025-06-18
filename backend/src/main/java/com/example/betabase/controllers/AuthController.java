@@ -33,20 +33,32 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@Valid @RequestBody LoginRequest request) {
-        UsernamePasswordAuthenticationToken authToken =
-            new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword());
+        try {
+            // Authenticate using Spring Security
+            UsernamePasswordAuthenticationToken authToken =
+                new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword());
+            Authentication auth = authManager.authenticate(authToken); // throws if invalid
 
-        Authentication auth = authManager.authenticate(authToken); // throws if invalid
+            // Fetch full GymUser by username
+            GymUser user = gymUserService.getByUsername(request.getUsername())
+                .orElseThrow(() -> new RuntimeException("User not found"));
 
-        String jwt = jwtService.generateToken(request.getUsername());
-        return ResponseEntity.ok(new JwtResponse(jwt));
+            // Generate JWT
+            String jwt = jwtService.generateToken(user);
+
+            return ResponseEntity.ok(new JwtResponse(jwt));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(Map.of("message", "Login failed: " + e.getMessage()));
+        }
     }
+
 
     @PostMapping("/register")
     public ResponseEntity<?> register(@Valid @RequestBody GymRegistrationRequest request) {
         try {
             GymUser user = gymUserService.register(request);
-            String jwt = jwtService.generateToken(user.getUsername());
+            String jwt = jwtService.generateToken(user);
             return ResponseEntity.status(HttpStatus.CREATED).body(new JwtResponse(jwt));
         } catch (Exception e) {
             // Log error here if needed

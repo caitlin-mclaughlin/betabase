@@ -5,27 +5,62 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.PasswordField?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox fx:id="mainPane" spacing="15"
-      styleClass="default-background"
-      xmlns="http://javafx.com/javafx/23.0.1"
-      xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="com.betabase.controllers.GymLoginController"
-      stylesheets="@../styles/colors.css, @../styles/loginStyles.css, @../styles/shared.css">
+<BorderPane fx:id="mainPane" 
+            styleClass="colors, default-background" 
+            xmlns="http://javafx.com/javafx/23.0.1"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.betabase.controllers.GymLoginController"
+            stylesheets="@../styles/colors.css, @../styles/loginStyles.css, @../styles/shared.css">
     <padding>
-      <Insets bottom="15" right="15" top="15" left="15" />
+      <Insets bottom="50" left="50" top="5" right="50" />
     </padding>
 
-    <Label text="Welcome to BetaBase!" styleClass="welcome-label" />
-    <TextField fx:id="usernameField" promptText="Gym Username" styleClass="field" />
-    <PasswordField fx:id="passwordField" promptText="Password" styleClass="field" />
-    <Button text="Login" onAction="#handleLogin" styleClass="check-in-button"/>
-    <Region VBox.vgrow="ALWAYS" />
-    <HBox spacing="20">
-      <Label text="New to Betabase?" />
-      <Button text="Create Account" onAction="#handleAccountCreation" styleClass="check-in-button"/>
-    </HBox>
-</VBox>
+    <top>
+        <VBox alignment="CENTER">
+            <ImageView fx:id="logo" fitWidth="300.0" preserveRatio="true">
+                <image>
+                    <Image url="@/com/betabase/images/logo2.png" />
+                </image>
+            </ImageView>
+            <Label text="Climb smarter. Manage better. Here's the beta." styleClass="tagline" />
+            <Region style="-fx-min-height: 30px;" />
+        </VBox>
+    </top>
+
+    <center>
+        <HBox spacing="50" HBox.hgrow="ALWAYS">
+            <VBox styleClass="options" HBox.hgrow="ALWAYS">
+                <padding>
+                    <Insets bottom="25" left="25" right="25" top="20" />
+                </padding>
+                <HBox alignment="CENTER">
+                    <Label styleClass="option-label" text="Log In to Your Gym" />
+                </HBox>
+                <Label fx:id="usernamePrompt" styleClass="field-prompt" text="Username:" />
+                <TextField fx:id="usernameField" styleClass="field" VBox.vgrow="ALWAYS" />
+                <Label fx:id="passwordPrompt" styleClass="field-prompt" text="Password:" />
+                <PasswordField fx:id="passwordField" styleClass="field" VBox.vgrow="ALWAYS" />
+                <Region VBox.vgrow="ALWAYS" />
+                <Button onAction="#handleLogin" styleClass="login-button" text="LOGIN" VBox.vgrow="ALWAYS" />
+            </VBox>
+            <VBox styleClass="options" HBox.hgrow="ALWAYS">
+                <padding>
+                    <Insets bottom="25" left="25" right="25" top="20" />
+                </padding>
+                <HBox alignment="CENTER">
+                    <Label styleClass="option-label" text="New to Betabase?" alignment="CENTER" />
+                </HBox>
+                <Label styleClass="field-prompt" text="Create an account for your gym to get started." />
+                <Region VBox.vgrow="ALWAYS" />
+                <Button onAction="#handleAccountCreation" styleClass="login-button" text="CREATE ACCOUNT" VBox.vgrow="ALWAYS" />
+            </VBox>
+        </HBox>
+    </center>
+</BorderPane>

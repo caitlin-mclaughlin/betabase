@@ -5,30 +5,63 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.PasswordField?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox fx:id="mainPane" spacing="15"
-      styleClass="default-background"
-      xmlns="http://javafx.com/javafx/23.0.1"
-      xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="com.betabase.controllers.CreateAccountController"
-      stylesheets="@../styles/colors.css, @../styles/loginStyles.css, @../styles/shared.css">
+<BorderPane fx:id="mainPane"
+            styleClass="colors, default-background"
+            xmlns="http://javafx.com/javafx/23.0.1"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.betabase.controllers.CreateAccountController"
+            stylesheets="@../styles/colors.css, @../styles/loginStyles.css, @../styles/shared.css">
     <padding>
-      <Insets bottom="15" right="15" top="15" left="15" />
+      <Insets bottom="50" right="175" top="5" left="175" />
     </padding>
 
-    <Label text="Welcome to BetaBase!" styleClass="welcome-label" />
-    <TextField fx:id="nameField" promptText="Gym Name" styleClass="field" />
-    <HBox spacing="15">
-        <TextField fx:id="streetField" promptText="Gym Street Address" styleClass="field" />
-        <TextField fx:id="cityField" promptText="Gym City" styleClass="field" />
-        <TextField fx:id="zipField" promptText="Gym Zip Code" styleClass="field" />
-        <TextField fx:id="stateField" promptText="Gym State" styleClass="field" />
-    </HBox>
-    <TextField fx:id="usernameField" promptText="Gym Username" styleClass="field" />
-    <PasswordField fx:id="passwordField" promptText="Password" styleClass="field" />
-    <PasswordField fx:id="confirmPasswordField" promptText="Confirm Password" styleClass="field" />
-    <Button text="Create Account and Login" onAction="#handleLogin" styleClass="check-in-button"/>
+    <top>
+        <VBox alignment="CENTER">
+            <ImageView fx:id="logo" fitWidth="150.0" preserveRatio="true">
+                <image>
+                    <Image url="@/com/betabase/images/logo2.png" />
+                </image>
+            </ImageView>
+            <Label text="Create a New Gym Account" styleClass="tagline" />
+            <Region style="-fx-min-height: 5px;" />
+        </VBox>
+    </top>
 
-</VBox>
+    <center>
+        <VBox spacing="5" alignment="CENTER_LEFT" styleClass="options">
+            <padding>
+                <Insets bottom="25" left="25" right="25" top="10" />
+            </padding>
+            <Label fx:id="namePrompt" text="Gym Name:" styleClass="field-prompt" />
+            <TextField fx:id="nameField" styleClass="field" />
+            <Label fx:id="addressPrompt" text="Address:" styleClass="field-prompt" />
+            <TextField fx:id="streetField1" promptText="Street Address" styleClass="field" />
+            <TextField fx:id="streetField2" promptText="Street Address (Optional)" styleClass="field" />
+            <HBox spacing="15">
+                <TextField fx:id="cityField" promptText="City" styleClass="field" HBox.hgrow="ALWAYS" />
+                <TextField fx:id="zipField" promptText="Zipcode" styleClass="field" />
+                <TextField fx:id="stateField" promptText="State" styleClass="field" />
+            </HBox>
+            <Label fx:id="usernamePrompt" text="Username:" styleClass="field-prompt" />
+            <TextField fx:id="usernameField" styleClass="field" />
+            <Label fx:id="passwordPrompt" text="Password:" styleClass="field-prompt" />
+            <PasswordField fx:id="passwordField" styleClass="field" />
+            <Label fx:id="confirmPasswordPrompt" text="Confirm Password:" styleClass="field-prompt" />
+            <PasswordField fx:id="confirmPasswordField" styleClass="field" />
+            <Region VBox.vgrow="ALWAYS" />
+            <Button text="CREATE ACCOUNT AND LOGIN" onAction="#handleLogin" styleClass="login-button"/>
+            <HBox spacing="40">
+                <Label text="Already have an account?" styleClass="field-prompt" />
+                <Button text="LOGIN" styleClass="return-button" onAction="#handleReturnToLogin"/>
+            </HBox>
+        </VBox>
+    </center>
+
+</BorderPane>

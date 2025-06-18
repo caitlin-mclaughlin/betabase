@@ -25,7 +25,7 @@ public class JwtAuthFilterTest {
     void setup() {
         jwtService = mock(JwtService.class);
         userDetailsService = mock(UserDetailsService.class);
-        filter = new JwtAuthFilter(jwtService, userDetailsService);
+        filter = new JwtAuthFilter(userDetailsService, jwtService);
     }
 
     @Test

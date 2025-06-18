@@ -197,11 +197,18 @@
     -fx-background-color:-fx-color-select;
 }
 
-.separator {
+.separator-horiz {
     -fx-background-color: -fx-light-color;
+    -fx-max-width: Infinity;
     -fx-min-height: 2;
     -fx-max-height: 2;
-    -fx-max-width: Infinity;
+}
+
+.separator-vert {
+    -fx-background-color: -fx-light-color;
+    -fx-min-width: 2;
+    -fx-max-width: 2;
+    -fx-max-height: Infinity;
 }
 
 .type {

@@ -5,7 +5,6 @@ import com.example.betabase.dtos.LoginRequest;
 import com.example.betabase.models.Gym;
 import com.example.betabase.models.GymUser;
 import com.example.betabase.security.JwtService;
-import com.example.betabase.services.GymService;
 import com.example.betabase.services.GymUserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -22,7 +21,6 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -144,12 +142,6 @@ public class AuthControllerTest {
         @Primary
         public AuthenticationManager authenticationManager() {
             return Mockito.mock(AuthenticationManager.class);
-        }
-
-        @Bean
-        @Primary
-        public UserDetailsService userDetailsService() {
-            return Mockito.mock(UserDetailsService.class);
         }
     }
 }

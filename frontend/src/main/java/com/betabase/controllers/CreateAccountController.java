@@ -2,6 +2,7 @@ package com.betabase.controllers;
 
 import com.betabase.models.Gym;
 import com.betabase.services.GymApiService;
+import com.betabase.utils.AuthSession;
 import com.betabase.utils.SceneManager;
 
 import javafx.fxml.FXML;
@@ -31,7 +32,6 @@ public class CreateAccountController {
         String confirm = confirmPasswordField.getText();
 
         if (!password.equals(confirm)) {
-            // Add popup alert or label for mismatch
             System.out.println("Passwords do not match.");
             return;
         }
@@ -45,8 +45,11 @@ public class CreateAccountController {
 
         GymApiService gymService = new GymApiService();
         try {
-            boolean success = gymService.registerGym(gym, username, password);
-            if (success) {
+            String jwt = gymService.registerGym(gym, username, password);
+            if (jwt != null) {
+                // Save the JWT in memory (or preferences for now, later use secure storage)
+                AuthSession.setToken(jwt); // <- Make a simple AuthSession class to hold it
+
                 SceneManager.switchScene(
                     (Stage) usernameField.getScene().getWindow(),
                     (DashboardController controller) -> controller.setMenuOpen(true),
@@ -59,5 +62,14 @@ public class CreateAccountController {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    @FXML
+    private void handleReturnToLogin() {
+        SceneManager.switchScene(
+            (Stage) usernameField.getScene().getWindow(),
+            (GymLoginController controller) -> { },
+            "/com/betabase/views/gymLogin.fxml",
+            false);
     }
 }

@@ -95,40 +95,40 @@
                   </FXCollections>
                </items>
             </ChoiceBox>
-            <Region style="-fx-background-color: -fx-color-shadow;" styleClass="separator" />
+            <Region style="-fx-background-color: -fx-color-shadow;" styleClass="separator-horiz" />
          </VBox>
 
          <Label styleClass="user-prompt" text="Phone Number:" />
          <VBox spacing="2">
             <Label fx:id="phoneLabel" alignment="CENTER" styleClass="user-info" text="Label" />
             <TextField fx:id="phoneField" styleClass="user-info-edit" text="" visible="false" managed="false" />
-            <Region style="-fx-background-color: -fx-color-shadow;" styleClass="separator" />
+            <Region style="-fx-background-color: -fx-color-shadow;" styleClass="separator-horiz" />
          </VBox>
 
          <Label styleClass="user-prompt" text="Email:" />
          <VBox spacing="2">
             <Label fx:id="emailLabel" alignment="CENTER" styleClass="user-info" text="Label" />
             <TextField fx:id="emailField" styleClass="user-info-edit" text="" visible="false" managed="false" />
-            <Region style="-fx-background-color: -fx-color-shadow;" styleClass="separator" />
+            <Region style="-fx-background-color: -fx-color-shadow;" styleClass="separator-horiz" />
          </VBox>
 
          <Label styleClass="user-prompt" text="Date of Birth:" />
          <VBox spacing="2">
             <Label fx:id="dobLabel" alignment="CENTER" styleClass="user-info" text="Label" />
-            <Region style="-fx-background-color: -fx-color-shadow;" styleClass="separator" />
+            <Region style="-fx-background-color: -fx-color-shadow;" styleClass="separator-horiz" />
          </VBox>
 
          <Label styleClass="user-prompt" text="Member ID:" />
          <VBox spacing="2">
             <Label fx:id="memberIdLabel" alignment="CENTER" styleClass="user-info" text="Label" />
             <TextField fx:id="memberIdField" styleClass="user-info-edit" text="" visible="false" managed="false" />
-            <Region style="-fx-background-color: -fx-color-shadow;" styleClass="separator" />
+            <Region style="-fx-background-color: -fx-color-shadow;" styleClass="separator-horiz" />
          </VBox>
 
          <Label styleClass="user-prompt" text="Member Since:" />
          <VBox spacing="2">
             <Label fx:id="memberSinceLabel" alignment="CENTER" styleClass="user-info" text="Label" />
-            <Region style="-fx-background-color: -fx-color-shadow;" styleClass="separator" />
+            <Region style="-fx-background-color: -fx-color-shadow;" styleClass="separator-horiz" />
          </VBox>
       </VBox>
       
@@ -150,35 +150,35 @@
                   </FXCollections>
                </items>
             </ChoiceBox>
-            <Region style="-fx-background-color: -fx-color-shadow;" styleClass="separator" />
+            <Region style="-fx-background-color: -fx-color-shadow;" styleClass="separator-horiz" />
          </VBox>
       
          <Label styleClass="user-prompt" text="Address:" />
          <VBox spacing="2">
             <Label fx:id="addressLabel" alignment="CENTER" styleClass="user-info" text="Label" />
             <TextField fx:id="addressField" styleClass="user-info-edit" text="" visible="false" managed="false" />
-            <Region style="-fx-background-color: -fx-color-shadow;" styleClass="separator" />
+            <Region style="-fx-background-color: -fx-color-shadow;" styleClass="separator-horiz" />
          </VBox>
 
          <Label styleClass="user-prompt" text="Emergency Contact Name: " />
          <VBox spacing="2">
             <Label fx:id="eNameLabel" alignment="CENTER" styleClass="user-info" text="Label" />
             <TextField fx:id="eNameField" styleClass="user-info-edit" text="" visible="false" managed="false" />
-            <Region style="-fx-background-color: -fx-color-shadow;" styleClass="separator" />
+            <Region style="-fx-background-color: -fx-color-shadow;" styleClass="separator-horiz" />
          </VBox>
 
          <Label styleClass="user-prompt" text="Emergency Contact Phone Number: " />
          <VBox spacing="2">
             <Label fx:id="ePhoneLabel" alignment="CENTER" styleClass="user-info" text="Label" />
             <TextField fx:id="ePhoneField" styleClass="user-info-edit" text="" visible="false" managed="false" />
-            <Region style="-fx-background-color: -fx-color-shadow;" styleClass="separator" />
+            <Region style="-fx-background-color: -fx-color-shadow;" styleClass="separator-horiz" />
          </VBox>
 
          <Label styleClass="user-prompt" text="Emergency Contact Email: " />
          <VBox spacing="2">
             <Label fx:id="eEmailLabel" alignment="CENTER" styleClass="user-info" text="Label" />
             <TextField fx:id="eEmailField" styleClass="user-info-edit" text="" visible="false" managed="false" />
-            <Region style="-fx-background-color: -fx-color-shadow;" styleClass="separator" />
+            <Region style="-fx-background-color: -fx-color-shadow;" styleClass="separator-horiz" />
          </VBox>
 
          <Region VBox.vgrow="ALWAYS" />
