@@ -18,7 +18,18 @@ public class TokenStorage {
 
     public static Map<String, String> loadTokens() throws IOException {
         if (!Files.exists(FILE)) return new HashMap<>();
-        return mapper.readValue(FILE.toFile(), Map.class);
+
+        Map<String, String> all = mapper.readValue(FILE.toFile(), Map.class);
+        Map<String, String> valid = new HashMap<>();
+
+        for (Map.Entry<String, String> entry : all.entrySet()) {
+            String token = entry.getValue();
+            if (!JwtUtils.isTokenExpired(token)) {
+                valid.put(entry.getKey(), token);
+            }
+        }
+
+        return valid;
     }
 
     public static String getTokenForUser(String username) throws IOException {

@@ -48,7 +48,6 @@ public class MemberController {
         return ResponseEntity.ok(results);
     }
 
-
     @PostMapping("/{id}")
     public ResponseEntity<Member> updateMember(@PathVariable Long id, @RequestBody Member updatedMember) {
         Member existing = service.getById(id).orElse(null);

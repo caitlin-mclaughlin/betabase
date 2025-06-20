@@ -2,13 +2,12 @@ package com.betabase.models;
 
 import java.time.LocalDate;
 
-import javafx.beans.property.SimpleLongProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 
 public class Gym {
     
-    private SimpleLongProperty id;
+    private Long id;
 
     private SimpleStringProperty name;
     private SimpleStringProperty address;
@@ -17,8 +16,17 @@ public class Gym {
     private SimpleStringProperty state;
     private SimpleObjectProperty<LocalDate> userSince;
 
-    public Long getId() {return id.get(); }
-    public void setId(Long id) { this.id.set(id); }
+    public Gym() {
+        this.name = new SimpleStringProperty("");
+        this.address = new SimpleStringProperty("");
+        this.city = new SimpleStringProperty("");
+        this.zipCode = new SimpleStringProperty("");
+        this.state = new SimpleStringProperty("");
+        this.userSince = new SimpleObjectProperty<>();
+    }
+
+    public Long getId() {return id; }
+    public void setId(Long id) { this.id = id; }
 
     public String getName() { return name.get(); }
     public void setName(String name) { this.name.set(name); }

@@ -28,14 +28,14 @@
                     <Insets bottom="15" left="10" right="10" top="10" />
                 </padding>
                 <HBox>
-                    <Label styleClass="member-header" text="Member Check In" />
+                    <Label text="Member Check In" styleClass="member-header" />
                     <Region HBox.hgrow="ALWAYS" />
-                    <Button styleClass="new-member" text="New Member" />
+                    <Button text="New Member" styleClass="new-member" onMouseClicked="#handleNewMember"/>
                 </HBox>
                 <HBox spacing="15">
-                    <Button styleClass="alt-check-in" text="Guest Pass" />
-                    <Button styleClass="alt-check-in" text="Punch Card" />
-                    <Button styleClass="alt-check-in" text="Event Check In" />
+                    <Button text="Guest Pass" styleClass="alt-check-in" />
+                    <Button text="Punch Card" styleClass="alt-check-in" />
+                    <Button text="Event Check In" styleClass="alt-check-in" />
                 </HBox>
                 <HBox alignment="CENTER_LEFT" styleClass="search-bar">
                     <Label text="Member Lookup" styleClass="member-search" HBox.hgrow="NEVER" />
@@ -47,7 +47,7 @@
                             </image>
                         </ImageView>
                         <TextField fx:id="search" promptText="Search members..." styleClass="search-field" HBox.hgrow="ALWAYS" />
-                        <StackPane onAction="#handleCancelClick" style="-fx-cursor: hand; -fx-padding: 1px;">
+                        <StackPane onMouseClicked="#handleCancelClick" style="-fx-cursor: hand; -fx-padding: 1px;">
                             <ImageView fx:id="cancel_logo" fitHeight="30.0" preserveRatio="true">
                                 <image>
                                     <Image url="@/com/betabase/images/cancel.png" />
@@ -62,7 +62,9 @@
                 <TableView fx:id="checkInTable" styleClass="table-view" VBox.vgrow="ALWAYS" />
             </VBox>
             <Pane fx:id="floatingPane" mouseTransparent="true">
-                <ListView fx:id="floatingListView" style="-fx-border-color: -fx-base-color; -fx-max-height: 300px;                          -fx-max-width: 600px; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 6, 0.2, 0, 2);" styleClass="list-view" visible="false" StackPane.alignment="TOP_LEFT" />
+                <ListView fx:id="floatingListView" styleClass="list-view" visible="false" StackPane.alignment="TOP_LEFT" 
+                          style="-fx-border-color: -fx-base-color; -fx-max-height: 300px; -fx-max-width: 600px; 
+                                 -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 6, 0.2, 0, 2);" />
             </Pane>
         </StackPane>
     </center>

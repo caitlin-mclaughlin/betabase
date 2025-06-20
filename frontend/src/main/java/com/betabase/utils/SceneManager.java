@@ -11,8 +11,6 @@ import java.util.function.Consumer;
 
 import java.net.URL;
 
-import com.betabase.controllers.MemberController;
-import com.betabase.models.Member;
 import com.betabase.services.MemberApiService;
 
 public class SceneManager {

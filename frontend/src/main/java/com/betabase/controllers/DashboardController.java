@@ -2,6 +2,7 @@ package com.betabase.controllers;
 
 import com.betabase.models.Member;
 import com.betabase.services.MemberApiService;
+import com.betabase.utils.AuthSession;
 import com.betabase.utils.SceneManager;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -20,7 +21,6 @@ import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
@@ -50,10 +50,15 @@ public class DashboardController implements Initializable {
     @FXML private Label memberLabel;
 
     private SidebarController sidebarController;
+    private boolean firstLoad;
     private final HttpClient httpClient = HttpClient.newHttpClient();
 
     public void setMenuOpen(boolean menuOpen) {
-        sidebarController.setMenuOpen(menuOpen);
+        if (sidebarController != null) {
+            sidebarController.setMenuOpen(menuOpen);
+        } else {
+            firstLoad = true;
+        }
     }
 
     @Override
@@ -63,6 +68,10 @@ public class DashboardController implements Initializable {
             VBox sidebar = loader.load();
             sidebarController = loader.getController();
             mainPane.setLeft(sidebar);
+            
+            if (firstLoad) {
+                sidebarController.setMenuOpen(true);
+            }
 
             sidebar.prefWidthProperty().bind(
                 Bindings.createDoubleBinding(() ->
@@ -155,7 +164,7 @@ public class DashboardController implements Initializable {
                 if (event.getClickCount() == 2) { // double-click
                     Member selected = memberList.getSelectionModel().getSelectedItem();
                     if (selected != null) {
-                        openMemberWindow(selected);
+                        openMemberWindow(selected.getId());
                     }
                 }
             });
@@ -166,7 +175,7 @@ public class DashboardController implements Initializable {
                         Member selected = memberList.getSelectionModel().getSelectedItem();
                         if (selected != null) {
                             handleCheckInOut(selected, selected.getChecked());
-                            openMemberWindow(selected);
+                            openMemberWindow(selected.getId());
                         }
                     }
                 }
@@ -207,14 +216,14 @@ public class DashboardController implements Initializable {
     @FXML
     private void handleCalendarClick(MouseEvent event) {
         if (sidebarController != null) {
-            sidebarController.handleCalendarClick();
+            sidebarController.handleCalendarClick(event);
         }
     }
 
     @FXML
     private void handleMemberClick(MouseEvent event) {
         if (sidebarController != null) {
-            sidebarController.handleMemberClick();
+            sidebarController.handleMemberClick(event);
         }
     }
 
@@ -229,8 +238,11 @@ public class DashboardController implements Initializable {
                 String encoded = URLEncoder.encode(query, StandardCharsets.UTF_8);
                 URI uri = URI.create("http://localhost:8080/api/members/search?query=" + encoded);
 
+                String jwt = AuthSession.getToken();
+
                 HttpRequest request = HttpRequest.newBuilder()
                         .uri(uri)
+                        .header("Authorization", "Bearer " + jwt)
                         .GET()
                         .build();
 
@@ -255,12 +267,12 @@ public class DashboardController implements Initializable {
         memberList.getItems().addAll(members);
     }
 
-    private void openMemberWindow(Member member) {
+    private void openMemberWindow(Long memberId) {
         SceneManager.switchScene(
             new Stage(), 
             (MemberController controller) -> {
                 controller.setApiService(new MemberApiService());
-                controller.setMember(member);
+                controller.setMember(memberId);
             },
             "/com/betabase/views/member.fxml",
             true

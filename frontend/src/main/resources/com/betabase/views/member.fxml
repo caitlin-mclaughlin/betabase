@@ -15,7 +15,7 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox fx:id="mainPane" styleClass="default-background"
+<VBox fx:id="mainPane" styleClass="colors, default-background"
       prefHeight="800.0" prefWidth="1000.0"
       xmlns="http://javafx.com/javafx/23.0.1"
       xmlns:fx="http://javafx.com/fxml/1"
@@ -28,9 +28,9 @@
       </padding>
       <Label text="Name:" minWidth="75.0" style="-fx-text-fill: -fx-light-color;" />
       <Label fx:id="nameLabel" styleClass="user-header" />
-      <TextField fx:id="firstNameField" styleClass="user-header-edit" text="" visible="false" managed="false" />
-      <TextField fx:id="lastNameField" styleClass="user-header-edit" text="" visible="false" managed="false" />
-      <TextField fx:id="prefNameField" styleClass="user-header-edit" text="" visible="false" managed="false" />
+      <TextField fx:id="firstNameField" styleClass="user-header-edit" promptText="First Name" visible="false" managed="false" />
+      <TextField fx:id="lastNameField" styleClass="user-header-edit" promptText="Last Name" visible="false" managed="false" />
+      <TextField fx:id="prefNameField" styleClass="user-header-edit" promptText="Preferred Name" visible="false" managed="false" />
       <ChoiceBox fx:id="pronounsField" value="Prefer Not to Answer" visible="false" managed="false">
          <items>
             <FXCollections fx:factory="observableArrayList">
@@ -59,8 +59,8 @@
          <Button mnemonicParsing="false" styleClass="photo-button" text="Change Photo" />
          <Region VBox.vgrow="ALWAYS" />
          <HBox fx:id="staffButtons" spacing="15.0" visible="false" alignment="CENTER">
-            <Button text="Clock In" onAction="#handleClockIn" styleClass="check-in-button" />
-            <Button text="Clock Out" onAction="#handleClockOut" styleClass="check-out-button" />
+            <Button text="Clock In" onMouseClicked="#handleClockIn" styleClass="check-in-button" />
+            <Button text="Clock Out" onMouseClicked="#handleClockOut" styleClass="check-out-button" />
          </HBox>
          <Label fx:id="typeLabel" styleClass="type" text="label" />
          <ChoiceBox fx:id="typeField" value="Unset" styleClass="type" visible="false" managed="false">
@@ -184,10 +184,10 @@
          <Region VBox.vgrow="ALWAYS" />
          <HBox alignment="CENTER_RIGHT" spacing="15.0">
             <Button fx:id="checkInButton" styleClass="check-in-button" text="Check In" />
-            <Button fx:id="saveButton" onAction="#handleSave" styleClass="check-in-button" text="Save"
+            <Button fx:id="saveButton" onMouseClicked="#handleSave" styleClass="check-in-button" text="Save"
                     visible="false" managed="false" />
             <Button fx:id="checkOutButton" styleClass="check-out-button" text="Check Out" />
-            <Button fx:id="cancelButton" onAction="#handleCancel" styleClass="check-out-button" text="Cancel"
+            <Button fx:id="cancelButton" onMouseClicked="#handleCancel" styleClass="check-out-button" text="Cancel"
                     visible="false" managed="false" />
             <Button fx:id="editButton" onAction="#handleEdit" styleClass="edit-button">
                <graphic> 

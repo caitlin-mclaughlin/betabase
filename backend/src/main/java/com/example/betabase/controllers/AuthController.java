@@ -53,7 +53,6 @@ public class AuthController {
         }
     }
 
-
     @PostMapping("/register")
     public ResponseEntity<?> register(@Valid @RequestBody GymRegistrationRequest request) {
         try {

@@ -46,8 +46,8 @@
             <TextField fx:id="streetField2" promptText="Street Address (Optional)" styleClass="field" />
             <HBox spacing="15">
                 <TextField fx:id="cityField" promptText="City" styleClass="field" HBox.hgrow="ALWAYS" />
-                <TextField fx:id="zipField" promptText="Zipcode" styleClass="field" />
                 <TextField fx:id="stateField" promptText="State" styleClass="field" />
+                <TextField fx:id="zipField" promptText="Zipcode" styleClass="field" />
             </HBox>
             <Label fx:id="usernamePrompt" text="Username:" styleClass="field-prompt" />
             <TextField fx:id="usernameField" styleClass="field" />
@@ -59,7 +59,7 @@
             <Button text="CREATE ACCOUNT AND LOGIN" onAction="#handleLogin" styleClass="login-button"/>
             <HBox spacing="40">
                 <Label text="Already have an account?" styleClass="field-prompt" />
-                <Button text="LOGIN" styleClass="return-button" onAction="#handleReturnToLogin"/>
+                <Button text="LOGIN" styleClass="return-button" onMouseClicked="#handleReturnToLogin"/>
             </HBox>
         </VBox>
     </center>

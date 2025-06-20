@@ -7,12 +7,12 @@ import com.betabase.enums.*;
 
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleLongProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 
 public class Member {
-    private SimpleLongProperty id;
+    
+    private Long id;
 
     private Gym gym;
 
@@ -68,8 +68,8 @@ public class Member {
 
     /** Getters and setters  **/
     // Id
-    public Long getId() { return id.get(); }
-    public void setId(Long id) { this.id.set(id); }
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
 
     // Gym
     public Gym getGym() { return gym; }

@@ -1,6 +1,7 @@
 package com.betabase.services;
 
 import com.betabase.models.Member;
+import com.betabase.utils.AuthSession;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.net.http.HttpClient;
@@ -21,10 +22,14 @@ public class MemberApiService {
     }
 
     public Member getMemberById(Long id) throws Exception {
+
+        String token = AuthSession.getToken();
+
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(BASE_URL + "/" + id))
                 .GET()
                 .header("Accept", "application/json")
+            .   header("Authorization", "Bearer " + token)
                 .build();
 
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
@@ -36,13 +41,33 @@ public class MemberApiService {
         }
     }
 
+    public boolean createMember(Member member) throws Exception {
+        String body = mapper.writeValueAsString(member);
+
+        String token = AuthSession.getToken();
+
+        HttpRequest request = HttpRequest.newBuilder()
+            .uri(URI.create(BASE_URL))
+            .header("Content-Type", "application/json")
+            .header("Authorization", "Bearer " + token)
+            .POST(HttpRequest.BodyPublishers.ofString(body))
+            .build();
+
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+        return response.statusCode() == 200 || response.statusCode() == 201;
+    }
+
     public boolean updateMember(Member member) throws Exception {
         String requestBody = mapper.writeValueAsString(member);
 
+        String token = AuthSession.getToken();
+        
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(BASE_URL + "/" + member.getId()))
                 .POST(HttpRequest.BodyPublishers.ofString(requestBody))
                 .header("Content-Type", "application/json")
+                .header("Authorization", "Bearer " + token)
                 .build();
 
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());

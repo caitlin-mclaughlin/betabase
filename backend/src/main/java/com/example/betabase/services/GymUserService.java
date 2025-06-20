@@ -1,6 +1,7 @@
 package com.example.betabase.services;
 
 import com.example.betabase.dtos.GymRegistrationRequest;
+import com.example.betabase.models.Gym;
 import com.example.betabase.models.GymUser;
 import com.example.betabase.repositories.GymUserRepository;
 
@@ -17,18 +18,33 @@ public class GymUserService implements UserDetailsService {
 
     private final GymUserRepository repository;
     private final PasswordEncoder passwordEncoder;
+    private final GymService gymService;
 
-    public GymUserService(GymUserRepository repository, PasswordEncoder passwordEncoder) {
+    public GymUserService(GymUserRepository repository,
+                          PasswordEncoder passwordEncoder,
+                          GymService gymService) {
         this.repository = repository;
         this.passwordEncoder = passwordEncoder;
+        this.gymService = gymService;
     }
 
     public GymUser register(GymRegistrationRequest request) {
+        // Persist the gym first (if it’s new)
+        Gym gym = request.getGym();
+        Gym savedGym;
+        Optional<Gym> existingGym = gymService.getByName(gym.getName());
+        if (existingGym.isPresent()) {
+            savedGym = existingGym.get();
+            System.out.println("Using existing gym: " + savedGym.getId());
+        } else {
+            savedGym = gymService.save(gym);
+            System.out.println("Saving new gym: " + savedGym.getId());
+        }
 
         GymUser user = new GymUser();
         user.setUsername(request.getUsername());
-        user.setPasswordHash(passwordEncoder.encode(request.getPassword())); // hash password
-        user.setGym(request.getGym());
+        user.setPasswordHash(passwordEncoder.encode(request.getPassword()));
+        user.setGym(savedGym);
 
         return repository.save(user);
     }

@@ -8,6 +8,7 @@ import com.betabase.utils.SceneManager;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
@@ -38,7 +39,7 @@ public class SidebarController {
     public boolean getMenuOpen() { return menuOpen; }
 
     @FXML
-    private void handleLogoClick() {
+    private void handleLogoClick(MouseEvent event) {
         SceneManager.switchScene(
             (Stage) logo.getScene().getWindow(),
             (DashboardController controller) -> {
@@ -73,7 +74,7 @@ public class SidebarController {
     }
 
     @FXML
-    protected void handleMemberClick() {
+    protected void handleMemberClick(MouseEvent event) {
         SceneManager.switchScene(
             (Stage) memberLabel.getScene().getWindow(), 
             (CheckInController controller) -> {
@@ -86,7 +87,7 @@ public class SidebarController {
     }
 
     @FXML
-    private void handlePosClick() {
+    private void handlePosClick(MouseEvent event) {
         SceneManager.switchScene(
             (Stage) posLabel.getScene().getWindow(),
             (PosController controller) -> {
@@ -98,7 +99,7 @@ public class SidebarController {
     }
 
     @FXML
-    protected void handleCalendarClick() {
+    protected void handleCalendarClick(MouseEvent event) {
         SceneManager.switchScene(
             (Stage) calLabel.getScene().getWindow(),
             (CalendarController controller) -> {
@@ -110,7 +111,7 @@ public class SidebarController {
     }
 
     @FXML
-    private void handleAnalyticsClick() {
+    private void handleAnalyticsClick(MouseEvent event) {
         SceneManager.switchScene(
             (Stage) analyticsLabel.getScene().getWindow(),
             (AnalyticsController controller) -> {
@@ -134,7 +135,7 @@ public class SidebarController {
     }
 
     @FXML
-    private void handleMenuClick() {
+    private void handleMenuClick(MouseEvent event) {
         toggleMenuVisibility();
     }
 

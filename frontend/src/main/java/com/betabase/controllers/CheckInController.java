@@ -8,6 +8,8 @@ import com.betabase.enums.MemberType;
 import com.betabase.models.Member;
 import com.betabase.models.MemberLogEntry;
 import com.betabase.services.MemberApiService;
+import com.betabase.utils.AuthSession;
+import com.betabase.utils.SceneManager;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -34,6 +36,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
 import javafx.util.Duration;
 
 import java.io.IOException;
@@ -186,6 +189,9 @@ public class CheckInController implements Initializable {
             // Add columns to the table
             checkInTable.getColumns().addAll(nameCol, checkInCol, checkOutCol, membershipCol, phoneCol);
             checkInTable.setItems(logEntries);
+            Label placeholder = new Label("No one has checked in yet today");
+            placeholder.setStyle("-fx-text-fill: -fx-base-color; -fx-font-size: 18px;");
+            checkInTable.setPlaceholder(placeholder);
 
             checkInTable.setOnMouseClicked(event -> {
                 MemberLogEntry selectedLog = checkInTable.getSelectionModel().getSelectedItem();
@@ -194,10 +200,6 @@ public class CheckInController implements Initializable {
                 }
             });
 
-            if (checkInTable.getItems().isEmpty()) {
-                MemberLogEntry nullMember = new MemberLogEntry();
-                logEntries.add(nullMember);
-            }
             checkInTable.getColumns().addListener((ListChangeListener<TableColumn<MemberLogEntry, ?>>) change -> {
                 while (change.next()) {
                     if (change.wasPermutated() || change.wasReplaced() || change.wasUpdated()) {
@@ -286,8 +288,11 @@ public class CheckInController implements Initializable {
                 String encoded = URLEncoder.encode(query, StandardCharsets.UTF_8);
                 URI uri = URI.create("http://localhost:8080/api/members/search?query=" + encoded);
 
+                String jwt = AuthSession.getToken();
+
                 HttpRequest request = HttpRequest.newBuilder()
                         .uri(uri)
+                        .header("Authorization", "Bearer " + jwt)
                         .GET()
                         .build();
 
@@ -345,6 +350,18 @@ public class CheckInController implements Initializable {
         // Update actively displayed member
         currentMember.setChecked(false);
         handleSave();
+    }
+
+    @FXML
+    private void handleNewMember(MouseEvent event) {
+        SceneManager.switchScene(
+            new Stage(), 
+            (MemberController controller) -> {
+                controller.setApiService(new MemberApiService());
+            },
+            "/com/betabase/views/member.fxml",
+            true
+        );
     }
 
     private void handleSave() {

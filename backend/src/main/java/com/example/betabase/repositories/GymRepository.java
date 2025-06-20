@@ -8,6 +8,7 @@ import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Repository;
 
@@ -19,14 +20,14 @@ public interface GymRepository extends JpaRepository<Gym, Long> {
 
     @Query("SELECT g FROM Gym g WHERE " +
            "LOWER(g.name) LIKE LOWER(CONCAT('%', :query, '%'))")
-    Optional<Gym> findByName(String name);
+    Optional<Gym> findByName(@Param("query") String name);
 
     @Query("SELECT g FROM Gym g WHERE " +
            "LOWER(g.state) LIKE LOWER(CONCAT('%', :query, '%'))")
-    List<Member> findByState(String query);
+    List<Member> findByState(@Param("query") String query);
 
     @Query("SELECT g FROM Gym g WHERE " +
            "LOWER(g.city) LIKE LOWER(CONCAT('%', :query, '%')) AND " +
            "LOWER(g.state) LIKE LOWER(CONCAT('%', :query, '%'))")
-    List<Member> findByCity(String cityState);
+    List<Member> findByCity(@Param("query") String cityState);
 }

@@ -1,9 +1,12 @@
 package com.betabase.services;
 
 import com.betabase.models.Gym;
+import com.betabase.models.Member;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import java.io.IOException;
 import java.net.URI;
@@ -16,8 +19,16 @@ import java.util.Optional;
 public class GymApiService {
 
     private static final String BASE_URL = "http://localhost:8080/api/auth";
-    private final HttpClient client = HttpClient.newHttpClient();
-    private final ObjectMapper mapper = new ObjectMapper();
+    
+    private final HttpClient client;
+    private final ObjectMapper mapper;
+
+    public GymApiService() {
+        this.client = HttpClient.newHttpClient();
+        this.mapper = new ObjectMapper();
+        mapper.registerModule(new JavaTimeModule());
+        mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+    }
 
     public String registerGym(Gym gym, String username, String password) throws Exception {
         String body = mapper.writeValueAsString(new GymRegistrationRequest(gym, username, password));
@@ -56,6 +67,22 @@ public class GymApiService {
             return Optional.of(json.get("token").asText());
         } else {
             return Optional.empty();
+        }
+    }
+
+    public Gym getGymById(Long id) throws Exception {
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(BASE_URL + "/" + id))
+                .GET()
+                .header("Accept", "application/json")
+                .build();
+
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+        if (response.statusCode() == 200) {
+            return mapper.readValue(response.body(), Gym.class);
+        } else {
+            return null;
         }
     }
 

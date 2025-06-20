@@ -24,10 +24,10 @@ public class JwtService {
     private long expirationMs;
     
     @PostConstruct
-public void debug() {
-    System.out.println("Injected secret: " + base64SecretKey);
-    System.out.println("Injected expirationMs: " + expirationMs);
-}
+    public void debug() {
+        System.out.println("Injected secret: " + base64SecretKey);
+        System.out.println("Injected expirationMs: " + expirationMs);
+    }
 
     private Key getSignKey() {
         byte[] keyBytes = Base64.getDecoder().decode(base64SecretKey);
@@ -57,11 +57,15 @@ public void debug() {
     }
 
     private <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
-        Claims claims = Jwts.parserBuilder()
-                .setSigningKey(getSignKey())
-                .build()
-                .parseClaimsJws(token)
-                .getBody();
-        return claimsResolver.apply(claims);
+        try {
+            Claims claims = Jwts.parserBuilder()
+                    .setSigningKey(getSignKey())
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody();
+            return claimsResolver.apply(claims);
+        } catch (JwtException | IllegalArgumentException e) {
+            throw new RuntimeException("Invalid JWT: " + e.getMessage());
+        }
     }
 }

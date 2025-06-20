@@ -7,18 +7,27 @@ import java.util.Base64;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.TestPropertySource;
+
 import static org.junit.jupiter.api.Assertions.*;
 
+@SpringBootTest
+@TestPropertySource(properties = {
+    "jwt.secret=${JWT_SECRET}",
+    "jwt.expiration-ms=${JWT_EXPIRATION_MS}",
+    "spring.jpa.hibernate.ddl-auto=none"
+})
 public class JwtServiceTest {
 
+    @Autowired
     private JwtService jwtService;
+    
     private GymUser mockUser;
 
     @BeforeEach
     void setUp() throws Exception {
-        jwtService = new JwtService();
-        jwtService.debug();
-
         // Inject dummy key for testing (32 bytes = 256 bits, required by HS256)
         String dummySecret = Base64.getEncoder().encodeToString("testsecretkey-testsecretkey-1234".getBytes());
 
@@ -29,7 +38,6 @@ public class JwtServiceTest {
         mockUser = new GymUser();
         mockUser.setUsername("testuser");
         mockUser.setGym(new Gym());
-        mockUser.getGym().setId(1L);
     }
 
     @Test
