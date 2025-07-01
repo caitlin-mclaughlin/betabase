@@ -2,6 +2,8 @@ package com.betabase.controllers;
 
 import java.util.List;
 
+import com.betabase.interfaces.ServiceAware;
+import com.betabase.services.GymApiService;
 import com.betabase.services.MemberApiService;
 import com.betabase.utils.SceneManager;
 
@@ -13,7 +15,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
-public class SidebarController {
+public class SidebarController implements ServiceAware {
     
     @FXML private VBox sidebar;
     @FXML private ImageView logo;
@@ -31,6 +33,14 @@ public class SidebarController {
 
     private boolean menuOpen;
 
+    private MemberApiService memberService;
+    private GymApiService gymService;
+
+    @Override
+    public void setServices(MemberApiService memberService, GymApiService gymService) {
+        this.memberService = memberService;
+        this.gymService = gymService;
+    }
     public void setMenuOpen(boolean menuOpen) {
         this.menuOpen = !menuOpen; // set opposite then toggle immediately
         toggleMenuVisibility();
@@ -78,7 +88,6 @@ public class SidebarController {
         SceneManager.switchScene(
             (Stage) memberLabel.getScene().getWindow(), 
             (CheckInController controller) -> {
-                controller.setApiService(new MemberApiService());
                 controller.setMenuOpen(menuOpen);
             },
             "/com/betabase/views/checkIn.fxml",

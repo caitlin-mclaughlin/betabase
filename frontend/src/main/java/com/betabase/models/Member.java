@@ -4,12 +4,14 @@ import java.time.LocalDate;
 import java.util.regex.Pattern;
 
 import com.betabase.enums.*;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 
+@JsonIgnoreProperties(value = {"gym"}, allowSetters = true)
 public class Member {
     
     private Long id;
@@ -32,9 +34,7 @@ public class Member {
     private SimpleBooleanProperty checked;
     private SimpleBooleanProperty loggedIn;
 
-    // Billing Info
-    private SimpleObjectProperty<BillingType> billingMethod;
-    private SimpleStringProperty address;
+    private SimpleObjectProperty<Address> address;
 
     // Emergency Contact
     private SimpleStringProperty emergencyContactName;
@@ -58,8 +58,7 @@ public class Member {
         this.checked = new SimpleBooleanProperty(false);
         this.loggedIn = new SimpleBooleanProperty(false);
 
-        this.billingMethod = new SimpleObjectProperty<>(BillingType.UNSET);
-        this.address = new SimpleStringProperty("");
+        this.address = new SimpleObjectProperty<>(null);
 
         this.emergencyContactName = new SimpleStringProperty("");
         this.emergencyContactPhone = new SimpleStringProperty("");
@@ -76,38 +75,43 @@ public class Member {
     public void setGym(Gym gym) { this.gym = gym; }
 
     // First Name
+    public SimpleStringProperty firstNameProperty() { return firstName; }
     public String getFirstName() { return firstName.get(); }
     public void setFirstName(String firstName) { this.firstName.set(firstName); }
 
     // Last Name
+    public SimpleStringProperty lastNameProperty() { return lastName; }
     public String getLastName() { return lastName.get(); }
     public void setLastName(String lastName) { this.lastName.set(lastName); }
 
     // Preferred Name
+    public SimpleStringProperty prefNameProperty() { return prefName; }
     public String getPrefName() { return prefName.get(); }
     public void setPrefName(String prefName) { this.prefName.set(prefName); }
 
     // Pronouns
+    public SimpleObjectProperty<PronounsType> pronounsProperty() { return pronouns; }
+
     public PronounsType getPronouns() { return pronouns.get(); }
     public void setPronouns(PronounsType pronouns) { this.pronouns.set(pronouns); }
-
-    public ObjectProperty<PronounsType> pronounsProperty() { return pronouns; }
 
     public void setPronouns(String pronounsStr) {
         this.pronouns.set(PronounsType.fromString(pronounsStr));
     }
 
     // Gender
+    public SimpleObjectProperty<GenderType> genderProperty() { return gender; }
+
     public GenderType getGender() { return gender.get(); }
     public void setGender(GenderType gender) { this.gender.set(gender); }
-
-    public ObjectProperty<GenderType> genderProperty() { return gender; }
 
     public void setGender(String genderStr) {
         this.gender.set(GenderType.fromString(genderStr));
     }
 
     // Phone Number (validated)
+    public SimpleStringProperty phoneNumberProperty() { return phoneNumber; }
+
     public String getPhoneNumber() { return phoneNumber.get(); }
     public void setPhoneNumber(String phoneNumber) { 
         String digits = phoneNumber.replaceAll("[^\\d]", "");
@@ -119,6 +123,8 @@ public class Member {
     }
 
     // Email (validated)
+    public SimpleStringProperty emailProperty() { return email; }
+
     public String getEmail() { return email.get(); }
     public void setEmail(String email) { 
         if (email == null || email.isBlank()) {
@@ -131,26 +137,34 @@ public class Member {
      }
 
     // Birthday
+    public SimpleObjectProperty<LocalDate> dateOfBirthProperty() { return dateOfBirth; }
+
     public LocalDate getDateOfBirth() { return dateOfBirth.get(); }
     public void setDateOfBirth(LocalDate dateOfBirth) { this.dateOfBirth.set(dateOfBirth); }
 
     // Photo URL
+    public SimpleStringProperty photoUrlProperty() { return photoUrl; }
+
     public String getPhotoUrl() { return photoUrl.get(); }
     public void setPhotoUrl(String photoUrl) { this.photoUrl.set(photoUrl); }
 
     // Member ID
+    public SimpleStringProperty memberIdProperty() { return memberId; }
+
     public String getMemberId() { return memberId.get(); }
     public void setMemberId(String memberId) { this.memberId.set(memberId); }
 
     // Member Since
+    public SimpleObjectProperty<LocalDate> memberSinceProperty() { return memberSince; }
+
     public LocalDate getMemberSince() { return memberSince.get(); }
     public void setMemberSince(LocalDate memberSince) { this.memberSince.set(memberSince); }
 
     // Member Type
+    public SimpleObjectProperty<MemberType> typeProperty() { return type; }
+
     public MemberType getType() { return type.get(); }
     public void setType(MemberType type) { this.type.set(type); }
-
-    public ObjectProperty<MemberType> typeProperty() { return type; }
 
     public void setType(String typeStr) {
         this.type.set(MemberType.fromString(typeStr));
@@ -168,25 +182,19 @@ public class Member {
     public void Login() { loggedIn.set(true); }
     public void Logout() { loggedIn.set(false); }
 
-    // Preferred Billing Method
-    public BillingType getBillingMethod() { return billingMethod.get(); }
-    public void setBillingMethod(BillingType billingMethod) { this.billingMethod.set(billingMethod); }
-
-    public ObjectProperty<BillingType> billingProperty() { return billingMethod; }
-
-    public void setBillingMethod(String billingStr) {
-        this.billingMethod.set(BillingType.fromString(billingStr));
-    }
-
     // Address
-    public String getAddress() { return address.get(); }
-    public void setAddress(String address) { this.address.set(address); }
+    public Address getAddress() { return address.get(); }
+    public void setAddress(Address address) { this.address.set(address); }
 
     // Emergency Contact Name
+    public SimpleStringProperty eNameProperty() { return emergencyContactName; }
+
     public String getEmergencyContactName() { return emergencyContactName.get(); }
     public void setEmergencyContactName(String emergencyContactName) { this.emergencyContactName.set(emergencyContactName); }
 
     // Emergency Contact Phone Number (validated)
+    public SimpleStringProperty ePhoneProperty() { return emergencyContactPhone; }
+
     public String getEmergencyContactPhone() { return emergencyContactPhone.get(); }
     public void setEmergencyContactPhone(String emergencyContactPhone) { 
         String digits = emergencyContactPhone.replaceAll("[^\\d]", "");
@@ -198,6 +206,8 @@ public class Member {
      }
 
     // Emergency Contact Email (validated)
+    public SimpleStringProperty eEmailProperty() { return emergencyContactEmail; }
+
     public String getEmergencyContactEmail() { return emergencyContactEmail.get(); }
     public void setEmergencyContactEmail(String emergencyContactEmail) { 
         if (emergencyContactEmail == null || emergencyContactEmail.isBlank()) {

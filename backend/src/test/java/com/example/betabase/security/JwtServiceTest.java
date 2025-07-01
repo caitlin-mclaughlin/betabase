@@ -1,6 +1,6 @@
 package com.example.betabase.security;
 import com.example.betabase.models.Gym;
-import com.example.betabase.models.GymUser;
+import com.example.betabase.models.GymLogin;
 
 import java.lang.reflect.Field;
 import java.util.Base64;
@@ -24,7 +24,7 @@ public class JwtServiceTest {
     @Autowired
     private JwtService jwtService;
     
-    private GymUser mockUser;
+    private GymLogin mockUser;
 
     @BeforeEach
     void setUp() throws Exception {
@@ -35,7 +35,7 @@ public class JwtServiceTest {
         field.setAccessible(true);
         field.set(jwtService, dummySecret);
 
-        mockUser = new GymUser();
+        mockUser = new GymLogin();
         mockUser.setUsername("testuser");
         mockUser.setGym(new Gym());
     }

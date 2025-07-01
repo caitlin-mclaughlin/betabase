@@ -1,25 +1,28 @@
 package com.betabase.controllers;
 
-import java.net.URL;
-import java.time.LocalDate;
-import java.util.ResourceBundle;
-
+import com.betabase.interfaces.ServiceAware;
+import com.betabase.models.Address;
 import com.betabase.models.Gym;
 import com.betabase.services.GymApiService;
+import com.betabase.services.MemberApiService;
 import com.betabase.utils.AuthSession;
 import com.betabase.utils.SceneManager;
 import com.betabase.utils.TokenStorage;
 
-import javafx.application.Platform;
+import java.net.URL;
+import java.time.LocalDate;
+import java.util.ResourceBundle;
+
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Control;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 
-public class CreateAccountController implements Initializable {
+public class CreateAccountController implements Initializable, ServiceAware {
     @FXML private TextField nameField;
     @FXML private TextField streetField1;
     @FXML private TextField streetField2;
@@ -29,6 +32,15 @@ public class CreateAccountController implements Initializable {
     @FXML private TextField usernameField;
     @FXML private PasswordField passwordField;
     @FXML private PasswordField confirmPasswordField;
+
+    private MemberApiService memberService;
+    private GymApiService gymService;
+
+    @Override
+    public void setServices(MemberApiService memberService, GymApiService gymService) {
+        this.memberService = memberService;
+        this.gymService = gymService;
+    }
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -44,13 +56,13 @@ public class CreateAccountController implements Initializable {
 
     @FXML
     private void handleLogin(ActionEvent event) {
-        if (!checkFields()) {
+        if (!validateFields()) {
             return;
         }
 
         String name = nameField.getText();
-        String address = streetField2.getText().isBlank() ? streetField1.getText() : 
-                         streetField1.getText() + " " + streetField2.getText();
+        String streetAddress1 = streetField1.getText();
+        String streetAddress2 = streetField2.getText();
         String city = cityField.getText();
         String state = stateField.getText();
         String zip = zipField.getText();
@@ -58,12 +70,10 @@ public class CreateAccountController implements Initializable {
         String password = passwordField.getText();
         String confirm = confirmPasswordField.getText();
 
+        Address address = formAddress(streetAddress1, streetAddress2, city, state, zip);
         Gym gym = new Gym();
         gym.setName(name);
         gym.setAddress(address);
-        gym.setCity(city);
-        gym.setState(state);
-        gym.setZipCode(zip);
         gym.setUserSince(LocalDate.now());
 
         GymApiService gymService = new GymApiService();
@@ -76,7 +86,9 @@ public class CreateAccountController implements Initializable {
 
                 SceneManager.switchScene(
                     (Stage) usernameField.getScene().getWindow(),
-                    (DashboardController controller) -> controller.setMenuOpen(true),
+                    (DashboardController controller) -> {
+                        controller.setMenuOpen(true);
+                    },
                     "/com/betabase/views/dashboard.fxml",
                     false
                 );
@@ -97,40 +109,88 @@ public class CreateAccountController implements Initializable {
             false);
     }
 
-    private boolean checkFields() {
-        if (nameField.getText() == null) {
-            // error message
-            return false;
+    /**
+     * 
+     * NOTE: HARDCODED COUNTRY
+     * 
+     */
+    private Address formAddress(String streetAddress1, String streetAddress2, String city, String state, String zip) {
+        String[] parsed = streetAddress1.split(" ");
+        String streetNumber = parsed[0];
+        String streetName = parsed[1];
+        return streetAddress2.isBlank() ? new Address(streetNumber, streetName, city, state, zip, "USA") :
+                                          new Address(streetNumber, streetName, streetAddress2, city, state, zip, "USA");
+    }
+
+    private boolean validateFields() {
+        boolean valid = true;
+        if (nameField.getText() .isBlank()) {
+            markInvalid(nameField);
+            valid =  false;
+        } else {
+            clearInvalid(nameField);
         }
-        if (streetField1.getText() == null) {
-            // error message
-            return false;
+
+        if (streetField1.getText() .isBlank()) {
+            markInvalid(streetField1);
+            valid = false;
+        } else {
+            clearInvalid(streetField1);
         }
-        if (cityField.getText() == null) {
-            // error message
-            return false;
+
+        if (cityField.getText() .isBlank()) {
+            markInvalid(cityField);
+            valid = false;
+        } else {
+            clearInvalid(cityField);
         }
-        if (stateField.getText() == null) {
-            // error message
-            return false;
+
+        if (stateField.getText() .isBlank()) {
+            markInvalid(stateField);
+            valid = false;
+        } else {
+            clearInvalid(stateField);
         }
-        if (zipField.getText() == null) {
-            // error message
-            return false;
+
+        if (zipField.getText() .isBlank()) {
+            markInvalid(zipField);
+            valid = false;
+        } else {
+            clearInvalid(zipField);
         }
-        if (usernameField.getText() == null) {
-            // error message
-            return false;
+
+        if (usernameField.getText() .isBlank()) {
+            markInvalid(usernameField);
+            valid = false;
+        } else {
+            clearInvalid(usernameField);
         }
-        if (passwordField.getText() == null) {
-            // error message
-            return false;
+
+        if (passwordField.getText() .isBlank()) {
+            markInvalid(passwordField);
+            valid = false;
+        } else {
+            clearInvalid(passwordField);
         }
-        if (confirmPasswordField.getText() == null || 
-            !passwordField.getText().equals(confirmPasswordField.getText())) {
-            // error message
-            return false;
+
+        if (confirmPasswordField.getText() .isBlank() || 
+                !passwordField.getText().equals(confirmPasswordField.getText())) {
+            markInvalid(confirmPasswordField);
+            valid = false;
+        } else {
+            clearInvalid(confirmPasswordField);
         }
-        return true;
+
+        return valid;
+    }
+
+    private void markInvalid(Control field) {
+        field.getStyleClass().remove("field");
+        field.getStyleClass().add("invalid-field");
+    }
+
+    private void clearInvalid(Control field) {
+        field.getStyleClass().remove("invalid-field");
+        field.getStyleClass().add("field");
     }
 }

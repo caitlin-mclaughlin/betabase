@@ -5,14 +5,13 @@ import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 
 import com.betabase.enums.MemberType;
+import com.betabase.enums.PronounsType;
+import com.betabase.interfaces.ServiceAware;
 import com.betabase.models.Member;
 import com.betabase.models.MemberLogEntry;
+import com.betabase.services.GymApiService;
 import com.betabase.services.MemberApiService;
-import com.betabase.utils.AuthSession;
 import com.betabase.utils.SceneManager;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import javafx.animation.PauseTransition;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
@@ -40,20 +39,14 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 
 import java.io.IOException;
-import java.net.URI;
 import java.net.URL;
-import java.net.URLEncoder;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Year;
 import java.util.List;
 import java.util.ResourceBundle;
 
-public class CheckInController implements Initializable {
+public class CheckInController implements Initializable, ServiceAware {
 
     @FXML private BorderPane mainPane;
     @FXML private ImageView logoImage;
@@ -65,13 +58,11 @@ public class CheckInController implements Initializable {
 
     private VBox sidebar;
     private SidebarController sidebarController;
-    private final HttpClient httpClient = HttpClient.newHttpClient();
 
     @FXML private Pane floatingPane;
     @FXML private ListView<Member> floatingListView;
     @FXML private TableView<MemberLogEntry> checkInTable;
 
-    MemberApiService apiService;
 
     // Right Sidebar: Member Info
     @FXML private VBox memberDisplay;
@@ -90,9 +81,11 @@ public class CheckInController implements Initializable {
 
     private Member currentMember;
     private final ObservableList<MemberLogEntry> logEntries = FXCollections.observableArrayList();
+    private MemberApiService memberService;
 
-    public void setApiService(MemberApiService apiService) {
-        this.apiService = apiService;
+    @Override
+    public void setServices(MemberApiService memberService, GymApiService gymService) {
+        this.memberService = memberService;
     }
 
     public void setMenuOpen(boolean menuOpen) {
@@ -153,6 +146,7 @@ public class CheckInController implements Initializable {
             floatingListView.setOnMouseClicked(event -> {
                 Member selected = floatingListView.getSelectionModel().getSelectedItem();
                 if (selected != null) {
+                    System.out.println("\nDEBUG: attempting to display member with id: "+ selected.getId()+"\n");
                     showFloatingList(false);
                     displayMember(selected.getId());
 
@@ -283,33 +277,12 @@ public class CheckInController implements Initializable {
     }
 
     private void performSearch(String query) {
-        new Thread(() -> {
-            try {
-                String encoded = URLEncoder.encode(query, StandardCharsets.UTF_8);
-                URI uri = URI.create("http://localhost:8080/api/members/search?query=" + encoded);
-
-                String jwt = AuthSession.getToken();
-
-                HttpRequest request = HttpRequest.newBuilder()
-                        .uri(uri)
-                        .header("Authorization", "Bearer " + jwt)
-                        .GET()
-                        .build();
-
-                HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-
-                if (response.statusCode() == 200) {
-                    ObjectMapper mapper = new ObjectMapper();
-                    List<Member> members = mapper.readValue(response.body(), new TypeReference<>() {});
-                    Platform.runLater(() -> updateListView(members));
-                } else {
-                    System.err.println("Search failed with code: " + response.statusCode());
-                }
-
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }).start();
+        memberService.searchMembersAsync(query,
+            members -> updateListView(members),
+            error -> {
+                System.out.println("\nDEBUG: Search failed\n");
+                error.printStackTrace();
+            });
     }
 
     @FXML
@@ -356,9 +329,7 @@ public class CheckInController implements Initializable {
     private void handleNewMember(MouseEvent event) {
         SceneManager.switchScene(
             new Stage(), 
-            (MemberController controller) -> {
-                controller.setApiService(new MemberApiService());
-            },
+            (MemberController controller) -> {},
             "/com/betabase/views/member.fxml",
             true
         );
@@ -366,7 +337,7 @@ public class CheckInController implements Initializable {
 
     private void handleSave() {
         try {
-            boolean success = apiService.updateMember(currentMember);
+            boolean success = memberService.updateMember(currentMember);
             if (success) {
                 // maybe show a confirmation
                 System.out.println("\nDEBUG: SUCCESS - member info saved\n");
@@ -385,15 +356,21 @@ public class CheckInController implements Initializable {
 
     private void displayMember(Long memberId) {
         try {
-            currentMember = apiService.getMemberById(memberId);
+            currentMember = memberService.getMemberById(memberId);
 
+            if (currentMember == null) {
+                System.out.println("\nDEBUG: attempting to display null member\n");
+                return;
+            }
             // Display sidebar
             memberDisplay.setVisible(true);
             memberDisplay.setManaged(true);
             
-            // Validate and display member info
-            nameLabel.setText(currentMember.getLastName() + ",  " + currentMember.getFirstName() + "  \"" + 
-                            currentMember.getPrefName() + "\"  (" + currentMember.getPronouns() + ")");
+            // Display member info
+            String prefName = !currentMember.getPrefName().isBlank() ? " \"" + currentMember.getPrefName() + "\"" : "";
+            String pronouns = currentMember.getPronouns() != PronounsType.UNSET  ? " (" + currentMember.getPrefName() + ")" : "";
+            
+            nameLabel.setText(currentMember.getLastName() + ",  " + currentMember.getFirstName() + prefName + pronouns);
             phoneLabel.setText(currentMember.getPhoneNumber());
             emailLabel.setText(currentMember.getEmail());
             memberIdLabel.setText(currentMember.getMemberId());

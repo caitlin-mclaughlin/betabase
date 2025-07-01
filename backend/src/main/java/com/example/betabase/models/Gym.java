@@ -5,6 +5,11 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 import java.time.LocalDate;
+import java.util.List;
+
+import org.checkerframework.common.aliasing.qual.Unique;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -14,6 +19,7 @@ import lombok.AllArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Gym {
     
     @Id
@@ -21,37 +27,22 @@ public class Gym {
     private Long id;
 
     @NotBlank
-    @Column(unique = true)
-    private String name;
-    @NotBlank
-    private String address;
-    @NotBlank
-    private String city;
-    @NotBlank
-    private String zipCode;
-    @NotBlank
-    private String state;
+    @Column(unique = true, nullable = false)
+    private String name; // Location Name (if applicable)
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "group_id")
+    private GymGroup group;
+
+    @NotNull
+    @Unique
+    @Embedded
+    private Address address;
+
     @NotNull
     private LocalDate userSince;
 
-    public Long getId() {return id; }
-    public void setId(Long id) { this.id = id; }
-    
-    public String getName() { return name; }
-    public void setName(String name) { this.name = name; }
+    @OneToMany(mappedBy = "gym")
+    private List<Membership> memberships;
 
-    public String getAddress() { return address; }
-    public void setAddress(String address) { this.address = address; }
-
-    public String getCity() { return city; }
-    public void setCity(String city) { this.city = city; }
-
-    public String getZipCode() { return zipCode; }
-    public void setZipCode(String zipCode) { this.zipCode = zipCode; }
-
-    public String getState() { return state; }
-    public void setState(String state) { this.state = state; }
-
-    public LocalDate getUserSince() { return userSince; }
-    public void setUserSince(LocalDate userSince) { this.userSince = userSince; }
 }

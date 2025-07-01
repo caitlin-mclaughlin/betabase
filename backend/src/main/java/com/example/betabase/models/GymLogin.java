@@ -2,28 +2,38 @@ package com.example.betabase.models;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+
+import org.checkerframework.common.aliasing.qual.Unique;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.Collection;
 import java.util.Collections;
 
 @Entity
 @Data
-public class GymUser implements UserDetails {
+@NoArgsConstructor
+@AllArgsConstructor
+public class GymLogin implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @NotBlank
+    @Unique
     private String username;
 
     @NotBlank
     private String passwordHash;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @ManyToOne
+    @NotNull
     @JoinColumn(name = "gym_id", referencedColumnName = "id")
     private Gym gym;
 

@@ -7,7 +7,7 @@ import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import com.example.betabase.models.GymUser;
+import com.example.betabase.models.GymLogin;
 
 import java.security.Key;
 import java.util.Base64;
@@ -34,7 +34,7 @@ public class JwtService {
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
-    public String generateToken(GymUser user) {
+    public String generateToken(GymLogin user) {
         return Jwts.builder()
             .setSubject(user.getUsername())
             .claim("gymId", user.getGym().getId())

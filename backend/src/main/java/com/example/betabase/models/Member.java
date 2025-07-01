@@ -1,6 +1,9 @@
 package com.example.betabase.models;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+
 import java.time.LocalDate;
 
 import com.example.betabase.enums.*;
@@ -21,6 +24,7 @@ public class Member {
 
     @JoinColumn(name="gym_id")
     @ManyToOne(fetch = FetchType.LAZY)
+    @NotNull
     private Gym gym;
 
     @Enumerated(EnumType.STRING)
@@ -30,95 +34,37 @@ public class Member {
     @Enumerated(EnumType.STRING)
     private GenderType gender;
 
+    @NotBlank
     private String firstName;
     private String prefName;
+    @NotBlank
     private String lastName;
+    @NotNull
     private LocalDate dateOfBirth;
+    @NotBlank
     private String phoneNumber;
+    @NotBlank
     private String email;
+    @NotNull
+    @Embedded
+    private Address address;
+
     private String photoUrl;
     private String memberId;
+    @NotNull
     private LocalDate memberSince;
     private Boolean clocked;
     private Boolean checked;
 
-    // Billing Info
-    private String billingMethod;
-    private String address;
-
     // Emergency Contact
+    @NotBlank
     private String emergencyContactName;
+    @NotBlank
     private String emergencyContactPhone;
+    @NotBlank
     private String emergencyContactEmail;
 
     /*public boolean hasMembershipAt(Long gymId) {
         return this.getGymIds().contains(gymId);
     }*/
-
-    // Getters and setters
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
-
-    public Gym getGym() { return gym; }
-    public void setGym(Gym gym) { this.gym = gym; }
-    //public void addGymId(Long gymId) { gymId.add(gymId); }
-    //public void removeGymId(Long gymId) { gymIds.remove(gymId); }
-
-    public String getFirstName() { return firstName; }
-    public void setFirstName(String firstName) { this.firstName = firstName; }
-
-    public String getPrefName() { return prefName; }
-    public void setPrefName(String prefName) { this.prefName = prefName; }
-    
-    public String getLastName() { return lastName; }
-    public void setLastName(String lastName) { this.lastName = lastName; }
-
-    public PronounsType getPronouns() { return pronouns; }
-    public void setPronouns(PronounsType pronouns) { this.pronouns = pronouns; }
-
-    public GenderType getGender() { return gender; }
-    public void setGender(GenderType gender) { this.gender = gender; }
-
-    public LocalDate getDateOfBirth() { return dateOfBirth; }
-    public void setDateOfBirth(LocalDate dateOfBirth) { this.dateOfBirth = dateOfBirth; }
-
-    public String getPhoneNumber() { return phoneNumber; }
-    public void setPhoneNumber(String phoneNumber) { this.phoneNumber = phoneNumber; }
-
-    public String getPhotoUrl() { return photoUrl; }
-    public void setPhotoUrl(String photoUrl) { this.photoUrl = photoUrl; }
-
-    public String getMemberId() { return memberId; }
-    public void setMemberId(String memberId) { this.memberId = memberId; }
-
-    public LocalDate getMemberSince() { return memberSince; }
-    public void setMemberSince(LocalDate memberSince) { this.memberSince = memberSince; }
-
-    public MemberType getType() { return type; }
-    public void setType(MemberType type) { this.type = type; }
-
-    public String getAddress() { return address; }
-    public void setAddress(String address) { this.address = address; }
-
-    public Boolean getClocked() { return clocked; }
-    public void setClocked(Boolean clocked) { this.clocked = clocked; }
-
-    public Boolean getChecked() { return checked; }
-    public void setChecked(Boolean checked) { this.checked = checked; }
-
-    public String getBillingMethod() { return billingMethod; }
-    public void setBillingMethod(String billingMethod) { this.billingMethod = billingMethod; }
-
-    public String getEmail() { return email; }
-    public void setEmail(String email) { this.email = email; }
-
-    public String getEmergencyContactName() { return emergencyContactName; }
-    public void setEmergencyContactName(String emergencyContactName) { this.emergencyContactName = emergencyContactName; }
-
-    public String getEmergencyContactPhone() { return emergencyContactPhone; }
-    public void setEmergencyContactPhone(String emergencyContactPhone) { this.emergencyContactPhone = emergencyContactPhone; }
-
-    public String getEmergencyContactEmail() { return emergencyContactEmail; }
-    public void setEmergencyContactEmail(String emergencyContactEmail) { this.emergencyContactEmail = emergencyContactEmail; }
-
 }

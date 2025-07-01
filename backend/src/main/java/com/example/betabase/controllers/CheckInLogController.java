@@ -18,7 +18,7 @@ import com.example.betabase.services.CheckInLogService;
 import com.example.betabase.services.MemberService;
 
 @RestController
-@RequestMapping("/api/logs")
+@RequestMapping("/api/users/gym/logs")
 public class CheckInLogController {
     
     private final CheckInLogService logService;

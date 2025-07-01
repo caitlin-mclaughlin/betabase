@@ -1,6 +1,13 @@
 package com.example.betabase.controllers;
 
-import java.util.Map;
+import com.example.betabase.dtos.GymRegistrationRequest;
+import com.example.betabase.dtos.JwtResponse;
+import com.example.betabase.dtos.LoginRequest;
+import com.example.betabase.models.GymLogin;
+import com.example.betabase.security.JwtService;
+import com.example.betabase.services.GymLoginService;
+
+import jakarta.validation.Valid;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -9,61 +16,40 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
-import com.example.betabase.dtos.*;
-import com.example.betabase.models.GymUser;
-import com.example.betabase.security.JwtService;
-import com.example.betabase.services.GymUserService;
-
-import jakarta.validation.Valid;
-
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
 
     private final AuthenticationManager authManager;
     private final JwtService jwtService;
-    private final GymUserService gymUserService;
+    private final GymLoginService gymUserService;
 
     public AuthController(AuthenticationManager authManager, JwtService jwtService,
-                          GymUserService gymUserService) {
+                          GymLoginService gymUserService) {
         this.authManager = authManager;
         this.jwtService = jwtService;
         this.gymUserService = gymUserService;
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@Valid @RequestBody LoginRequest request) {
-        try {
-            // Authenticate using Spring Security
-            UsernamePasswordAuthenticationToken authToken =
-                new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword());
-            Authentication auth = authManager.authenticate(authToken); // throws if invalid
+    public ResponseEntity<JwtResponse> login(@Valid @RequestBody LoginRequest request) {
+        // Use Spring Security to authenticate
+        UsernamePasswordAuthenticationToken authToken =
+            new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword());
+        Authentication authentication = authManager.authenticate(authToken); // Will throw if invalid
 
-            // Fetch full GymUser by username
-            GymUser user = gymUserService.getByUsername(request.getUsername())
+        // Get full user info to generate JWT
+        GymLogin user = gymUserService.getByUsername(request.getUsername())
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-            // Generate JWT
-            String jwt = jwtService.generateToken(user);
-
-            return ResponseEntity.ok(new JwtResponse(jwt));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                .body(Map.of("message", "Login failed: " + e.getMessage()));
-        }
+        String token = jwtService.generateToken(user);
+        return ResponseEntity.ok(new JwtResponse(token));
     }
 
     @PostMapping("/register")
-    public ResponseEntity<?> register(@Valid @RequestBody GymRegistrationRequest request) {
-        try {
-            GymUser user = gymUserService.register(request);
-            String jwt = jwtService.generateToken(user);
-            return ResponseEntity.status(HttpStatus.CREATED).body(new JwtResponse(jwt));
-        } catch (Exception e) {
-            // Log error here if needed
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("message", "Registration failed: " + e.getMessage()));
-        }
+    public ResponseEntity<JwtResponse> register(@Valid @RequestBody GymRegistrationRequest request) {
+        GymLogin newUser = gymUserService.register(request);
+        String token = jwtService.generateToken(newUser);
+        return ResponseEntity.status(HttpStatus.CREATED).body(new JwtResponse(token));
     }
 }
-

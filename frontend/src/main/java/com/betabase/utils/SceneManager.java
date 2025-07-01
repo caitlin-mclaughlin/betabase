@@ -11,34 +11,48 @@ import java.util.function.Consumer;
 
 import java.net.URL;
 
+import com.betabase.interfaces.ServiceAware;
+import com.betabase.services.GymApiService;
 import com.betabase.services.MemberApiService;
 
 public class SceneManager {
 
-    private static final MemberApiService apiService= new MemberApiService();
-    private static String defaultTitle = "Betabase";
+    private static MemberApiService memberService;
+    private static GymApiService gymService;
+
+    private static final String defaultTitle = "Betabase";
+
+    public static void setServices(MemberApiService member, GymApiService gym) {
+        memberService = member;
+        gymService = gym;
+    }
 
     public static <T> void switchScene(Stage stage, Consumer<T> controllerConfigurator, 
-                                         String fxmlPath, Boolean newWindow) {
+                                       String fxmlPath, boolean newWindow) {
         try {
             URL location = SceneManager.class.getResource(fxmlPath);
             if (location == null) {
-                throw new IllegalArgumentException("FXML file not found: " + fxmlPath);
+                throw new IllegalArgumentException("FXML not found: " + fxmlPath);
             }
 
             FXMLLoader loader = new FXMLLoader(location);
-
-            // Defer controller config until after instance is created by FXMLLoader
             Parent root = loader.load();
             T controller = loader.getController();
+
+            // Automatically inject services if setServices() method exists
+            if (controller instanceof ServiceAware sa) {
+                sa.setServices(memberService, gymService);
+            }
+
             if (controllerConfigurator != null) {
                 controllerConfigurator.accept(controller);
             }
 
             if (newWindow) {
-                stage.setScene(new Scene(root));
-                stage.initModality(Modality.APPLICATION_MODAL); // Block input to other windows
-                stage.showAndWait();
+                Stage newStage = new Stage();
+                newStage.setScene(new Scene(root));
+                newStage.initModality(Modality.APPLICATION_MODAL);
+                newStage.showAndWait();
             } else {
                 stage.setScene(new Scene(root, stage.getWidth(), stage.getHeight()));
                 stage.show();
@@ -48,3 +62,4 @@ public class SceneManager {
         }
     }
 }
+

@@ -2,6 +2,9 @@ package com.betabase.services;
 
 import com.betabase.models.Gym;
 import com.betabase.models.Member;
+import com.betabase.utils.AuthSession;
+import com.betabase.utils.JwtUtils;
+import com.betabase.utils.TokenStorage;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -50,12 +53,12 @@ public class GymApiService {
         }
     }
 
-    public Optional<String> login(String username, String password) throws IOException, InterruptedException {
+    public Optional<String> login(String username, String password) throws IOException, InterruptedException, LoginException {
         ObjectMapper mapper = new ObjectMapper();
         String body = mapper.writeValueAsString(Map.of("username", username, "password", password));
 
         HttpRequest request = HttpRequest.newBuilder()
-            .uri(URI.create("http://localhost:8080/api/auth/login"))
+            .uri(URI.create(BASE_URL + "/login"))
             .header("Content-Type", "application/json")
             .POST(HttpRequest.BodyPublishers.ofString(body))
             .build();
@@ -65,8 +68,28 @@ public class GymApiService {
         if (response.statusCode() == 200) {
             JsonNode json = mapper.readTree(response.body());
             return Optional.of(json.get("token").asText());
+        } else if (response.statusCode() == 401) {
+            throw new LoginException("Invalid username or password");
         } else {
+            System.out.println("Login failed: " + response.statusCode());
             return Optional.empty();
+        }
+    }
+    
+    public void logout() {
+        // Clear active token
+        try {
+            String username = JwtUtils.getUsername(AuthSession.getToken());
+            if (username != null) {
+                Map<String, String> tokens = TokenStorage.loadTokens();
+                tokens.remove(username);
+                TokenStorage.saveAllTokens(tokens);
+            }
+
+            // Clear in-memory session
+            AuthSession.clear();
+        } catch (Exception e) {
+            System.err.println("Failed to clear stored token: " + e.getMessage());
         }
     }
 
@@ -105,6 +128,12 @@ public class GymApiService {
         public LoginRequest(String username, String password) {
             this.username = username;
             this.password = password;
+        }
+    }
+
+    public static class LoginException extends Exception {
+        public LoginException(String message) {
+            super(message);
         }
     }
 }

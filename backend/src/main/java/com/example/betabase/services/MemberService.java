@@ -34,8 +34,8 @@ public class MemberService {
         return repo.findById(id);
     }
 
-    public List<Member> search(String query) {
-        return repo.findByQuery(query.toLowerCase());
+    public List<Member> searchMembers(String query, Long gymId) {
+        return repo.findByQueryAndGymId(query, gymId);
     }
 
     // You can later add methods to check-in history, logs, etc.

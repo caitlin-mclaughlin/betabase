@@ -1,6 +1,8 @@
 package com.betabase.controllers;
 
+import com.betabase.interfaces.ServiceAware;
 import com.betabase.models.Member;
+import com.betabase.services.GymApiService;
 import com.betabase.services.MemberApiService;
 import com.betabase.utils.AuthSession;
 import com.betabase.utils.SceneManager;
@@ -31,17 +33,11 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 
 import java.io.IOException;
-import java.net.URI;
-import java.net.URLEncoder;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.nio.charset.StandardCharsets;
 import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
 
-public class DashboardController implements Initializable {
+public class DashboardController implements Initializable, ServiceAware {
 
     @FXML private BorderPane mainPane;
     @FXML private ImageView logoImage;
@@ -51,7 +47,15 @@ public class DashboardController implements Initializable {
 
     private SidebarController sidebarController;
     private boolean firstLoad;
-    private final HttpClient httpClient = HttpClient.newHttpClient();
+
+    private MemberApiService memberService;
+    private GymApiService gymService;
+
+    @Override
+    public void setServices(MemberApiService memberService, GymApiService gymService) {
+        this.memberService = memberService;
+        this.gymService = gymService;
+    }
 
     public void setMenuOpen(boolean menuOpen) {
         if (sidebarController != null) {
@@ -164,7 +168,7 @@ public class DashboardController implements Initializable {
                 if (event.getClickCount() == 2) { // double-click
                     Member selected = memberList.getSelectionModel().getSelectedItem();
                     if (selected != null) {
-                        openMemberWindow(selected.getId());
+                        openMemberWindow(selected);
                     }
                 }
             });
@@ -175,7 +179,7 @@ public class DashboardController implements Initializable {
                         Member selected = memberList.getSelectionModel().getSelectedItem();
                         if (selected != null) {
                             handleCheckInOut(selected, selected.getChecked());
-                            openMemberWindow(selected.getId());
+                            openMemberWindow(selected);
                         }
                     }
                 }
@@ -233,46 +237,28 @@ public class DashboardController implements Initializable {
     }
 
     private void performSearch(String query) {
-        new Thread(() -> {
-            try {
-                String encoded = URLEncoder.encode(query, StandardCharsets.UTF_8);
-                URI uri = URI.create("http://localhost:8080/api/members/search?query=" + encoded);
-
-                String jwt = AuthSession.getToken();
-
-                HttpRequest request = HttpRequest.newBuilder()
-                        .uri(uri)
-                        .header("Authorization", "Bearer " + jwt)
-                        .GET()
-                        .build();
-
-                HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-
-                if (response.statusCode() == 200) {
-                    ObjectMapper mapper = new ObjectMapper();
-                    List<Member> members = mapper.readValue(response.body(), new TypeReference<>() {});
-                    Platform.runLater(() -> updateListView(members));
-                } else {
-                    System.err.println("Search failed with code: " + response.statusCode());
-                }
-
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }).start();
+        memberService.searchMembersAsync(query,
+            members -> updateListView(members),
+            error -> {
+                System.out.println("\nDEBUG: Search failed\n");
+                error.printStackTrace();
+            });
     }
 
     private void updateListView(List<Member> members) {
+        if (members == null || members.size() == 0) {
+            System.out.println("\nDEBUG: attempting to display null list of members\n");
+            return;
+        }
         memberList.getItems().clear();
         memberList.getItems().addAll(members);
     }
 
-    private void openMemberWindow(Long memberId) {
+    private void openMemberWindow(Member member) {
         SceneManager.switchScene(
             new Stage(), 
             (MemberController controller) -> {
-                controller.setApiService(new MemberApiService());
-                controller.setMember(memberId);
+                controller.setMember(member);
             },
             "/com/betabase/views/member.fxml",
             true

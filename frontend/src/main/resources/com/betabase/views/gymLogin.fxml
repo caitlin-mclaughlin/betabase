@@ -5,6 +5,7 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.PasswordField?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.Tooltip?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.BorderPane?>
@@ -43,11 +44,26 @@
                 <HBox alignment="CENTER">
                     <Label styleClass="option-label" text="Log In to Your Gym" />
                 </HBox>
-                <Label fx:id="usernamePrompt" styleClass="field-prompt" text="Username:" />
+                <HBox spacing="5">
+                    <Label fx:id="usernamePrompt" styleClass="field-prompt" text="Username:" />
+                    <Label text="*" styleClass="field-prompt" style="-fx-text-fill: -fx-accent-color;" mouseTransparent="false">
+                        <tooltip>
+                            <Tooltip text="Username is required" styleClass="warning" />
+                        </tooltip>
+                    </Label>
+                </HBox>
                 <TextField fx:id="usernameField" styleClass="field" VBox.vgrow="ALWAYS" />
-                <Label fx:id="passwordPrompt" styleClass="field-prompt" text="Password:" />
+                <HBox spacing="5">
+                    <Label fx:id="passwordPrompt" styleClass="field-prompt" text="Password:" />
+                    <Label text="*" styleClass="field-prompt" style="-fx-text-fill: -fx-accent-color;" mouseTransparent="false">
+                        <tooltip>
+                            <Tooltip text="Password is required" styleClass="warning" />
+                        </tooltip>
+                    </Label>
+                </HBox>
                 <PasswordField fx:id="passwordField" styleClass="field" VBox.vgrow="ALWAYS" />
                 <Region VBox.vgrow="ALWAYS" />
+                <Label fx:id="loginError" text="Invalid username or password. Try again." visible="false" styleClass="invalid-login" />
                 <Button onAction="#handleLogin" styleClass="login-button" text="LOGIN" VBox.vgrow="ALWAYS" />
             </VBox>
             <VBox styleClass="options" HBox.hgrow="ALWAYS">

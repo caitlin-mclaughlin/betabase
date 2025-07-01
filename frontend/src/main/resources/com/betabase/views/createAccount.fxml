@@ -5,6 +5,7 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.PasswordField?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.Tooltip?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.BorderPane?>
@@ -39,9 +40,23 @@
             <padding>
                 <Insets bottom="25" left="25" right="25" top="10" />
             </padding>
-            <Label fx:id="namePrompt" text="Gym Name:" styleClass="field-prompt" />
+            <HBox spacing="5">
+                <Label fx:id="namePrompt" text="Gym Name:" styleClass="field-prompt" />
+                <Label text="*" styleClass="field-prompt" style="-fx-text-fill: -fx-accent-color;" mouseTransparent="false">
+                    <tooltip>
+                        <Tooltip text="Gym name is required" styleClass="warning" />
+                    </tooltip>
+                </Label>
+            </HBox>
             <TextField fx:id="nameField" styleClass="field" />
-            <Label fx:id="addressPrompt" text="Address:" styleClass="field-prompt" />
+            <HBox spacing="5">
+                <Label fx:id="addressPrompt" text="Address:" styleClass="field-prompt" />
+                <Label text="*" styleClass="field-prompt" style="-fx-text-fill: -fx-accent-color;" mouseTransparent="false">
+                    <tooltip>
+                        <Tooltip text="Gym address is required" styleClass="warning" />
+                    </tooltip>
+                </Label>
+            </HBox>
             <TextField fx:id="streetField1" promptText="Street Address" styleClass="field" />
             <TextField fx:id="streetField2" promptText="Street Address (Optional)" styleClass="field" />
             <HBox spacing="15">
@@ -49,11 +64,32 @@
                 <TextField fx:id="stateField" promptText="State" styleClass="field" />
                 <TextField fx:id="zipField" promptText="Zipcode" styleClass="field" />
             </HBox>
-            <Label fx:id="usernamePrompt" text="Username:" styleClass="field-prompt" />
+            <HBox spacing="5">
+                <Label fx:id="usernamePrompt" text="Username:" styleClass="field-prompt" />
+                <Label text="*" styleClass="field-prompt" style="-fx-text-fill: -fx-accent-color;" mouseTransparent="false">
+                    <tooltip>
+                        <Tooltip text="Username is required" styleClass="warning" />
+                    </tooltip>
+                </Label>
+            </HBox>
             <TextField fx:id="usernameField" styleClass="field" />
-            <Label fx:id="passwordPrompt" text="Password:" styleClass="field-prompt" />
+            <HBox spacing="5">
+                <Label fx:id="passwordPrompt" text="Password:" styleClass="field-prompt" />
+                <Label text="*" styleClass="field-prompt" style="-fx-text-fill: -fx-accent-color;" mouseTransparent="false">
+                    <tooltip>
+                        <Tooltip text="Password is required" styleClass="warning" />
+                    </tooltip>
+                </Label>
+            </HBox>
             <PasswordField fx:id="passwordField" styleClass="field" />
-            <Label fx:id="confirmPasswordPrompt" text="Confirm Password:" styleClass="field-prompt" />
+            <HBox spacing="5">
+                <Label fx:id="confirmPasswordPrompt" text="Confirm Password:" styleClass="field-prompt" />
+                <Label text="*" styleClass="field-prompt" style="-fx-text-fill: -fx-accent-color;" mouseTransparent="false">
+                    <tooltip>
+                        <Tooltip text="Password confirmation is required" styleClass="warning" />
+                    </tooltip>
+                </Label>
+            </HBox>
             <PasswordField fx:id="confirmPasswordField" styleClass="field" />
             <Region VBox.vgrow="ALWAYS" />
             <Button text="CREATE ACCOUNT AND LOGIN" onAction="#handleLogin" styleClass="login-button"/>

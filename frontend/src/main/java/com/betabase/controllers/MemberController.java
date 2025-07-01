@@ -1,12 +1,15 @@
 package com.betabase.controllers;
 
 import java.net.URL;
-import java.sql.Date;
+import java.time.LocalDate;
 import java.util.ResourceBundle;
 import java.util.function.UnaryOperator;
 
 import com.betabase.enums.*;
+import com.betabase.interfaces.ServiceAware;
+import com.betabase.models.Address;
 import com.betabase.models.Member;
+import com.betabase.services.GymApiService;
 import com.betabase.services.MemberApiService;
 
 import javafx.application.Platform;
@@ -14,18 +17,12 @@ import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Button;
-import javafx.scene.control.ChoiceBox;
-import javafx.scene.control.DatePicker;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
-import javafx.scene.control.TextFormatter;
+import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
-import javafx.scene.text.Text;
 import javafx.util.StringConverter;
 
-public class MemberController implements Initializable {
+public class MemberController implements Initializable, ServiceAware {
     
     // Member information fields
     @FXML private Label nameLabel;
@@ -36,8 +33,8 @@ public class MemberController implements Initializable {
     @FXML private Label dobLabel;
     @FXML private Label memberIdLabel;
     @FXML private Label memberSinceLabel;
-    @FXML private Label billingLabel;
-    @FXML private Label addressLabel;
+    @FXML private Label addressLabel1;
+    @FXML private Label addressLabel2;
     @FXML private Label eNameLabel;
     @FXML private Label ePhoneLabel;
     @FXML private Label eEmailLabel;
@@ -52,10 +49,13 @@ public class MemberController implements Initializable {
     @FXML private TextField phoneField;
     @FXML private TextField emailField;
     @FXML private TextField memberIdField;
-//    @FXML private DatePicker dobField;
+    @FXML private DatePicker dobField;
 //    @FXML private DatePicker memberSinceField;
-    @FXML private ChoiceBox<BillingType> billingField;
-    @FXML private TextField addressField;
+    @FXML private TextField streetField1;
+    @FXML private TextField streetField2;
+    @FXML private TextField cityField;
+    @FXML private TextField zipField;
+    @FXML private TextField stateField;
     @FXML private TextField eNameField;
     @FXML private TextField ePhoneField;
     @FXML private TextField eEmailField;
@@ -69,12 +69,12 @@ public class MemberController implements Initializable {
 
     @FXML private HBox staffButtons;
 
-    private MemberApiService apiService;
-
     private Member currentMember;
+    private MemberApiService memberService;
 
-    public void setApiService(MemberApiService apiService) {
-        this.apiService = apiService;
+    @Override
+    public void setServices(MemberApiService memberService, GymApiService gymService) {
+        this.memberService = memberService;
     }
 
     @Override
@@ -87,75 +87,43 @@ public class MemberController implements Initializable {
         typeField.setItems(FXCollections.observableArrayList(MemberType.values()));
         genderField.setItems(FXCollections.observableArrayList(GenderType.values()));
         pronounsField.setItems(FXCollections.observableArrayList(PronounsType.values()));
-        billingField.setItems(FXCollections.observableArrayList(BillingType.values()));
 
-        setupPhoneFormatter(this.phoneField);
-        initializePhoneField();
+        setupPhoneFormatter(phoneField);
+        setupPhoneFormatter(ePhoneField);
     }
 
-    private void initializePhoneField() {
+    private void setupPhoneFormatter(TextField field) {
         UnaryOperator<TextFormatter.Change> filter = change -> {
-            String text = change.getControlNewText().replaceAll("[^\\d]", ""); // Only digits
+            String newText = change.getControlNewText().replaceAll("[^\\d]", "");
 
-            if (text.length() > 10) {
-                return null; // restrict to 10 digits
-            }
+            if (newText.length() > 10) return null;
 
-            // Format: (XXX) XXX-XXXX
+            // Format live
             StringBuilder formatted = new StringBuilder();
-            int len = text.length();
+            int len = newText.length();
 
-            if (len > 0) formatted.append("(").append(text.substring(0, Math.min(3, len)));
-            if (len >= 4) formatted.append(") ").append(text.substring(3, Math.min(6, len)));
-            if (len >= 7) formatted.append("-").append(text.substring(6));
+            if (len > 0) formatted.append("(").append(newText.substring(0, Math.min(3, len)));
+            if (len >= 3) formatted.append(") ").append(newText.substring(3, Math.min(6, len)));
+            if (len >= 7) formatted.append("-").append(newText.substring(6));
 
             change.setText(formatted.toString());
-            change.setRange(0, change.getControlText().length()); // overwrite whole field
+            change.setRange(0, change.getControlText().length()); // Replace full content
             return change;
         };
 
         TextFormatter<String> formatter = new TextFormatter<>(filter);
-        phoneField.setTextFormatter(formatter);
+        field.setTextFormatter(formatter);
+
+        // Optional: keep caret at end while typing
+        field.textProperty().addListener((obs, oldVal, newVal) ->
+            Platform.runLater(() -> field.positionCaret(field.getText().length()))
+        );
     }
 
-
-    private void setupPhoneFormatter(TextField phoneField) {
-        TextFormatter<String> formatter = new TextFormatter<>(new StringConverter<>() {
-            @Override
-            public String toString(String object) {
-                return formatPhoneNumber(object);
-            }
-
-            @Override
-            public String fromString(String string) {
-                return string.replaceAll("[^\\d]", "");
-            }
-        }, "", change -> {
-            String newText = change.getControlNewText().replaceAll("[^\\d]", "");
-            if (newText.length() > 10) return null;
-            return change;
-        });
-
-        phoneField.setTextFormatter(formatter);
-
-        // Keep caret at end while typing
-        phoneField.textProperty().addListener((obs, oldVal, newVal) -> {
-            Platform.runLater(() -> phoneField.positionCaret(phoneField.getText().length()));
-        });
-    }
-
-    private String formatPhoneNumber(String digits) {
-        digits = digits.replaceAll("[^\\d]", "");
-        if (digits.length() == 0) return "";
-        if (digits.length() <= 3) return "(" + digits;
-        if (digits.length() <= 6) return "(" + digits.substring(0, 3) + ") " + digits.substring(3);
-        return "(" + digits.substring(0, 3) + ") " + digits.substring(3, 6) + "-" + digits.substring(6);
-    }
-
-    public void setMember(Long memberId) {
+    public void setMember(Member member) {
+        this.currentMember = member;
         setEditableState(false);
-        System.out.println("\nDEBUG: setting member\n");
-        updateDisplayFromMember(memberId);
+        updateDisplayFromMember(member);
     }
 
     @FXML
@@ -177,27 +145,40 @@ public class MemberController implements Initializable {
     @FXML
     private void handleCancel(MouseEvent event) {
         setEditableState(false);
-        updateDisplayFromMember(currentMember.getId()); // revert to original values
+        updateDisplayFromMember(currentMember); // revert to original values
     }
 
     @FXML
     private void handleSave(MouseEvent event) { 
         // save changes to object
-        boolean newMember = currentMember.getFirstName().isBlank();
+        if (!validateFields()) {
+            return;
+        }
+        boolean newMember = currentMember == null || currentMember.getId() == null;
 
         try {
             boolean success;
+            updateCurrentMemberFromFields();
 
             if (newMember) {
-                success = apiService.createMember(currentMember);
+                currentMember.setMemberSince(LocalDate.now());
+                System.out.println("Before: " + currentMember+"\tid:"+currentMember.getId());
+                System.out.println("\nDEBUG: new member with dob: "+currentMember.getDateOfBirth().toString()+"\n");
+                currentMember = memberService.createMember(currentMember);
+                System.out.println("After: " + currentMember+"\tid:"+currentMember.getId());
+
+                success = currentMember != null;
+                System.out.println("\nDEBUG: new member with id: "+currentMember.getId()+"\n"+success);
             } else {
-                updateMemberFromFields(currentMember.getId());
-                success = apiService.updateMember(currentMember);
+                System.out.println("\nDEBUG: existing member with id: "+currentMember.getId()+"\n");
+                success = memberService.updateMember(currentMember);
             }
             
             if (success) {
                 // maybe show a confirmation
-                System.out.println("\nDEBUG: SUCCESS - member info saved\n");
+                System.out.println("\nDEBUG: save method: SUCCESS - member info saved\n");
+                setEditableState(false);
+                updateDisplayFromMember(currentMember); // refresh display
             } else {
                 // show error
                 System.out.println("\nDEBUG: member info could not be saved\n");
@@ -206,68 +187,173 @@ public class MemberController implements Initializable {
             e.printStackTrace();
             // show error dialog
         }
-        setEditableState(false);
-        updateDisplayFromMember(currentMember.getId()); // refresh display
     }
 
-
-    private void updateDisplayFromMember(Long memberId) {
+    private void updateDisplayFromMember(Member member) {
         // Reload and display data
-        try {
-            currentMember = apiService.getMemberById(memberId);
-            System.out.println("\nDEBUG: got member: "+currentMember.getFirstName()+"\n");
-            if (currentMember.getPrefName().isBlank()) {
-                nameLabel.setText(currentMember.getLastName() + ", " + currentMember.getFirstName() +
-                                "  (" + currentMember.getPronouns().toString() + ")");
-            } else {
-                nameLabel.setText(currentMember.getLastName() + ",  " + currentMember.getFirstName() + "  \"" + 
-                                currentMember.getPrefName() + "\"  (" + currentMember.getPronouns().toString() + ")");
-            }
-            genderLabel.setText(currentMember.getGender().toString());
-            phoneLabel.setText(currentMember.getPhoneNumber());
-            emailLabel.setText(currentMember.getEmail());
-            dobLabel.setText(currentMember.getDateOfBirth() != null ? currentMember.getDateOfBirth().toString()  : "MM/DD/YYYY");
-            memberIdLabel.setText(currentMember.getMemberId());
-            memberSinceLabel.setText(currentMember.getMemberSince() != null ? currentMember.getMemberSince().toString()  : "MM/DD/YYYY");
-            billingLabel.setText(currentMember.getBillingMethod().toString());
-            addressLabel.setText(currentMember.getAddress());
-            eNameLabel.setText(currentMember.getEmergencyContactName());
-            ePhoneLabel.setText(currentMember.getEmergencyContactPhone());
-            eEmailLabel.setText(currentMember.getEmergencyContactEmail());
-
-            // style and display member type
-            MemberType type = currentMember.getType();
-            switch (type) {
-                case ADMIN: {
-                    typeLabel.setStyle("-fx-background-color: -fx-color-pos3;");
-                    staffButtons.setVisible(true);
-                    break;
-                }
-                case MEMBER: {
-                    typeLabel.setStyle("-fx-background-color: -fx-color-pos1;");
-                    staffButtons.setVisible(false);
-                    break;
-                }
-                case STAFF: {
-                    typeLabel.setStyle("-fx-background-color: -fx-color-pos4;");
-                    staffButtons.setVisible(true);
-                    break;
-                }
-                case VISITOR: {
-                    typeLabel.setStyle("-fx-background-color: -fx-color-pos2;");
-                    staffButtons.setVisible(false);
-                    break;
-                }
-                default: {
-                    typeLabel.setStyle("-fx-background-color: -fx-accent-color;");
-                    staffButtons.setVisible(false);
-                }
-            }
-            typeLabel.setText(type.toString().toUpperCase());
-        } catch (Exception e) {
-            e.printStackTrace();
-            // show error dialog
+        // fix behavior when getById fails (null pointer)
+        if (member == null) {
+            System.out.println("\nDEBUG: attempted to display null member\n");
+            return;
         }
+        System.out.println("\nDEBUG: updating display with member: "+member.getFirstName()+"\n");
+        if (member.getPrefName().isBlank()) {
+            nameLabel.setText(member.getLastName() + ", " + member.getFirstName() +
+                            "  (" + member.getPronouns().toString() + ")");
+        } else {
+            nameLabel.setText(member.getLastName() + ",  " + member.getFirstName() + "  \"" + 
+                            member.getPrefName() + "\"  (" + member.getPronouns().toString() + ")");
+        }
+        genderLabel.setText(member.getGender().toString());
+        phoneLabel.setText(member.getPhoneNumber());
+        emailLabel.setText(member.getEmail());
+        dobLabel.setText(member.getDateOfBirth() != null ? member.getDateOfBirth().toString()  : "MM/DD/YYYY");
+        memberIdLabel.setText(member.getMemberId());
+        memberSinceLabel.setText(member.getMemberSince() != null ? member.getMemberSince().toString()  : "MM/DD/YYYY");
+        addressLabel1.setText(member.getAddress().toStringLine1());
+        addressLabel2.setText(member.getAddress().toStringLine2());
+        eNameLabel.setText(member.getEmergencyContactName());
+        ePhoneLabel.setText(member.getEmergencyContactPhone());
+        eEmailLabel.setText(member.getEmergencyContactEmail());
+
+        // style and display member type
+        MemberType type = member.getType();
+        switch (type) {
+            case ADMIN: {
+                typeLabel.setStyle("-fx-background-color: -fx-color-pos3;");
+                staffButtons.setVisible(true);
+                break;
+            }
+            case MEMBER: {
+                typeLabel.setStyle("-fx-background-color: -fx-color-pos1;");
+                staffButtons.setVisible(false);
+                break;
+            }
+            case STAFF: {
+                typeLabel.setStyle("-fx-background-color: -fx-color-pos4;");
+                staffButtons.setVisible(true);
+                break;
+            }
+            case VISITOR: {
+                typeLabel.setStyle("-fx-background-color: -fx-color-pos2;");
+                staffButtons.setVisible(false);
+                break;
+            }
+            default: {
+                typeLabel.setStyle("-fx-background-color: -fx-accent-color;");
+                staffButtons.setVisible(false);
+            }
+        }
+        typeLabel.setText(type.toString().toUpperCase());
+    }
+
+    private boolean validateFields() {
+        boolean valid = true;
+
+        if (firstNameField.getText().isBlank()) {
+            markInvalid(firstNameField);
+            valid = false;
+        } else {
+            clearInvalid(firstNameField);
+        }
+
+        if (lastNameField.getText().isBlank()) {
+            markInvalid(lastNameField);
+            valid = false;
+        } else {
+            clearInvalid(lastNameField);
+        }
+
+        if (phoneField.getText().replaceAll("[^\\d]", "").length() != 10) {
+            markInvalid(phoneField);
+            valid = false;
+        } else {
+            clearInvalid(phoneField);
+        }
+
+        if (!emailField.getText().matches("^[\\w\\.-]+@[\\w\\.-]+\\.\\w+$")) {
+            markInvalid(emailField);
+            valid = false;
+        } else {
+            clearInvalid(emailField);
+        }
+
+        if (dobField.getValue() == null) {
+            markInvalid(dobField);
+            valid = false;
+        } else {
+            clearInvalid(dobField);
+        }
+
+        // Address 
+        if (streetField1.getText().isBlank()) {
+            markInvalid(streetField1);
+            valid = false;
+        } else {
+            clearInvalid(streetField1);
+        }
+
+        if (streetField2.getText().isBlank()) {
+            markInvalid(streetField2);
+            valid = false;
+        } else {
+            clearInvalid(streetField2);
+        }
+
+        if (cityField.getText().isBlank()) {
+            markInvalid(cityField);
+            valid = false;
+        } else {
+            clearInvalid(cityField);
+        }
+
+        if (stateField.getText().isBlank()) {
+            markInvalid(stateField);
+            valid = false;
+        } else {
+            clearInvalid(stateField);
+        }
+
+        if (zipField.getText().isBlank()) {
+            markInvalid(zipField);
+            valid = false;
+        } else {
+            clearInvalid(zipField);
+        }
+
+        // Emergency contact info
+        if (eNameField.getText().isBlank()) {
+            markInvalid(eNameField);
+            valid = false;
+        } else {
+            clearInvalid(eNameField);
+        }
+
+        if (ePhoneField.getText().replaceAll("[^\\d]", "").length() != 10) {
+            markInvalid(ePhoneField);
+            valid = false;
+        } else {
+            clearInvalid(ePhoneField);
+        }
+
+        if (!eEmailField.getText().matches("^[\\w\\.-]+@[\\w\\.-]+\\.\\w+$")) {
+            markInvalid(eEmailField);
+            valid = false;
+        } else {
+            clearInvalid(eEmailField);
+        }
+
+        return valid;
+    }
+
+    private void markInvalid(Control field) {
+        field.getStyleClass().remove("user-info-edit");
+        field.getStyleClass().add("user-info-invalid");
+    }
+
+    private void clearInvalid(Control field) {
+        field.getStyleClass().remove("user-info-invalid");
+        field.getStyleClass().add("user-info-edit");
     }
 
     private void setEditableState(boolean editable) {
@@ -306,20 +392,42 @@ public class MemberController implements Initializable {
         memberIdField.setManaged(editable);
         dobLabel.setVisible(!editable);
         dobLabel.setManaged(!editable);
-        //dobField.setVisible(editable);
-        //dobField.setManaged(editable);
+        dobField.setVisible(editable);
+        dobField.setManaged(editable);
         memberSinceLabel.setVisible(!editable);
         memberSinceLabel.setManaged(!editable);
         //memberSinceField.setVisible(editable);
         //memberSinceField.setManaged(editable);
-        billingLabel.setVisible(!editable);
-        billingLabel.setManaged(!editable);
-        billingField.setVisible(editable);
-        billingField.setManaged(editable);
-        addressLabel.setVisible(!editable);
-        addressLabel.setManaged(!editable);
-        addressField.setVisible(editable);
-        addressField.setManaged(editable);
+
+        // Address
+        addressLabel1.setVisible(!editable);
+        addressLabel1.setManaged(!editable);
+        addressLabel1.setVisible(editable);
+        addressLabel1.setManaged(editable);
+        addressLabel2.setVisible(!editable);
+        addressLabel2.setManaged(!editable);
+        addressLabel2.setVisible(editable);
+        addressLabel2.setManaged(editable);
+        streetField1.setVisible(!editable);
+        streetField1.setManaged(!editable);
+        streetField1.setVisible(editable);
+        streetField1.setManaged(editable);
+        streetField2.setVisible(!editable);
+        streetField2.setManaged(!editable);
+        streetField2.setVisible(editable);
+        streetField2.setManaged(editable);
+        cityField.setVisible(!editable);
+        cityField.setManaged(!editable);
+        cityField.setVisible(editable);
+        cityField.setManaged(editable);
+        stateField.setVisible(!editable);
+        stateField.setManaged(!editable);
+        stateField.setVisible(editable);
+        stateField.setManaged(editable);
+        zipField.setVisible(!editable);
+        zipField.setManaged(!editable);
+        zipField.setVisible(editable);
+        zipField.setManaged(editable);
 
         // Emergency contact info
         eNameLabel.setVisible(!editable);
@@ -346,36 +454,45 @@ public class MemberController implements Initializable {
         cancelButton.setManaged(editable);
     }
 
-    private void updateMemberFromFields(Long memberId) {
-        // Update or restore provided member
-        try {
-            currentMember.setFirstName(firstNameField.getText());
-            currentMember.setLastName(lastNameField.getText());
-            currentMember.setPrefName(prefNameField.getText());
-            currentMember.setPronouns(pronounsField.getValue().toString());
-            currentMember.setGender(genderField.getValue().toString());
-            currentMember.setType(typeField.getValue().toString());
-            currentMember.setPhoneNumber(phoneField.getText().replaceAll("[^\\d]", ""));
-            currentMember.setEmail(emailField.getText());
-    //        currentMember.setDateOfBirth(dobField.getValue());
-    //        currentMember.setMemberSince(memberSinceField.getValue());
-            currentMember.setMemberId(memberIdField.getText());
-            currentMember.setBillingMethod(billingField.getValue().toString());
-            currentMember.setAddress(addressField.getText());
-            currentMember.setEmergencyContactName(eNameField.getText());
-            currentMember.setEmergencyContactPhone(ePhoneField.getText());
-            currentMember.setEmergencyContactEmail(eEmailField.getText());
-            
-            boolean success = apiService.updateMember(currentMember);
-            if (success) {
-                // maybe show a confirmation
-                System.out.println("\nDEBUG: SUCCESS - member info saved\n");
-            }
+    private void updateCurrentMemberFromFields() {
+        // Update or restore member
+        currentMember.setFirstName(firstNameField.getText());
+        currentMember.setLastName(lastNameField.getText());
+        currentMember.setPrefName(prefNameField.getText());
+        currentMember.setPronouns(pronounsField.getValue());
+        currentMember.setGender(genderField.getValue());
+        currentMember.setType(typeField.getValue());
+        currentMember.setPhoneNumber(phoneField.getText().replaceAll("[^\\d]", ""));
+        currentMember.setEmail(emailField.getText());
+        currentMember.setDateOfBirth(dobField.getValue());
+        currentMember.setMemberId(memberIdField.getText());
+        currentMember.setAddress(formAddress(streetField1.getText(), streetField2.getText(), cityField.getText(),
+                                             stateField.getText(), zipField.getText()));
+        currentMember.setEmergencyContactName(eNameField.getText());
+        currentMember.setEmergencyContactPhone(ePhoneField.getText().replaceAll("[^\\d]", ""));
+        currentMember.setEmergencyContactEmail(eEmailField.getText());
+    }
 
-        } catch (Exception e) {
-            e.printStackTrace();
-            // show error dialog
+    /**
+     * 
+     * NOTE: HARDCODED COUNTRY
+     * 
+     */
+    private Address formAddress(String streetAddress1, String streetAddress2, String city, String state, String zip) {
+        String streetNumber;
+        String streetName;
+
+        int firstSpace = streetAddress1.indexOf(" ");
+        if (firstSpace > 0) {
+            streetNumber = streetAddress1.substring(0, firstSpace).trim();
+            streetName = streetAddress1.substring(firstSpace + 1).trim();
+        } else {
+            // fallback: assume whole thing is name
+            streetNumber = "";
+            streetName = streetAddress1.trim();
         }
+        return streetAddress2.isBlank() ? new Address(streetNumber, streetName, city, state, zip, "USA") :
+                                          new Address(streetNumber, streetName, streetAddress2, city, state, zip, "USA");
     }
 
     private void setFieldPrompts(Member member) {
@@ -402,12 +519,14 @@ public class MemberController implements Initializable {
         phoneField.setText(member.getPhoneNumber());
         emailField.setText(member.getEmail());
         memberIdField.setText(member.getMemberId());
-        billingField.setValue(member.getBillingMethod());
-        addressField.setText(member.getAddress());
+        streetField1.setText(member.getAddress().getStreetAddress());
+        streetField2.setText(member.getAddress().getApartmentNumber());
+        cityField.setText(member.getAddress().getCity());
+        stateField.setText(member.getAddress().getState());
+        zipField.setText(member.getAddress().getZipCode());
         eNameField.setText(member.getEmergencyContactName());
         ePhoneField.setText(member.getEmergencyContactPhone());
         eEmailField.setText(member.getEmergencyContactEmail());
-
     }
 
 }

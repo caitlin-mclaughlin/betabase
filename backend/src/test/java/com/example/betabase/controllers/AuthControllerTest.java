@@ -2,10 +2,11 @@ package com.example.betabase.controllers;
 
 import com.example.betabase.dtos.GymRegistrationRequest;
 import com.example.betabase.dtos.LoginRequest;
+import com.example.betabase.models.Address;
 import com.example.betabase.models.Gym;
-import com.example.betabase.models.GymUser;
+import com.example.betabase.models.GymLogin;
 import com.example.betabase.security.JwtService;
-import com.example.betabase.services.GymUserService;
+import com.example.betabase.services.GymLoginService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -26,6 +27,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.mockito.Mockito.*;
 
 import java.time.LocalDate;
 
@@ -43,7 +45,7 @@ public class AuthControllerTest {
     private ObjectMapper objectMapper;
 
     @Autowired
-    private GymUserService gymUserService;
+    private GymLoginService gymUserService;
 
     @Autowired
     private JwtService jwtService;
@@ -52,23 +54,21 @@ public class AuthControllerTest {
 
     @BeforeEach
     void defineGym() {
+        Address address = new Address("123", "Address St", "Madison", "WI", "53703", "USA");
         mockGym = new Gym();
         mockGym.setId(1L);
         mockGym.setName("BetaBase");
-        mockGym.setAddress("123 Street");
-        mockGym.setCity("Madison");
-        mockGym.setZipCode("53703");
-        mockGym.setState("WI");
+        mockGym.setAddress(address);
         mockGym.setUserSince(LocalDate.of(2023, 1, 1));
 
-        GymUser mockUser = new GymUser();
+        GymLogin mockUser = new GymLogin();
         mockUser.setId(1L);
         mockUser.setUsername("betabase");
         mockUser.setPasswordHash("hashed-password");
         mockUser.setGym(mockGym);
 
-        Mockito.when(gymUserService.register(Mockito.any(GymRegistrationRequest.class))).thenReturn(mockUser);
-        Mockito.when(jwtService.generateToken(Mockito.any())).thenReturn("mock-jwt");
+        when(gymUserService.register(any(GymRegistrationRequest.class))).thenReturn(mockUser);
+        when(jwtService.generateToken(any())).thenReturn("mock-jwt");
     }
 
     @Test
@@ -128,8 +128,8 @@ public class AuthControllerTest {
 
         @Bean
         @Primary  // override any existing bean of this type
-        public GymUserService gymUserService() {
-            return Mockito.mock(GymUserService.class);
+        public GymLoginService gymUserService() {
+            return Mockito.mock(GymLoginService.class);
         }
 
         @Bean

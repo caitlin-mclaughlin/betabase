@@ -73,7 +73,7 @@
         <VBox fx:id="memberDisplay" alignment="TOP_CENTER" spacing="15" styleClass="member-sidebar"
               visible="false" managed="false">
             <padding>
-                <Insets bottom="15" />
+                <Insets bottom="15" left="10" top="5" right="10" />
             </padding>
             <Label fx:id="nameLabel" styleClass="name-label" text="Name" HBox.hgrow="ALWAYS" />
             <StackPane alignment="CENTER" maxWidth="225.0" prefHeight="275.0" 

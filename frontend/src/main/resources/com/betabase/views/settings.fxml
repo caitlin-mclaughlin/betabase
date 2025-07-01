@@ -95,6 +95,11 @@
                         <Label text="Today Highlight Color:" styleClass="settings-text" />
                     </HBox>
                 </VBox>
+                <Region VBox.vgrow="ALWAYS"/>
+                <HBox alignment="BOTTOM_RIGHT">
+                    <Button text="Logout" styleClass="check-out-button" onMouseClicked="#handleLogout" 
+                            alignment="CENTER"/>
+                </HBox>
             </VBox>
         </HBox>
     </center>

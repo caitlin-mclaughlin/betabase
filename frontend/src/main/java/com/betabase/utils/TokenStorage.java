@@ -32,7 +32,21 @@ public class TokenStorage {
         return valid;
     }
 
+    public static void saveAllTokens(Map<String, String> tokens) throws IOException {
+        mapper.writeValue(FILE.toFile(), tokens);
+    }
+
     public static String getTokenForUser(String username) throws IOException {
         return loadTokens().get(username);
+    }
+
+    public static String getAnyValidToken() throws IOException {
+        Map<String, String> tokens = loadTokens();
+        for (String token : tokens.values()) {
+            if (!JwtUtils.isTokenExpired(token)) {
+                return token;
+            }
+        }
+        return null;
     }
 }

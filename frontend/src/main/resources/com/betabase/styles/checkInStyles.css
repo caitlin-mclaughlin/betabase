@@ -41,7 +41,7 @@
 .member-sidebar {
     -fx-background-color: -fx-color-shadow;
     -fx-text-fill: -fx-base-color;
-    -fx-min-width: 400px;
+    -fx-min-width: 425px;
 }
 
 .name-label {
