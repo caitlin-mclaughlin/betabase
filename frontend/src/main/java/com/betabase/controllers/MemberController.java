@@ -8,9 +8,14 @@ import java.util.function.UnaryOperator;
 import com.betabase.enums.*;
 import com.betabase.interfaces.ServiceAware;
 import com.betabase.models.Address;
-import com.betabase.models.Member;
+import com.betabase.models.CompositeMember;
+import com.betabase.models.Membership;
+import com.betabase.models.User;
+import com.betabase.services.CompositeMemberService;
 import com.betabase.services.GymApiService;
-import com.betabase.services.MemberApiService;
+import com.betabase.services.MembershipApiService;
+import com.betabase.services.UserApiService;
+import com.betabase.utils.AuthSession;
 
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
@@ -20,328 +25,204 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
-import javafx.util.StringConverter;
 
 public class MemberController implements Initializable, ServiceAware {
-    
-    // Member information fields
-    @FXML private Label nameLabel;
-    @FXML private Label typeLabel;
-    @FXML private Label genderLabel;
-    @FXML private Label phoneLabel;
-    @FXML private Label emailLabel;
-    @FXML private Label dobLabel;
-    @FXML private Label memberIdLabel;
-    @FXML private Label memberSinceLabel;
-    @FXML private Label addressLabel1;
-    @FXML private Label addressLabel2;
-    @FXML private Label eNameLabel;
-    @FXML private Label ePhoneLabel;
-    @FXML private Label eEmailLabel;
 
-    // Editable fields
-    @FXML private TextField firstNameField;
-    @FXML private TextField lastNameField;
-    @FXML private TextField prefNameField;
-    @FXML private ChoiceBox<MemberType>  typeField;
+    @FXML private Label nameLabel, typeLabel, genderLabel, phoneLabel, emailLabel, dobLabel, userIdLabel, userSinceLabel;
+    @FXML private Label addressLabel1, addressLabel2, eNameLabel, ePhoneLabel, eEmailLabel;
+    @FXML private TextField firstNameField, lastNameField, prefNameField, phoneField, emailField, userIdField;
+    @FXML private TextField streetField1, streetField2, cityField, zipField, stateField;
+    @FXML private TextField eNameField, ePhoneField, eEmailField;
+    @FXML private ChoiceBox<UserType> typeField;
     @FXML private ChoiceBox<GenderType> genderField;
-    @FXML private ChoiceBox<PronounsType>  pronounsField;
-    @FXML private TextField phoneField;
-    @FXML private TextField emailField;
-    @FXML private TextField memberIdField;
+    @FXML private ChoiceBox<PronounsType> pronounsField;
     @FXML private DatePicker dobField;
-//    @FXML private DatePicker memberSinceField;
-    @FXML private TextField streetField1;
-    @FXML private TextField streetField2;
-    @FXML private TextField cityField;
-    @FXML private TextField zipField;
-    @FXML private TextField stateField;
-    @FXML private TextField eNameField;
-    @FXML private TextField ePhoneField;
-    @FXML private TextField eEmailField;
-
-    // Buttons
-    @FXML private Button editButton;
-    @FXML private Button checkInButton;
-    @FXML private Button checkOutButton;
-    @FXML private Button saveButton;
-    @FXML private Button cancelButton;
-
+    @FXML private Button editButton, checkInButton, checkOutButton, saveButton, cancelButton;
     @FXML private HBox staffButtons;
 
-    private Member currentMember;
-    private MemberApiService memberService;
+    private CompositeMember currentMember;
+    private UserApiService userService;
+    private MembershipApiService membershipService;
+    private CompositeMemberService compositeMemberService;
 
     @Override
-    public void setServices(MemberApiService memberService, GymApiService gymService) {
-        this.memberService = memberService;
+    public void setServices(UserApiService userService, MembershipApiService membershipService,
+                            CompositeMemberService compositeMemberService, GymApiService gymService) {
+        this.userService = userService;
+        this.membershipService = membershipService;
+        this.compositeMemberService = compositeMemberService;
     }
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        // If the member is not set, it's a new member --> enter edit mode
-        if (currentMember == null) {
-            currentMember = new Member();
-            handleEdit(new ActionEvent());
-        }
-        typeField.setItems(FXCollections.observableArrayList(MemberType.values()));
+        if (currentMember == null)
+            currentMember = new CompositeMember(new User(), new Membership());
+
+        typeField.setItems(FXCollections.observableArrayList(UserType.values()));
         genderField.setItems(FXCollections.observableArrayList(GenderType.values()));
         pronounsField.setItems(FXCollections.observableArrayList(PronounsType.values()));
 
         setupPhoneFormatter(phoneField);
         setupPhoneFormatter(ePhoneField);
+
+        handleEdit(null); // assume new entry if no currentMember was set externally
+    }
+
+    public void setMember(CompositeMember member) {
+        this.currentMember = member;
+        try {
+            currentMember.setMembership(
+                membershipService.getForUserAndGym(member.getId(), AuthSession.getCurrentGymId())
+            );
+        } catch (Exception e) {
+            System.err.println("Could not load membership: " + e.getMessage());
+        }
+        setEditableState(false);
+        updateDisplayFromMember(currentMember);
+    }
+
+    @FXML private void handleClockIn(MouseEvent e) { System.out.println("Clock in"); }
+    @FXML private void handleClockOut(MouseEvent e) { System.out.println("Clock out"); }
+    @FXML private void handleEdit(ActionEvent e) { setEditableState(true); setFieldPrompts(currentMember); }
+    @FXML private void handleCancel(MouseEvent e) { setEditableState(false); updateDisplayFromMember(currentMember); }
+
+    @FXML
+    private void handleSave(MouseEvent e) {
+        if (!validateFields()) return;
+
+        try {
+            boolean isNew = currentMember == null || 
+                            currentMember.getUser() == null || 
+                            currentMember.getId() == null;
+            updateCurrentMemberFromFields();
+
+            if (isNew) {
+                User createdUser = userService.createUser(currentMember.getUser());
+
+                Membership membership = new Membership(createdUser.getId(), AuthSession.getCurrentGymId(), 
+                                                       UserType.MEMBER, LocalDate.now());
+                membershipService.createMembership(membership);
+                currentMember = new CompositeMember(createdUser, membership);
+            } else {
+                currentMember = compositeMemberService.updateCompositeMember(currentMember);
+            }
+
+            setEditableState(false);
+            updateDisplayFromMember(currentMember);
+
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
     }
 
     private void setupPhoneFormatter(TextField field) {
         UnaryOperator<TextFormatter.Change> filter = change -> {
-            String newText = change.getControlNewText().replaceAll("[^\\d]", "");
-
-            if (newText.length() > 10) return null;
-
-            // Format live
+            String text = change.getControlNewText().replaceAll("[^\\d]", "");
+            if (text.length() > 10) return null;
             StringBuilder formatted = new StringBuilder();
-            int len = newText.length();
-
-            if (len > 0) formatted.append("(").append(newText.substring(0, Math.min(3, len)));
-            if (len >= 3) formatted.append(") ").append(newText.substring(3, Math.min(6, len)));
-            if (len >= 7) formatted.append("-").append(newText.substring(6));
-
+            if (text.length() > 0) formatted.append("(").append(text.substring(0, Math.min(3, text.length())));
+            if (text.length() >= 3) formatted.append(") ").append(text.substring(3, Math.min(6, text.length())));
+            if (text.length() >= 7) formatted.append("-").append(text.substring(6));
             change.setText(formatted.toString());
-            change.setRange(0, change.getControlText().length()); // Replace full content
+            change.setRange(0, change.getControlText().length());
             return change;
         };
-
-        TextFormatter<String> formatter = new TextFormatter<>(filter);
-        field.setTextFormatter(formatter);
-
-        // Optional: keep caret at end while typing
-        field.textProperty().addListener((obs, oldVal, newVal) ->
-            Platform.runLater(() -> field.positionCaret(field.getText().length()))
-        );
+        field.setTextFormatter(new TextFormatter<>(filter));
+        field.textProperty().addListener((obs, oldVal, newVal) -> Platform.runLater(() -> field.positionCaret(field.getText().length())));
     }
 
-    public void setMember(Member member) {
-        this.currentMember = member;
-        setEditableState(false);
-        updateDisplayFromMember(member);
+    private void updateCurrentMemberFromFields() {
+        User u = currentMember.getUser();
+        Membership m = currentMember.getMembership();
+        u.setFirstName(firstNameField.getText());
+        u.setLastName(lastNameField.getText());
+        u.setPrefName(prefNameField.getText());
+        u.setPronouns(pronounsField.getValue());
+        u.setGender(genderField.getValue());
+        m.setType(typeField.getValue());
+        u.setPhoneNumber(phoneField.getText().replaceAll("[^\\d]", ""));
+        u.setEmail(emailField.getText());
+        u.setDateOfBirth(dobField.getValue());
+        m.setMembershipId(userIdField.getText());
+        u.setAddress(new Address(
+            streetField1.getText(), streetField2.getText(), cityField.getText(), stateField.getText(), zipField.getText(), "USA"
+        ));
+        u.setEmergencyContactName(eNameField.getText());
+        u.setEmergencyContactPhone(ePhoneField.getText().replaceAll("[^\\d]", ""));
+        u.setEmergencyContactEmail(eEmailField.getText());
     }
 
-    @FXML
-    private void handleClockIn(MouseEvent event) {
-        System.out.println("\nDEBUG: Clock in pressed\n");
+    private void updateDisplayFromMember(CompositeMember member) {
+        if (member == null || member.getUser() == null || member.getMembership() == null) return;
+        User u = member.getUser();
+        Membership m = member.getMembership();
+
+        nameLabel.setText(u.getLastName() + ", " + u.getFirstName() + (u.getPrefName().isBlank() ? "" : " (\"" + u.getPrefName() + "\")") +
+                          " (" + u.getPronouns() + ")");
+        genderLabel.setText(String.valueOf(u.getGender()));
+        phoneLabel.setText(u.getPhoneNumber());
+        emailLabel.setText(u.getEmail());
+        dobLabel.setText(u.getDateOfBirth() != null ? u.getDateOfBirth().toString() : "MM/DD/YYYY");
+        userIdLabel.setText(m.getMembershipId());
+        userSinceLabel.setText(m.getUserSince() != null ? m.getUserSince().toString() : "MM/DD/YYYY");
+        addressLabel1.setText(u.getAddress().toStringLine1());
+        addressLabel2.setText(u.getAddress().toStringLine2());
+        eNameLabel.setText(u.getEmergencyContactName());
+        ePhoneLabel.setText(u.getEmergencyContactPhone());
+        eEmailLabel.setText(u.getEmergencyContactEmail());
+
+        typeLabel.setText(m.getType().toString().toUpperCase());
+        typeLabel.setStyle("-fx-background-color: " + switch (m.getType()) {
+            case ADMIN -> "-fx-color-pos3";
+            case STAFF -> "-fx-color-pos4";
+            case VISITOR -> "-fx-color-pos2";
+            default -> "-fx-color-pos1";
+        });
+        staffButtons.setVisible(m.getType() == UserType.ADMIN || m.getType() == UserType.STAFF);
     }
 
-    @FXML
-    private void handleClockOut(MouseEvent event) {
-        System.out.println("\nDEBUG: Clock out pressed\n");
-    }
-    
-    @FXML
-    private void handleEdit(ActionEvent event) {
-        setEditableState(true);
-        setFieldPrompts(currentMember);
-    }
-
-    @FXML
-    private void handleCancel(MouseEvent event) {
-        setEditableState(false);
-        updateDisplayFromMember(currentMember); // revert to original values
-    }
-
-    @FXML
-    private void handleSave(MouseEvent event) { 
-        // save changes to object
-        if (!validateFields()) {
-            return;
+    private void setEditableState(boolean editable) {
+        for (Control field : new Control[]{
+            firstNameField, lastNameField, prefNameField, phoneField, emailField, userIdField,
+            streetField1, streetField2, cityField, stateField, zipField, eNameField, ePhoneField, eEmailField,
+            genderField, pronounsField, typeField, dobField,
+            saveButton, cancelButton
+        }) {
+            field.setVisible(editable);
+            field.setManaged(editable);
         }
-        boolean newMember = currentMember == null || currentMember.getId() == null;
 
-        try {
-            boolean success;
-            updateCurrentMemberFromFields();
-
-            if (newMember) {
-                currentMember.setMemberSince(LocalDate.now());
-                System.out.println("Before: " + currentMember+"\tid:"+currentMember.getId());
-                System.out.println("\nDEBUG: new member with dob: "+currentMember.getDateOfBirth().toString()+"\n");
-                currentMember = memberService.createMember(currentMember);
-                System.out.println("After: " + currentMember+"\tid:"+currentMember.getId());
-
-                success = currentMember != null;
-                System.out.println("\nDEBUG: new member with id: "+currentMember.getId()+"\n"+success);
-            } else {
-                System.out.println("\nDEBUG: existing member with id: "+currentMember.getId()+"\n");
-                success = memberService.updateMember(currentMember);
-            }
-            
-            if (success) {
-                // maybe show a confirmation
-                System.out.println("\nDEBUG: save method: SUCCESS - member info saved\n");
-                setEditableState(false);
-                updateDisplayFromMember(currentMember); // refresh display
-            } else {
-                // show error
-                System.out.println("\nDEBUG: member info could not be saved\n");
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            // show error dialog
+        for (Control label : new Control[]{
+            nameLabel, typeLabel, genderLabel, phoneLabel, emailLabel, dobLabel, userIdLabel, userSinceLabel,
+            addressLabel1, addressLabel2, eNameLabel, ePhoneLabel, eEmailLabel,
+            checkInButton, checkOutButton
+        }) {
+            label.setVisible(!editable);
+            label.setManaged(!editable);
         }
-    }
-
-    private void updateDisplayFromMember(Member member) {
-        // Reload and display data
-        // fix behavior when getById fails (null pointer)
-        if (member == null) {
-            System.out.println("\nDEBUG: attempted to display null member\n");
-            return;
-        }
-        System.out.println("\nDEBUG: updating display with member: "+member.getFirstName()+"\n");
-        if (member.getPrefName().isBlank()) {
-            nameLabel.setText(member.getLastName() + ", " + member.getFirstName() +
-                            "  (" + member.getPronouns().toString() + ")");
-        } else {
-            nameLabel.setText(member.getLastName() + ",  " + member.getFirstName() + "  \"" + 
-                            member.getPrefName() + "\"  (" + member.getPronouns().toString() + ")");
-        }
-        genderLabel.setText(member.getGender().toString());
-        phoneLabel.setText(member.getPhoneNumber());
-        emailLabel.setText(member.getEmail());
-        dobLabel.setText(member.getDateOfBirth() != null ? member.getDateOfBirth().toString()  : "MM/DD/YYYY");
-        memberIdLabel.setText(member.getMemberId());
-        memberSinceLabel.setText(member.getMemberSince() != null ? member.getMemberSince().toString()  : "MM/DD/YYYY");
-        addressLabel1.setText(member.getAddress().toStringLine1());
-        addressLabel2.setText(member.getAddress().toStringLine2());
-        eNameLabel.setText(member.getEmergencyContactName());
-        ePhoneLabel.setText(member.getEmergencyContactPhone());
-        eEmailLabel.setText(member.getEmergencyContactEmail());
-
-        // style and display member type
-        MemberType type = member.getType();
-        switch (type) {
-            case ADMIN: {
-                typeLabel.setStyle("-fx-background-color: -fx-color-pos3;");
-                staffButtons.setVisible(true);
-                break;
-            }
-            case MEMBER: {
-                typeLabel.setStyle("-fx-background-color: -fx-color-pos1;");
-                staffButtons.setVisible(false);
-                break;
-            }
-            case STAFF: {
-                typeLabel.setStyle("-fx-background-color: -fx-color-pos4;");
-                staffButtons.setVisible(true);
-                break;
-            }
-            case VISITOR: {
-                typeLabel.setStyle("-fx-background-color: -fx-color-pos2;");
-                staffButtons.setVisible(false);
-                break;
-            }
-            default: {
-                typeLabel.setStyle("-fx-background-color: -fx-accent-color;");
-                staffButtons.setVisible(false);
-            }
-        }
-        typeLabel.setText(type.toString().toUpperCase());
     }
 
     private boolean validateFields() {
         boolean valid = true;
 
-        if (firstNameField.getText().isBlank()) {
-            markInvalid(firstNameField);
-            valid = false;
-        } else {
-            clearInvalid(firstNameField);
-        }
-
-        if (lastNameField.getText().isBlank()) {
-            markInvalid(lastNameField);
-            valid = false;
-        } else {
-            clearInvalid(lastNameField);
-        }
-
-        if (phoneField.getText().replaceAll("[^\\d]", "").length() != 10) {
-            markInvalid(phoneField);
-            valid = false;
-        } else {
-            clearInvalid(phoneField);
-        }
-
-        if (!emailField.getText().matches("^[\\w\\.-]+@[\\w\\.-]+\\.\\w+$")) {
-            markInvalid(emailField);
-            valid = false;
-        } else {
-            clearInvalid(emailField);
+        for (TextField field : new TextField[]{firstNameField, lastNameField, phoneField, emailField,
+                                               streetField1, cityField, stateField, zipField,
+                                               eNameField, ePhoneField, eEmailField}) {
+            if (field.getText().isBlank()) {
+                markInvalid(field); valid = false;
+            } else {
+                clearInvalid(field);
+            }
         }
 
         if (dobField.getValue() == null) {
-            markInvalid(dobField);
-            valid = false;
-        } else {
-            clearInvalid(dobField);
-        }
+            markInvalid(dobField); valid = false;
+        } else clearInvalid(dobField);
 
-        // Address 
-        if (streetField1.getText().isBlank()) {
-            markInvalid(streetField1);
-            valid = false;
-        } else {
-            clearInvalid(streetField1);
-        }
-
-        if (streetField2.getText().isBlank()) {
-            markInvalid(streetField2);
-            valid = false;
-        } else {
-            clearInvalid(streetField2);
-        }
-
-        if (cityField.getText().isBlank()) {
-            markInvalid(cityField);
-            valid = false;
-        } else {
-            clearInvalid(cityField);
-        }
-
-        if (stateField.getText().isBlank()) {
-            markInvalid(stateField);
-            valid = false;
-        } else {
-            clearInvalid(stateField);
-        }
-
-        if (zipField.getText().isBlank()) {
-            markInvalid(zipField);
-            valid = false;
-        } else {
-            clearInvalid(zipField);
-        }
-
-        // Emergency contact info
-        if (eNameField.getText().isBlank()) {
-            markInvalid(eNameField);
-            valid = false;
-        } else {
-            clearInvalid(eNameField);
-        }
-
-        if (ePhoneField.getText().replaceAll("[^\\d]", "").length() != 10) {
-            markInvalid(ePhoneField);
-            valid = false;
-        } else {
-            clearInvalid(ePhoneField);
-        }
-
-        if (!eEmailField.getText().matches("^[\\w\\.-]+@[\\w\\.-]+\\.\\w+$")) {
-            markInvalid(eEmailField);
-            valid = false;
-        } else {
-            clearInvalid(eEmailField);
-        }
+        if (!emailField.getText().matches("^[\\w\\.-]+@[\\w\\.-]+\\.\\w+$")) markInvalid(emailField);
+        if (!eEmailField.getText().matches("^[\\w\\.-]+@[\\w\\.-]+\\.\\w+$")) markInvalid(eEmailField);
+        if (phoneField.getText().replaceAll("[^\\d]", "").length() != 10) markInvalid(phoneField);
+        if (ePhoneField.getText().replaceAll("[^\\d]", "").length() != 10) markInvalid(ePhoneField);
 
         return valid;
     }
@@ -356,177 +237,26 @@ public class MemberController implements Initializable, ServiceAware {
         field.getStyleClass().add("user-info-edit");
     }
 
-    private void setEditableState(boolean editable) {
-        // Header
-        nameLabel.setVisible(!editable);
-        nameLabel.setManaged(!editable);
-        lastNameField.setVisible(editable);
-        lastNameField.setManaged(editable);
-        firstNameField.setVisible(editable);
-        firstNameField.setManaged(editable);
-        prefNameField.setVisible(editable);
-        prefNameField.setManaged(editable);
-        pronounsField.setVisible(editable);
-        pronounsField.setManaged(editable);
-
-        // Member info
-        typeLabel.setVisible(!editable);
-        typeLabel.setManaged(!editable);
-        typeField.setVisible(editable);
-        typeField.setManaged(editable);
-        genderLabel.setVisible(!editable);
-        genderLabel.setManaged(!editable);
-        genderField.setVisible(editable);
-        genderField.setManaged(editable);
-        phoneLabel.setVisible(!editable);
-        phoneLabel.setManaged(!editable);
-        phoneField.setVisible(editable);
-        phoneField.setManaged(editable);
-        emailLabel.setVisible(!editable);
-        emailLabel.setManaged(!editable);
-        emailField.setVisible(editable);
-        emailField.setManaged(editable);
-        memberIdLabel.setVisible(!editable);
-        memberIdLabel.setManaged(!editable);
-        memberIdField.setVisible(editable);
-        memberIdField.setManaged(editable);
-        dobLabel.setVisible(!editable);
-        dobLabel.setManaged(!editable);
-        dobField.setVisible(editable);
-        dobField.setManaged(editable);
-        memberSinceLabel.setVisible(!editable);
-        memberSinceLabel.setManaged(!editable);
-        //memberSinceField.setVisible(editable);
-        //memberSinceField.setManaged(editable);
-
-        // Address
-        addressLabel1.setVisible(!editable);
-        addressLabel1.setManaged(!editable);
-        addressLabel1.setVisible(editable);
-        addressLabel1.setManaged(editable);
-        addressLabel2.setVisible(!editable);
-        addressLabel2.setManaged(!editable);
-        addressLabel2.setVisible(editable);
-        addressLabel2.setManaged(editable);
-        streetField1.setVisible(!editable);
-        streetField1.setManaged(!editable);
-        streetField1.setVisible(editable);
-        streetField1.setManaged(editable);
-        streetField2.setVisible(!editable);
-        streetField2.setManaged(!editable);
-        streetField2.setVisible(editable);
-        streetField2.setManaged(editable);
-        cityField.setVisible(!editable);
-        cityField.setManaged(!editable);
-        cityField.setVisible(editable);
-        cityField.setManaged(editable);
-        stateField.setVisible(!editable);
-        stateField.setManaged(!editable);
-        stateField.setVisible(editable);
-        stateField.setManaged(editable);
-        zipField.setVisible(!editable);
-        zipField.setManaged(!editable);
-        zipField.setVisible(editable);
-        zipField.setManaged(editable);
-
-        // Emergency contact info
-        eNameLabel.setVisible(!editable);
-        eNameLabel.setManaged(!editable);
-        eNameField.setVisible(editable);
-        eNameField.setManaged(editable);
-        ePhoneLabel.setVisible(!editable);
-        ePhoneLabel.setManaged(!editable);
-        ePhoneField.setVisible(editable);
-        ePhoneField.setManaged(editable);
-        eEmailLabel.setVisible(!editable);
-        eEmailLabel.setManaged(!editable);
-        eEmailField.setVisible(editable);
-        eEmailField.setManaged(editable);
-
-        // Buttons
-        checkInButton.setVisible(!editable);
-        checkInButton.setManaged(!editable);
-        saveButton.setVisible(editable);
-        saveButton.setManaged(editable);
-        checkOutButton.setVisible(!editable);
-        checkOutButton.setManaged(!editable);
-        cancelButton.setVisible(editable);
-        cancelButton.setManaged(editable);
+    private void setFieldPrompts(CompositeMember member) {
+        User u = member.getUser();
+        Membership m = member.getMembership();
+        typeField.setValue(m.getType());
+        firstNameField.setText(u.getFirstName());
+        lastNameField.setText(u.getLastName());
+        prefNameField.setText(u.getPrefName());
+        pronounsField.setValue(u.getPronouns());
+        genderField.setValue(u.getGender());
+        phoneField.setText(u.getPhoneNumber());
+        emailField.setText(u.getEmail());
+        userIdField.setText(m.getMembershipId());
+        streetField1.setText(u.getAddress().getStreetAddress());
+        streetField2.setText(u.getAddress().getApartmentNumber());
+        cityField.setText(u.getAddress().getCity());
+        stateField.setText(u.getAddress().getState());
+        zipField.setText(u.getAddress().getZipCode());
+        eNameField.setText(u.getEmergencyContactName());
+        ePhoneField.setText(u.getEmergencyContactPhone());
+        eEmailField.setText(u.getEmergencyContactEmail());
+        dobField.setValue(u.getDateOfBirth());
     }
-
-    private void updateCurrentMemberFromFields() {
-        // Update or restore member
-        currentMember.setFirstName(firstNameField.getText());
-        currentMember.setLastName(lastNameField.getText());
-        currentMember.setPrefName(prefNameField.getText());
-        currentMember.setPronouns(pronounsField.getValue());
-        currentMember.setGender(genderField.getValue());
-        currentMember.setType(typeField.getValue());
-        currentMember.setPhoneNumber(phoneField.getText().replaceAll("[^\\d]", ""));
-        currentMember.setEmail(emailField.getText());
-        currentMember.setDateOfBirth(dobField.getValue());
-        currentMember.setMemberId(memberIdField.getText());
-        currentMember.setAddress(formAddress(streetField1.getText(), streetField2.getText(), cityField.getText(),
-                                             stateField.getText(), zipField.getText()));
-        currentMember.setEmergencyContactName(eNameField.getText());
-        currentMember.setEmergencyContactPhone(ePhoneField.getText().replaceAll("[^\\d]", ""));
-        currentMember.setEmergencyContactEmail(eEmailField.getText());
-    }
-
-    /**
-     * 
-     * NOTE: HARDCODED COUNTRY
-     * 
-     */
-    private Address formAddress(String streetAddress1, String streetAddress2, String city, String state, String zip) {
-        String streetNumber;
-        String streetName;
-
-        int firstSpace = streetAddress1.indexOf(" ");
-        if (firstSpace > 0) {
-            streetNumber = streetAddress1.substring(0, firstSpace).trim();
-            streetName = streetAddress1.substring(firstSpace + 1).trim();
-        } else {
-            // fallback: assume whole thing is name
-            streetNumber = "";
-            streetName = streetAddress1.trim();
-        }
-        return streetAddress2.isBlank() ? new Address(streetNumber, streetName, city, state, zip, "USA") :
-                                          new Address(streetNumber, streetName, streetAddress2, city, state, zip, "USA");
-    }
-
-    private void setFieldPrompts(Member member) {
-        // type
-        MemberType type = member.getType();
-        typeField.setValue(type);
-        String bgColor = switch (type) {
-            case ADMIN -> "-fx-color-pos3";
-            case MEMBER -> "-fx-color-pos1";
-            case STAFF -> "-fx-color-pos4";
-            case VISITOR -> "-fx-color-pos2";
-            default -> "-fx-accent-color";
-        };
-        typeField.setStyle(String.format(
-            "-fx-background-color: %s;", bgColor
-        ));
-
-        // other fields
-        firstNameField.setText(member.getFirstName());
-        lastNameField.setText(member.getLastName());
-        prefNameField.setText(member.getPrefName());
-        pronounsField.setValue(member.getPronouns());
-        genderField.setValue(member.getGender());
-        phoneField.setText(member.getPhoneNumber());
-        emailField.setText(member.getEmail());
-        memberIdField.setText(member.getMemberId());
-        streetField1.setText(member.getAddress().getStreetAddress());
-        streetField2.setText(member.getAddress().getApartmentNumber());
-        cityField.setText(member.getAddress().getCity());
-        stateField.setText(member.getAddress().getState());
-        zipField.setText(member.getAddress().getZipCode());
-        eNameField.setText(member.getEmergencyContactName());
-        ePhoneField.setText(member.getEmergencyContactPhone());
-        eEmailField.setText(member.getEmergencyContactEmail());
-    }
-
 }

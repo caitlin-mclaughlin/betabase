@@ -5,8 +5,10 @@ import java.net.URL;
 import java.util.ResourceBundle;
 
 import com.betabase.interfaces.ServiceAware;
+import com.betabase.services.CompositeMemberService;
 import com.betabase.services.GymApiService;
-import com.betabase.services.MemberApiService;
+import com.betabase.services.MembershipApiService;
+import com.betabase.services.UserApiService;
 import com.betabase.utils.SceneManager;
 
 import javafx.beans.binding.Bindings;
@@ -24,12 +26,11 @@ public class SettingsController implements Initializable, ServiceAware {
 
     private SidebarController sidebarController;
     
-    private MemberApiService memberService;
     private GymApiService gymService;
 
     @Override
-    public void setServices(MemberApiService memberService, GymApiService gymService) {
-        this.memberService = memberService;
+    public void setServices(UserApiService userService, MembershipApiService membershipService,
+                            CompositeMemberService compositeMemberService, GymApiService gymService) {
         this.gymService = gymService;
     }
 

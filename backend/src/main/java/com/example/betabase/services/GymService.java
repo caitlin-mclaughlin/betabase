@@ -12,26 +12,30 @@ import java.util.Optional;
 @Service
 public class GymService {
 
-    private final GymRepository repo;
+    private final GymRepository repository;
 
-    public GymService(GymRepository repo) {
-        this.repo = repo;
+    public GymService(GymRepository repository) {
+        this.repository = repository;
     }
 
     public Gym save(Gym gym) {
-        return repo.save(gym);
+        return repository.save(gym);
     }
 
     public List<Gym> getAllGyms() {
-        return repo.findAll();
+        return repository.findAll();
     }
 
     public Optional<Gym> getById(Long id) {
-        return repo.findById(id);
+        return repository.findById(id);
+    }
+
+    public List<Gym> getByIds(List<Long> ids) {
+        return repository.findAllById(ids);
     }
 
     public Optional<Gym> getByName(String name) {
-        return repo.findByName(name);
+        return repository.findByName(name);
     }
 
     // You can later add methods to check-in history, logs, etc.

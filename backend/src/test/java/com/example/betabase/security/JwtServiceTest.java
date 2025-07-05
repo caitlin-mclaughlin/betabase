@@ -1,49 +1,49 @@
 package com.example.betabase.security;
+
 import com.example.betabase.models.Gym;
 import com.example.betabase.models.GymLogin;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Field;
 import java.util.Base64;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.TestPropertySource;
-
 import static org.junit.jupiter.api.Assertions.*;
 
-@SpringBootTest
-@TestPropertySource(properties = {
-    "jwt.secret=${JWT_SECRET}",
-    "jwt.expiration-ms=${JWT_EXPIRATION_MS}",
-    "spring.jpa.hibernate.ddl-auto=none"
-})
 public class JwtServiceTest {
 
-    @Autowired
     private JwtService jwtService;
-    
     private GymLogin mockUser;
 
     @BeforeEach
     void setUp() throws Exception {
-        // Inject dummy key for testing (32 bytes = 256 bits, required by HS256)
-        String dummySecret = Base64.getEncoder().encodeToString("testsecretkey-testsecretkey-1234".getBytes());
+        jwtService = new JwtService();
 
-        Field field = JwtService.class.getDeclaredField("base64SecretKey");
-        field.setAccessible(true);
-        field.set(jwtService, dummySecret);
+        // Inject dummy base64 key
+        String dummySecret = Base64.getEncoder().encodeToString("testsecretkey-testsecretkey-1234".getBytes());
+        Field secretField = JwtService.class.getDeclaredField("base64SecretKey");
+        secretField.setAccessible(true);
+        secretField.set(jwtService, dummySecret);
+
+        // Inject expiration manually (1 hour = 3600000 ms)
+        Field expirationField = JwtService.class.getDeclaredField("expirationMs");
+        expirationField.setAccessible(true);
+        expirationField.set(jwtService, 3600000L);
 
         mockUser = new GymLogin();
         mockUser.setUsername("testuser");
-        mockUser.setGym(new Gym());
+        Gym gym = new Gym();
+        gym.setId(1L); // must not be null
+        mockUser.setGym(gym);
     }
 
     @Test
     void generateAndValidateToken() {
         String token = jwtService.generateToken(mockUser);
         assertNotNull(token);
+        
+        // These should now work
         assertEquals("testuser", jwtService.extractUsername(token));
         assertTrue(jwtService.isTokenValid(token, "testuser"));
     }

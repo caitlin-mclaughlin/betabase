@@ -21,8 +21,8 @@
         prefHeight="800.0" prefWidth="1000.0"
         xmlns="http://javafx.com/javafx/23.0.1"
         xmlns:fx="http://javafx.com/fxml/1"
-        fx:controller="com.betabase.controllers.MemberController"
-        stylesheets="@../styles/colors.css, @../styles/memberStyles.css, @../styles/shared.css">
+        fx:controller="com.betabase.controllers.UserController"
+        stylesheets="@../styles/colors.css, @../styles/userStyles.css, @../styles/shared.css">
 
     <HBox alignment="CENTER" spacing="20.0" styleClass="user-header">
         <padding>
@@ -43,7 +43,7 @@
 
             <StackPane alignment="CENTER" prefHeight="275.0" maxWidth="225.0" 
                         style="-fx-border-color: -fx-base-color; -fx-border-width: 2px;">
-                <ImageView fx:id="memberPhoto" fitWidth="225.0" pickOnBounds="true" preserveRatio="true" />
+                <ImageView fx:id="userPhoto" fitWidth="225.0" pickOnBounds="true" preserveRatio="true" />
             </StackPane>
             <Button mnemonicParsing="false" styleClass="photo-button" text="Change Photo" />
             <Region VBox.vgrow="ALWAYS" />
@@ -110,16 +110,16 @@
                 <Region style="-fx-background-color: -fx-color-shadow;" styleClass="separator-horiz" />
             </VBox>
 
-            <Label text="Member ID:" styleClass="user-prompt" />
+            <Label text="User ID:" styleClass="user-prompt" />
             <VBox spacing="2">
-                <Label fx:id="memberIdLabel" alignment="CENTER" styleClass="user-info" text="Label" />
-                <TextField fx:id="memberIdField" styleClass="user-info-edit" text="" visible="false" managed="false" />
+                <Label fx:id="userIdLabel" alignment="CENTER" styleClass="user-info" text="Label" />
+                <TextField fx:id="userIdField" styleClass="user-info-edit" text="" visible="false" managed="false" />
                 <Region style="-fx-background-color: -fx-color-shadow;" styleClass="separator-horiz" />
             </VBox>
 
-            <Label text="Member Since:" styleClass="user-prompt" />
+            <Label text="User Since:" styleClass="user-prompt" />
             <VBox spacing="2">
-                <Label fx:id="memberSinceLabel" alignment="CENTER" styleClass="user-info" text="Label" />
+                <Label fx:id="userSinceLabel" alignment="CENTER" styleClass="user-info" text="Label" />
                 <Region style="-fx-background-color: -fx-color-shadow;" styleClass="separator-horiz" />
             </VBox>
         </VBox>

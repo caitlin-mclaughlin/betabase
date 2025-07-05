@@ -1,8 +1,11 @@
 package com.betabase.controllers;
 
+import com.betabase.dtos.JwtResponseDto;
 import com.betabase.interfaces.ServiceAware;
+import com.betabase.services.CompositeMemberService;
 import com.betabase.services.GymApiService;
-import com.betabase.services.MemberApiService;
+import com.betabase.services.MembershipApiService;
+import com.betabase.services.UserApiService;
 import com.betabase.utils.*;
 
 import javafx.application.Platform;
@@ -25,39 +28,36 @@ public class GymLoginController implements Initializable, ServiceAware {
     @FXML private PasswordField passwordField;
     @FXML private Label loginError;
 
-    private MemberApiService memberService;
+    private UserApiService userService;
     private GymApiService gymService;
 
     @Override
-    public void setServices(MemberApiService memberService, GymApiService gymService) {
-        this.memberService = memberService;
+    public void setServices(UserApiService userService, MembershipApiService membershipService,
+                            CompositeMemberService compositeMemberService, GymApiService gymService) {
+        this.userService = userService;
         this.gymService = gymService;
     }
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        // Keypress shortcut
         passwordField.setOnKeyPressed(event -> {
             switch (event.getCode()) {
                 case ENTER -> handleLogin(new ActionEvent());
             }
         });
 
-        // Delay auto-login until scene is loaded
         Platform.runLater(() -> {
             try {
                 String savedToken = TokenStorage.getAnyValidToken();
                 if (savedToken != null && !JwtUtils.isTokenExpired(savedToken)) {
-                    AuthSession.setToken(savedToken);
+                    JwtResponseDto dto = JwtUtils.extractJwtDetails(savedToken);
+                    AuthSession.setSession(savedToken, dto.getGymId(), dto.getGymName(), dto.getUsername());
 
-                    String username = JwtUtils.getUsername(savedToken);
-                    System.out.println("Auto-login success for: " + username);
+                    System.out.println("Auto-login success for: " + dto.getUsername());
 
                     SceneManager.switchScene(
                         (Stage) usernameField.getScene().getWindow(),
-                        (DashboardController controller) -> {
-                            controller.setMenuOpen(true);
-                        },
+                        (DashboardController controller) -> controller.setMenuOpen(true),
                         "/com/betabase/views/dashboard.fxml",
                         false
                     );
@@ -72,29 +72,25 @@ public class GymLoginController implements Initializable, ServiceAware {
 
     @FXML
     private void handleLogin(ActionEvent event) {
-            loginError.setVisible(false);
-        if (!checkFields()) {
-            return;
-        }
+        loginError.setVisible(false);
+        if (!checkFields()) return;
 
         String username = usernameField.getText();
         String password = passwordField.getText();
 
         try {
-            Optional<String> tokenOpt = gymService.login(username, password);
+            Optional<JwtResponseDto> responseOpt = gymService.login(username, password);
 
-            if (tokenOpt.isPresent()) {
-                String token = tokenOpt.get();
-                if (JwtUtils.isTokenExpired(token)) {
+            if (responseOpt.isPresent()) {
+                JwtResponseDto dto = responseOpt.get();
+                if (JwtUtils.isTokenExpired(dto.getToken())) {
                     System.out.println("Login failed: Token expired");
                     return;
                 }
 
-                // Store token persistently
-                AuthSession.setToken(token);
-                TokenStorage.saveToken(username, token);
+                AuthSession.setSession(dto.getToken(), dto.getGymId(), dto.getGymName(), dto.getUsername());
+                TokenStorage.saveToken(dto.getUsername(), dto.getToken());
 
-                // Transition to dashboard
                 SceneManager.switchScene(
                     (Stage) usernameField.getScene().getWindow(),
                     (DashboardController controller) -> controller.setMenuOpen(true),
@@ -102,12 +98,14 @@ public class GymLoginController implements Initializable, ServiceAware {
                     false
                 );
             } else {
-                System.out.println("Login failed: token not present");
+                System.out.println("Login failed: No token returned");
             }
         } catch (GymApiService.LoginException e) {
-            // Display backend-driven messages
+            loginError.setText("Invalid credentials.");
             loginError.setVisible(true);
         } catch (Exception e) {
+            loginError.setText("Error logging in.");
+            loginError.setVisible(true);
             e.printStackTrace();
         }
     }
@@ -115,25 +113,23 @@ public class GymLoginController implements Initializable, ServiceAware {
     @FXML
     private void handleAccountCreation(ActionEvent event) {
         SceneManager.switchScene(
-                (Stage) usernameField.getScene().getWindow(),
-                (CreateAccountController controller) -> {},
-                "/com/betabase/views/createAccount.fxml",
-                false);
+            (Stage) usernameField.getScene().getWindow(),
+            (CreateAccountController controller) -> {},
+            "/com/betabase/views/createAccount.fxml",
+            false
+        );
     }
 
     private boolean checkFields() {
         boolean valid = true;
-
         if (usernameField.getText().isBlank()) {
-            markInvalid(usernameField);
-            valid = false;
+            markInvalid(usernameField); valid = false;
         } else {
             clearInvalid(usernameField);
         }
 
         if (passwordField.getText().isBlank()) {
-            markInvalid(passwordField);
-            valid = false;
+            markInvalid(passwordField); valid = false;
         } else {
             clearInvalid(passwordField);
         }
@@ -150,6 +146,4 @@ public class GymLoginController implements Initializable, ServiceAware {
         field.getStyleClass().remove("invalid-field");
         field.getStyleClass().add("field");
     }
-
-    private record LoginRequest(String username, String password) {}
 }

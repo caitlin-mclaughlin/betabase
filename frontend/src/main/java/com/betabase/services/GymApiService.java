@@ -1,37 +1,22 @@
 package com.betabase.services;
 
+import com.betabase.dtos.JwtResponseDto;
 import com.betabase.models.Gym;
-import com.betabase.models.Member;
 import com.betabase.utils.AuthSession;
 import com.betabase.utils.JwtUtils;
 import com.betabase.utils.TokenStorage;
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
-import java.io.IOException;
 import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
+import java.net.http.*;
 import java.util.Map;
 import java.util.Optional;
 
 public class GymApiService {
-
-    private static final String BASE_URL = "http://localhost:8080/api/auth";
-    
-    private final HttpClient client;
-    private final ObjectMapper mapper;
-
-    public GymApiService() {
-        this.client = HttpClient.newHttpClient();
-        this.mapper = new ObjectMapper();
-        mapper.registerModule(new JavaTimeModule());
-        mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-    }
+    private static final String BASE_URL = "http://localhost:8080/api/gym-login";
+    private final HttpClient client = HttpClient.newHttpClient();
+    private final ObjectMapper mapper = new ObjectMapper();
 
     public String registerGym(Gym gym, String username, String password) throws Exception {
         String body = mapper.writeValueAsString(new GymRegistrationRequest(gym, username, password));
@@ -53,27 +38,24 @@ public class GymApiService {
         }
     }
 
-    public Optional<String> login(String username, String password) throws IOException, InterruptedException, LoginException {
-        ObjectMapper mapper = new ObjectMapper();
-        String body = mapper.writeValueAsString(Map.of("username", username, "password", password));
+    public Optional<JwtResponseDto> login(String username, String password) throws Exception {
+        String requestBody = mapper.writeValueAsString(new LoginRequest(username, password));
 
         HttpRequest request = HttpRequest.newBuilder()
             .uri(URI.create(BASE_URL + "/login"))
+            .POST(HttpRequest.BodyPublishers.ofString(requestBody))
             .header("Content-Type", "application/json")
-            .POST(HttpRequest.BodyPublishers.ofString(body))
             .build();
 
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
         if (response.statusCode() == 200) {
-            JsonNode json = mapper.readTree(response.body());
-            return Optional.of(json.get("token").asText());
+            JwtResponseDto jwtDto = mapper.readValue(response.body(), JwtResponseDto.class);
+            return Optional.of(jwtDto);
         } else if (response.statusCode() == 401) {
-            throw new LoginException("Invalid username or password");
-        } else {
-            System.out.println("Login failed: " + response.statusCode());
-            return Optional.empty();
+            throw new LoginException("Invalid credentials.");
         }
+        return Optional.empty();
     }
     
     public void logout() {
@@ -93,20 +75,17 @@ public class GymApiService {
         }
     }
 
-    public Gym getGymById(Long id) throws Exception {
+    public Optional<Gym> getGymById(Long gymId) throws Exception {
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(BASE_URL + "/" + id))
-                .GET()
-                .header("Accept", "application/json")
+                .uri(URI.create(BASE_URL + "/" + gymId))
+                .header("Authorization", "Bearer " + AuthSession.getToken())
                 .build();
 
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-
         if (response.statusCode() == 200) {
-            return mapper.readValue(response.body(), Gym.class);
-        } else {
-            return null;
+            return Optional.of(mapper.readValue(response.body(), Gym.class));
         }
+        return Optional.empty();
     }
 
     public static class GymRegistrationRequest {

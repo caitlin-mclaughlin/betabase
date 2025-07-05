@@ -6,13 +6,11 @@ import java.util.regex.Pattern;
 import com.betabase.enums.*;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 
 @JsonIgnoreProperties(value = {"gym"}, allowSetters = true)
-public class Member {
+public class User {
     
     private Long id;
 
@@ -26,14 +24,6 @@ public class Member {
     private SimpleObjectProperty<LocalDate> dateOfBirth;
     private SimpleStringProperty phoneNumber;
     private SimpleStringProperty email;
-    private SimpleStringProperty photoUrl;
-    private SimpleStringProperty memberId;
-    private SimpleObjectProperty<LocalDate> memberSince;
-    private SimpleObjectProperty<MemberType> type;
-    private SimpleBooleanProperty clocked;
-    private SimpleBooleanProperty checked;
-    private SimpleBooleanProperty loggedIn;
-
     private SimpleObjectProperty<Address> address;
 
     // Emergency Contact
@@ -41,7 +31,7 @@ public class Member {
     private SimpleStringProperty emergencyContactPhone;
     private SimpleStringProperty emergencyContactEmail;
 
-    public Member() {
+    public User() {
         this.firstName = new SimpleStringProperty("");
         this.prefName = new SimpleStringProperty("");
         this.lastName = new SimpleStringProperty("");
@@ -50,13 +40,6 @@ public class Member {
         this.dateOfBirth = new SimpleObjectProperty<>(null);
         this.phoneNumber = new SimpleStringProperty("");
         this.email = new SimpleStringProperty("");
-        this.photoUrl = new SimpleStringProperty("");
-        this.memberId = new SimpleStringProperty("");
-        this.memberSince = new SimpleObjectProperty<>(null);
-        this.type = new SimpleObjectProperty<>(MemberType.UNSET);
-        this.clocked = new SimpleBooleanProperty(false);
-        this.checked = new SimpleBooleanProperty(false);
-        this.loggedIn = new SimpleBooleanProperty(false);
 
         this.address = new SimpleObjectProperty<>(null);
 
@@ -141,46 +124,6 @@ public class Member {
 
     public LocalDate getDateOfBirth() { return dateOfBirth.get(); }
     public void setDateOfBirth(LocalDate dateOfBirth) { this.dateOfBirth.set(dateOfBirth); }
-
-    // Photo URL
-    public SimpleStringProperty photoUrlProperty() { return photoUrl; }
-
-    public String getPhotoUrl() { return photoUrl.get(); }
-    public void setPhotoUrl(String photoUrl) { this.photoUrl.set(photoUrl); }
-
-    // Member ID
-    public SimpleStringProperty memberIdProperty() { return memberId; }
-
-    public String getMemberId() { return memberId.get(); }
-    public void setMemberId(String memberId) { this.memberId.set(memberId); }
-
-    // Member Since
-    public SimpleObjectProperty<LocalDate> memberSinceProperty() { return memberSince; }
-
-    public LocalDate getMemberSince() { return memberSince.get(); }
-    public void setMemberSince(LocalDate memberSince) { this.memberSince.set(memberSince); }
-
-    // Member Type
-    public SimpleObjectProperty<MemberType> typeProperty() { return type; }
-
-    public MemberType getType() { return type.get(); }
-    public void setType(MemberType type) { this.type.set(type); }
-
-    public void setType(String typeStr) {
-        this.type.set(MemberType.fromString(typeStr));
-    }
-
-    // Clocked In?
-    public boolean getClocked() { return clocked.get(); }
-    public void setClocked(boolean clocked) { this.clocked.set(clocked); }
-
-    // Checked In?
-    public boolean getChecked() { return checked.get(); }
-    public void setChecked(boolean checked) { this.checked.set(checked); }
-
-    // Login/out
-    public void Login() { loggedIn.set(true); }
-    public void Logout() { loggedIn.set(false); }
 
     // Address
     public Address getAddress() { return address.get(); }

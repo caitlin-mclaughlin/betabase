@@ -4,9 +4,10 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
-import org.checkerframework.common.aliasing.qual.Unique;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+
+import com.example.betabase.enums.GymLoginRole;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -26,7 +27,7 @@ public class GymLogin implements UserDetails {
     private Long id;
 
     @NotBlank
-    @Unique
+    @Column(unique = true, nullable = false)
     private String username;
 
     @NotBlank
@@ -34,8 +35,16 @@ public class GymLogin implements UserDetails {
 
     @ManyToOne
     @NotNull
-    @JoinColumn(name = "gym_id", referencedColumnName = "id")
+    @JoinColumn(name = "gym_id")
     private Gym gym;
+
+    @ManyToOne(optional = true)
+    @JoinColumn(name = "group_id")
+    private GymGroup group;
+
+    @NotNull
+    @Enumerated(EnumType.STRING)
+    private GymLoginRole role; // enum: ADMIN, STAFF, KIOSK
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

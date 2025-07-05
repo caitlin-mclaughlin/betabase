@@ -4,7 +4,7 @@ package com.example.betabase.services;
 import com.example.betabase.models.CheckInLogEntry;
 import com.example.betabase.models.DailyCheckInLog;
 import com.example.betabase.models.Gym;
-import com.example.betabase.models.Member;
+import com.example.betabase.models.User;
 import com.example.betabase.repositories.CheckInLogRepository;
 import com.example.betabase.repositories.DailyCheckInLogRepository;
 
@@ -27,7 +27,7 @@ public class CheckInLogService {
         this.logEntryRepo = logEntryRepo;
     }
 
-    public CheckInLogEntry logMemberCheckIn(Gym gym, Member member) {
+    public CheckInLogEntry logUserCheckIn(Gym gym, User user) {
         LocalDate today = LocalDate.now();
         DailyCheckInLog dailyLog = dailyLogRepo.findByGymAndDate(gym, today)
                 .orElseGet(() -> {
@@ -38,7 +38,7 @@ public class CheckInLogService {
                 });
 
         CheckInLogEntry entry = new CheckInLogEntry();
-        entry.setMember(member);
+        entry.setUser(user);
         entry.setCheckInTime(LocalDateTime.now());
         entry.setDailyLog(dailyLog);
         return logEntryRepo.save(entry);

@@ -17,11 +17,24 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @NonNull
     Optional<User> findById(@NonNull Long id);
 
-    @Query("SELECT m FROM User m JOIN FETCH m.gym WHERE m.gym.id = :gymId AND (" +
-        "LOWER(m.userId) LIKE LOWER(CONCAT(:query, '%')) OR " +
-        "LOWER(m.firstName) LIKE LOWER(CONCAT(:query, '%')) OR " +
-        "LOWER(m.lastName) LIKE LOWER(CONCAT(:query, '%')) OR " +
-        "LOWER(m.prefName) LIKE LOWER(CONCAT(:query, '%')))")
-    List<User> findByQueryAndGymId(@Param("query") String query, @Param("gymId") Long gymId);
+    Optional<User> findByEmail(String email);
+    Optional<User> findByPhoneNumber(String phoneNumber);
 
+    @Query("""
+        SELECT u FROM User u
+        WHERE EXISTS (
+            SELECT 1 FROM Membership m
+            WHERE m.user.id = u.id AND m.gymGroup.id = :groupId
+        )
+        AND (
+            LOWER(u.firstName) LIKE LOWER(CONCAT(:query, '%')) OR
+            LOWER(u.lastName) LIKE LOWER(CONCAT(:query, '%')) OR
+            LOWER(u.prefName) LIKE LOWER(CONCAT(:query, '%')) OR
+            CAST(u.id AS string) LIKE CONCAT(:query, '%')
+        )
+    """)
+    List<User> findByQueryAndGymGroupId(@Param("query") String query, @Param("groupId") Long groupId);
+
+    @Query("SELECT u FROM User u WHERE LOWER(u.email) = LOWER(:email) OR u.phoneNumber = :phone")
+    List<User> findByEmailOrPhoneNumber(@Param("email") String email, @Param("phone") String phoneNumber);
 }

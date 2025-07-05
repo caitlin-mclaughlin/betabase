@@ -7,15 +7,15 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 @Service
-public class CurrentUserService {
+public class CurrentMemberService {
 
     private final GymLoginRepository userRepo;
 
-    public CurrentUserService(GymLoginRepository userRepo) {
+    public CurrentMemberService(GymLoginRepository userRepo) {
         this.userRepo = userRepo;
     }
 
-    public GymLogin getCurrentUser() {
+    public GymLogin getCurrentMember() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String username = auth.getName(); // default: principal.getUsername()
         return userRepo.findByUsername(username)

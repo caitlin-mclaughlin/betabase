@@ -1,7 +1,9 @@
 package com.betabase;
 
+import com.betabase.services.CompositeMemberService;
 import com.betabase.services.GymApiService;
-import com.betabase.services.MemberApiService;
+import com.betabase.services.MembershipApiService;
+import com.betabase.services.UserApiService;
 import com.betabase.utils.SceneManager;
 
 import javafx.application.Application;
@@ -13,11 +15,13 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        MemberApiService memberApiService = new MemberApiService();
+        UserApiService userApiService = new UserApiService();
+        MembershipApiService membershipApiService = new MembershipApiService();
+        CompositeMemberService compositeMemberService = new CompositeMemberService(userApiService, membershipApiService);
         GymApiService gymApiService = new GymApiService();
 
         // Set services in SceneManager
-        SceneManager.setServices(memberApiService, gymApiService);
+        SceneManager.setServices(userApiService, membershipApiService, compositeMemberService, gymApiService);
 
         // Get screen bounds
         Rectangle2D screenBounds = Screen.getPrimary().getVisualBounds();

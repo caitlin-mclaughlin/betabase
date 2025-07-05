@@ -52,7 +52,7 @@
                 <ListView style="-fx-max-height: 200px;" />
             </VBox>
             <Region prefHeight="10" />
-            <HBox alignment="CENTER_LEFT" spacing="5" onMouseClicked="#handleMemberClick">
+            <HBox alignment="CENTER_LEFT" spacing="5" onMouseClicked="#handleUserClick">
                 <padding>
                     <Insets left="5"/>
                 </padding>
@@ -61,10 +61,10 @@
                         <Image url="@/com/betabase/images/person.png" />
                     </image>
                 </ImageView>
-                <Label fx:id="memberLabel" styleClass="schedule-label" text="Members" />
+                <Label fx:id="userLabel" styleClass="schedule-label" text="Users" />
             </HBox>
             <HBox styleClass="search-bar" alignment="CENTER_LEFT">
-                <Label text="Member Lookup" style="-fx-text-fill: -fx-base-color; -fx-font-weight: bold;" />
+                <Label text="User Lookup" style="-fx-text-fill: -fx-base-color; -fx-font-weight: bold;" />
                 <HBox style="-fx-border-color: -fx-base-color; -fx-border-radius: 10px;" alignment="CENTER" 
                         HBox.hgrow="ALWAYS" maxWidth="600">
                     <ImageView fx:id="search_logo" fitHeight="30.0" preserveRatio="true">
@@ -73,7 +73,7 @@
                         </image>
                     </ImageView>
                     <TextField fx:id="search" styleClass="search-field"
-                                promptText="Search members..." HBox.hgrow="ALWAYS" />
+                                promptText="Search users..." HBox.hgrow="ALWAYS" />
                     <StackPane style="-fx-cursor: hand; -fx-padding: 1px;"
                                 onMouseClicked="#handleCancelClick">
                         <ImageView fx:id="cancel_logo" fitHeight="30.0" 
@@ -86,7 +86,7 @@
                 </HBox>
                 <Button text="Check In/Out" styleClass="search-button" />
             </HBox>
-            <ListView fx:id="memberList" VBox.vgrow="ALWAYS" />
+            <ListView fx:id="userList" VBox.vgrow="ALWAYS" />
         </VBox>
     </center>
 </BorderPane>

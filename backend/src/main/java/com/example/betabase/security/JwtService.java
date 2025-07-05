@@ -37,7 +37,7 @@ public class JwtService {
     public String generateToken(GymLogin user) {
         return Jwts.builder()
             .setSubject(user.getUsername())
-            .claim("gymId", user.getGym().getId())
+            .claim("gymId", user.getGym() != null ? user.getGym().getId() : null)
             .setIssuedAt(new Date(System.currentTimeMillis()))
             .setExpiration(new Date(System.currentTimeMillis() + expirationMs))
             .signWith(getSignKey(), SignatureAlgorithm.HS256)

@@ -22,6 +22,8 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -50,10 +52,14 @@ public class AuthControllerTest {
     @Autowired
     private JwtService jwtService;
 
+    @Autowired
+    private AuthenticationManager authManager;
+
     private Gym mockGym;
+    private GymLogin mockUser;
 
     @BeforeEach
-    void defineGym() {
+    void setup() {
         Address address = new Address("123", "Address St", "Madison", "WI", "53703", "USA");
         mockGym = new Gym();
         mockGym.setId(1L);
@@ -61,29 +67,32 @@ public class AuthControllerTest {
         mockGym.setAddress(address);
         mockGym.setUserSince(LocalDate.of(2023, 1, 1));
 
-        GymLogin mockUser = new GymLogin();
+        mockUser = new GymLogin();
         mockUser.setId(1L);
         mockUser.setUsername("betabase");
         mockUser.setPasswordHash("hashed-password");
         mockUser.setGym(mockGym);
 
         when(gymUserService.register(any(GymRegistrationRequest.class))).thenReturn(mockUser);
+        when(gymUserService.getByUsername(eq("betabase"))).thenReturn(java.util.Optional.of(mockUser));
         when(jwtService.generateToken(any())).thenReturn("mock-jwt");
+
+        Authentication auth = mock(Authentication.class);
+        when(authManager.authenticate(any(UsernamePasswordAuthenticationToken.class))).thenReturn(auth);
     }
 
     @Test
     void whenLoginWithBlankFields_thenReturns400() throws Exception {
         LoginRequest request = new LoginRequest();
-        request.setUsername("");  // Invalid
-        request.setPassword("");  // Invalid
+        request.setUsername("");
+        request.setPassword("");
 
         mockMvc.perform(post("/api/auth/login")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").value(Matchers.containsString("username: Username is required")))
-                .andExpect(jsonPath("$.message").value(Matchers.containsString("password: Password is required")));
-
+                .andExpect(jsonPath("$.message").value(Matchers.containsString("Username is required")))
+                .andExpect(jsonPath("$.message").value(Matchers.containsString("Password is required")));
     }
 
     @Test
@@ -91,18 +100,17 @@ public class AuthControllerTest {
         GymRegistrationRequest request = new GymRegistrationRequest();
         request.setGym(mockGym);
         request.setUsername("betabase");
-        request.setPassword("123"); // too short
+        request.setPassword("123");
 
         mockMvc.perform(post("/api/auth/register")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value(Matchers.containsString("Password must be at least 6 characters")));
-
     }
 
     @Test
-    void whenValidRegistration_thenReturns201() throws Exception {
+    void whenValidRegistration_thenReturns201AndJwt() throws Exception {
         GymRegistrationRequest request = new GymRegistrationRequest();
         request.setGym(mockGym);
         request.setUsername("betabase");
@@ -111,23 +119,35 @@ public class AuthControllerTest {
         mockMvc.perform(post("/api/auth/register")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isCreated());
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.token").value("mock-jwt"));
     }
 
-    // Nested static test config to provide mocks instead of @MockBean
+    @Test
+    void whenValidLogin_thenReturns200AndJwt() throws Exception {
+        LoginRequest request = new LoginRequest();
+        request.setUsername("betabase");
+        request.setPassword("securepassword");
+
+        mockMvc.perform(post("/api/auth/login")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.token").value("mock-jwt"));
+    }
+
     @TestConfiguration
     static class TestConfig {
 
         @Bean
         public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-            http
-                .csrf(csrf -> csrf.disable())
+            http.csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(authz -> authz.anyRequest().permitAll());
             return http.build();
         }
 
         @Bean
-        @Primary  // override any existing bean of this type
+        @Primary
         public GymLoginService gymUserService() {
             return Mockito.mock(GymLoginService.class);
         }

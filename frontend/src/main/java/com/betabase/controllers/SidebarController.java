@@ -3,8 +3,10 @@ package com.betabase.controllers;
 import java.util.List;
 
 import com.betabase.interfaces.ServiceAware;
+import com.betabase.services.CompositeMemberService;
 import com.betabase.services.GymApiService;
-import com.betabase.services.MemberApiService;
+import com.betabase.services.MembershipApiService;
+import com.betabase.services.UserApiService;
 import com.betabase.utils.SceneManager;
 
 import javafx.fxml.FXML;
@@ -15,16 +17,16 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
-public class SidebarController implements ServiceAware {
+public class SidebarController {
     
     @FXML private VBox sidebar;
     @FXML private ImageView logo;
-    @FXML private Label memberLabel;
+    @FXML private Label userLabel;
     @FXML private Label posLabel;
     @FXML private Label calLabel;
     @FXML private Label analyticsLabel;
     @FXML private Label settingsLabel;
-    @FXML private HBox member;
+    @FXML private HBox user;
     @FXML private HBox pos;
     @FXML private HBox cal;
     @FXML private HBox analytics;
@@ -32,15 +34,7 @@ public class SidebarController implements ServiceAware {
     @FXML private HBox menu;
 
     private boolean menuOpen;
-
-    private MemberApiService memberService;
-    private GymApiService gymService;
-
-    @Override
-    public void setServices(MemberApiService memberService, GymApiService gymService) {
-        this.memberService = memberService;
-        this.gymService = gymService;
-    }
+    
     public void setMenuOpen(boolean menuOpen) {
         this.menuOpen = !menuOpen; // set opposite then toggle immediately
         toggleMenuVisibility();
@@ -62,7 +56,7 @@ public class SidebarController implements ServiceAware {
 
     public void setActiveSection(String section) {
         switch (section.toLowerCase()) {
-            case "member" -> highlightActiveButton(member);
+            case "user" -> highlightActiveButton(user);
             case "pos" -> highlightActiveButton(pos);
             case "cal" -> highlightActiveButton(cal);
             case "analytics" -> highlightActiveButton(analytics);
@@ -84,9 +78,9 @@ public class SidebarController implements ServiceAware {
     }
 
     @FXML
-    protected void handleMemberClick(MouseEvent event) {
+    protected void handleUserClick(MouseEvent event) {
         SceneManager.switchScene(
-            (Stage) memberLabel.getScene().getWindow(), 
+            (Stage) userLabel.getScene().getWindow(), 
             (CheckInController controller) -> {
                 controller.setMenuOpen(menuOpen);
             },
@@ -159,8 +153,8 @@ public class SidebarController implements ServiceAware {
 
         logo.setVisible(menuOpen);
         logo.setManaged(menuOpen);
-        memberLabel.setVisible(menuOpen);
-        memberLabel.setManaged(menuOpen);
+        userLabel.setVisible(menuOpen);
+        userLabel.setManaged(menuOpen);
         posLabel.setVisible(menuOpen);
         posLabel.setManaged(menuOpen);
         calLabel.setVisible(menuOpen);

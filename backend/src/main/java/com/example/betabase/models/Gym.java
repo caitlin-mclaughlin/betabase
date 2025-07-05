@@ -5,9 +5,6 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 import java.time.LocalDate;
-import java.util.List;
-
-import org.checkerframework.common.aliasing.qual.Unique;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
@@ -30,19 +27,15 @@ public class Gym {
     @Column(unique = true, nullable = false)
     private String name; // Location Name (if applicable)
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "group_id")
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "group_id", nullable = false)
     private GymGroup group;
 
     @NotNull
-    @Unique
     @Embedded
     private Address address;
 
     @NotNull
     private LocalDate userSince;
-
-    @OneToMany(mappedBy = "gym")
-    private List<Membership> memberships;
 
 }

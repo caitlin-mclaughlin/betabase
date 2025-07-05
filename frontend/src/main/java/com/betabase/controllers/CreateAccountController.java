@@ -3,8 +3,10 @@ package com.betabase.controllers;
 import com.betabase.interfaces.ServiceAware;
 import com.betabase.models.Address;
 import com.betabase.models.Gym;
+import com.betabase.services.CompositeMemberService;
 import com.betabase.services.GymApiService;
-import com.betabase.services.MemberApiService;
+import com.betabase.services.MembershipApiService;
+import com.betabase.services.UserApiService;
 import com.betabase.utils.AuthSession;
 import com.betabase.utils.SceneManager;
 import com.betabase.utils.TokenStorage;
@@ -23,6 +25,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 
 public class CreateAccountController implements Initializable, ServiceAware {
+
     @FXML private TextField nameField;
     @FXML private TextField streetField1;
     @FXML private TextField streetField2;
@@ -33,62 +36,52 @@ public class CreateAccountController implements Initializable, ServiceAware {
     @FXML private PasswordField passwordField;
     @FXML private PasswordField confirmPasswordField;
 
-    private MemberApiService memberService;
     private GymApiService gymService;
 
     @Override
-    public void setServices(MemberApiService memberService, GymApiService gymService) {
-        this.memberService = memberService;
+    public void setServices(UserApiService userService, MembershipApiService membershipService,
+                            CompositeMemberService compositeMemberService, GymApiService gymService) {
         this.gymService = gymService;
     }
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         confirmPasswordField.setOnKeyPressed(event -> {
-                switch (event.getCode()) {
-                    case ENTER -> {
-                        handleLogin(new ActionEvent());
-                    }
-                }
+            switch (event.getCode()) {
+                case ENTER -> handleCreateAccount(new ActionEvent());
             }
-        );
+        });
     }
 
     @FXML
-    private void handleLogin(ActionEvent event) {
-        if (!validateFields()) {
-            return;
-        }
+    private void handleCreateAccount(ActionEvent event) {
+        if (!validateFields()) return;
 
         String name = nameField.getText();
-        String streetAddress1 = streetField1.getText();
-        String streetAddress2 = streetField2.getText();
+        String street1 = streetField1.getText();
+        String street2 = streetField2.getText();
         String city = cityField.getText();
         String state = stateField.getText();
         String zip = zipField.getText();
         String username = usernameField.getText();
         String password = passwordField.getText();
-        String confirm = confirmPasswordField.getText();
 
-        Address address = formAddress(streetAddress1, streetAddress2, city, state, zip);
+        Address address = formAddress(street1, street2, city, state, zip);
+
         Gym gym = new Gym();
         gym.setName(name);
         gym.setAddress(address);
         gym.setUserSince(LocalDate.now());
 
-        GymApiService gymService = new GymApiService();
         try {
             String token = gymService.registerGym(gym, username, password);
             if (token != null) {
-                // Save the JWT in memory (or preferences for now, later use secure storage)
                 AuthSession.setToken(token);
                 TokenStorage.saveToken(username, token);
 
                 SceneManager.switchScene(
                     (Stage) usernameField.getScene().getWindow(),
-                    (DashboardController controller) -> {
-                        controller.setMenuOpen(true);
-                    },
+                    (DashboardController controller) -> controller.setMenuOpen(true),
                     "/com/betabase/views/dashboard.fxml",
                     false
                 );
@@ -104,77 +97,34 @@ public class CreateAccountController implements Initializable, ServiceAware {
     private void handleReturnToLogin(MouseEvent event) {
         SceneManager.switchScene(
             (Stage) usernameField.getScene().getWindow(),
-            (GymLoginController controller) -> { },
+            (GymLoginController controller) -> {},
             "/com/betabase/views/gymLogin.fxml",
-            false);
+            false
+        );
     }
 
-    /**
-     * 
-     * NOTE: HARDCODED COUNTRY
-     * 
-     */
-    private Address formAddress(String streetAddress1, String streetAddress2, String city, String state, String zip) {
-        String[] parsed = streetAddress1.split(" ");
-        String streetNumber = parsed[0];
-        String streetName = parsed[1];
-        return streetAddress2.isBlank() ? new Address(streetNumber, streetName, city, state, zip, "USA") :
-                                          new Address(streetNumber, streetName, streetAddress2, city, state, zip, "USA");
+    private Address formAddress(String street1, String street2, String city, String state, String zip) {
+        String[] parts = street1.trim().split(" ", 2);
+        String number = parts.length > 0 ? parts[0] : "";
+        String name = parts.length > 1 ? parts[1] : "";
+
+        return street2.isBlank()
+            ? new Address(number, name, city, state, zip, "USA")
+            : new Address(number, name, street2, city, state, zip, "USA");
     }
 
     private boolean validateFields() {
         boolean valid = true;
-        if (nameField.getText() .isBlank()) {
-            markInvalid(nameField);
-            valid =  false;
-        } else {
-            clearInvalid(nameField);
-        }
 
-        if (streetField1.getText() .isBlank()) {
-            markInvalid(streetField1);
-            valid = false;
-        } else {
-            clearInvalid(streetField1);
-        }
+        valid &= validateField(nameField);
+        valid &= validateField(streetField1);
+        valid &= validateField(cityField);
+        valid &= validateField(stateField);
+        valid &= validateField(zipField);
+        valid &= validateField(usernameField);
+        valid &= validateField(passwordField);
 
-        if (cityField.getText() .isBlank()) {
-            markInvalid(cityField);
-            valid = false;
-        } else {
-            clearInvalid(cityField);
-        }
-
-        if (stateField.getText() .isBlank()) {
-            markInvalid(stateField);
-            valid = false;
-        } else {
-            clearInvalid(stateField);
-        }
-
-        if (zipField.getText() .isBlank()) {
-            markInvalid(zipField);
-            valid = false;
-        } else {
-            clearInvalid(zipField);
-        }
-
-        if (usernameField.getText() .isBlank()) {
-            markInvalid(usernameField);
-            valid = false;
-        } else {
-            clearInvalid(usernameField);
-        }
-
-        if (passwordField.getText() .isBlank()) {
-            markInvalid(passwordField);
-            valid = false;
-        } else {
-            clearInvalid(passwordField);
-        }
-
-        if (confirmPasswordField.getText() .isBlank() || 
-                !passwordField.getText().equals(confirmPasswordField.getText())) {
+        if (confirmPasswordField.getText().isBlank() || !confirmPasswordField.getText().equals(passwordField.getText())) {
             markInvalid(confirmPasswordField);
             valid = false;
         } else {
@@ -182,6 +132,16 @@ public class CreateAccountController implements Initializable, ServiceAware {
         }
 
         return valid;
+    }
+
+    private boolean validateField(Control field) {
+        if (((TextField) field).getText().isBlank()) {
+            markInvalid(field);
+            return false;
+        } else {
+            clearInvalid(field);
+            return true;
+        }
     }
 
     private void markInvalid(Control field) {

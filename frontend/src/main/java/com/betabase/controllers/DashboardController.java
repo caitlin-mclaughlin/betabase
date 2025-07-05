@@ -1,9 +1,13 @@
 package com.betabase.controllers;
 
 import com.betabase.interfaces.ServiceAware;
-import com.betabase.models.Member;
+import com.betabase.models.CompositeMember;
+import com.betabase.models.Membership;
+import com.betabase.models.User;
+import com.betabase.services.CompositeMemberService;
 import com.betabase.services.GymApiService;
-import com.betabase.services.MemberApiService;
+import com.betabase.services.MembershipApiService;
+import com.betabase.services.UserApiService;
 import com.betabase.utils.AuthSession;
 import com.betabase.utils.SceneManager;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -34,7 +38,9 @@ import javafx.util.Duration;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.ResourceBundle;
 
 public class DashboardController implements Initializable, ServiceAware {
@@ -42,19 +48,22 @@ public class DashboardController implements Initializable, ServiceAware {
     @FXML private BorderPane mainPane;
     @FXML private ImageView logoImage;
     @FXML private TextField search;
-    @FXML private ListView<Member> memberList;
-    @FXML private Label memberLabel;
+    @FXML private ListView<CompositeMember> memberList;
+    @FXML private Label userLabel;
 
     private SidebarController sidebarController;
     private boolean firstLoad;
 
-    private MemberApiService memberService;
-    private GymApiService gymService;
+    private UserApiService userService;
+    private MembershipApiService membershipService;
+    private CompositeMemberService compositeMemberService;
 
     @Override
-    public void setServices(MemberApiService memberService, GymApiService gymService) {
-        this.memberService = memberService;
-        this.gymService = gymService;
+    public void setServices(UserApiService userService, MembershipApiService membershipService,
+                            CompositeMemberService compositeMemberService, GymApiService gymService) {
+        this.userService = userService;
+        this.membershipService = membershipService;
+        this.compositeMemberService = compositeMemberService;
     }
 
     public void setMenuOpen(boolean menuOpen) {
@@ -90,7 +99,7 @@ public class DashboardController implements Initializable, ServiceAware {
                 private final Button checkOutButton = new Button();
                 private final Region spacer = new Region();
                 private final Label nameLabel = new Label();
-                private final Label memberIdLabel = new Label();
+                private final Label userIdLabel = new Label();
                 private final Label phoneLabel = new Label();
                 private final Label emailLabel = new Label();
                 private final HBox content = new HBox(30);
@@ -100,7 +109,7 @@ public class DashboardController implements Initializable, ServiceAware {
                     checkInButton.getStyleClass().add("check-in-narrow");
                     checkOutButton.getStyleClass().add("check-out-narrow");
                     nameLabel.getStyleClass().add("list-label");
-                    memberIdLabel.getStyleClass().add("list-label");
+                    userIdLabel.getStyleClass().add("list-label");
                     phoneLabel.getStyleClass().add("list-label");
                     emailLabel.getStyleClass().add("list-label");
 
@@ -109,7 +118,7 @@ public class DashboardController implements Initializable, ServiceAware {
 
                     // Consistent column widths
                     nameLabel.setPrefWidth(260);
-                    memberIdLabel.setPrefWidth(110);
+                    userIdLabel.setPrefWidth(110);
                     phoneLabel.setPrefWidth(145);
                     emailLabel.setPrefWidth(225);
 
@@ -123,23 +132,26 @@ public class DashboardController implements Initializable, ServiceAware {
                     checkOutButton.setOnMouseClicked(event -> handleCheckInOut(null, false));
                         
                     // Add labels to row
-                    content.getChildren().addAll(nameLabel, memberIdLabel, phoneLabel, emailLabel,
+                    content.getChildren().addAll(nameLabel, userIdLabel, phoneLabel, emailLabel,
                                                  spacer, checkInButton, checkOutButton);
                     content.setAlignment(Pos.CENTER_LEFT);
                 }
 
                 @Override
-                protected void updateItem(Member member, boolean empty) {
+                protected void updateItem(CompositeMember member, boolean empty) {
                     super.updateItem(member, empty);
                     if (empty || member == null) {
                         setText(null);
                         setGraphic(null);
                     } else {
-                        nameLabel.setText(member.getLastName() + ", " + member.getFirstName()
-                                          + " (" + member.getPrefName() + ")");
-                        memberIdLabel.setText(member.getMemberId());
-                        phoneLabel.setText(member.getPhoneNumber());
-                        emailLabel.setText(member.getEmail());
+                        User u = member.getUser();
+
+                        nameLabel.setText(member.getFullName());
+                        userIdLabel.setText(member.getMembership().getMembershipId());
+                        phoneLabel.setText(u.getPhoneNumber());
+                        emailLabel.setText(u.getEmail());
+
+                        // You can use membership.getType() or .isActive() to style check-in/out
 
                         setText(null);
                         setGraphic(content);
@@ -166,9 +178,9 @@ public class DashboardController implements Initializable, ServiceAware {
 
             memberList.setOnMouseClicked(event -> {
                 if (event.getClickCount() == 2) { // double-click
-                    Member selected = memberList.getSelectionModel().getSelectedItem();
+                    CompositeMember selected = memberList.getSelectionModel().getSelectedItem();
                     if (selected != null) {
-                        openMemberWindow(selected);
+                        openUserWindow(selected);
                     }
                 }
             });
@@ -176,10 +188,10 @@ public class DashboardController implements Initializable, ServiceAware {
             memberList.setOnKeyPressed(event -> {
                 switch (event.getCode()) {
                     case ENTER -> {
-                        Member selected = memberList.getSelectionModel().getSelectedItem();
+                        CompositeMember selected = memberList.getSelectionModel().getSelectedItem();
                         if (selected != null) {
-                            handleCheckInOut(selected, selected.getChecked());
-                            openMemberWindow(selected);
+                            handleCheckInOut(selected, selected.getMembership().getChecked());
+                            openUserWindow(selected);
                         }
                     }
                 }
@@ -187,8 +199,8 @@ public class DashboardController implements Initializable, ServiceAware {
         });
     }
 
-    private void handleCheckInOut(Member member, Boolean checked) {
-        Member selected;
+    private void handleCheckInOut(CompositeMember member, boolean checked) {
+        CompositeMember selected;
         if (member == null) {
             selected = memberList.getSelectionModel().getSelectedItem();
         } else {
@@ -197,7 +209,7 @@ public class DashboardController implements Initializable, ServiceAware {
         // Only send check in/out call to backend if the member's state is different
         //  i.e. only checkIn if member is currently checked out
         //  Unnecessary calls will bog down the member log
-        if (selected.getChecked() ^ checked) selected.setChecked(checked);
+        if (selected.getMembership().getChecked() ^ checked) selected.getMembership().setChecked(checked);
     }
 
     private final PauseTransition inactivityTimer = new PauseTransition(Duration.seconds(20));
@@ -225,9 +237,9 @@ public class DashboardController implements Initializable, ServiceAware {
     }
 
     @FXML
-    private void handleMemberClick(MouseEvent event) {
+    private void handleUserClick(MouseEvent event) {
         if (sidebarController != null) {
-            sidebarController.handleMemberClick(event);
+            sidebarController.handleUserClick(event);
         }
     }
 
@@ -236,31 +248,59 @@ public class DashboardController implements Initializable, ServiceAware {
         search.clear();
     }
 
-    private void performSearch(String query) {
-        memberService.searchMembersAsync(query,
-            members -> updateListView(members),
-            error -> {
-                System.out.println("\nDEBUG: Search failed\n");
-                error.printStackTrace();
-            });
+    private void searchCompositeMembersAsync(String query, Long gymId) {
+        new Thread(() -> {
+            try {
+                List<User> users = userService.searchUsers(query);
+                List<CompositeMember> results = new ArrayList<>();
+
+                for (User user : users) {
+                    Membership membership = membershipService.getForUserAndGym(user.getId(), gymId);
+                    if (membership != null) {
+                        results.add(new CompositeMember(user, membership));
+                    } else {
+                        System.out.println("No membership found for the given user and gym.");
+                    }
+                }
+
+                Platform.runLater(() -> updateListViewWithComposite(results));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }).start();
     }
 
-    private void updateListView(List<Member> members) {
+    private void performSearch(String query) {
+        Long currentGymId = AuthSession.getCurrentGymId();
+        if (currentGymId != null) {
+            searchCompositeMembersAsync(query, currentGymId);
+        }
+    }
+
+    private void updateListViewWithComposite(List<CompositeMember> members) {
+        memberList.getItems().clear();
+        for (CompositeMember cm : members) {
+            cm.getMembership().setChecked(cm.getMembership().getChecked());
+            memberList.getItems().add(cm);
+        }
+    }
+
+    private void updateListView(List<CompositeMember> members) {
         if (members == null || members.size() == 0) {
-            System.out.println("\nDEBUG: attempting to display null list of members\n");
+            System.out.println("\nDEBUG: attempting to display null list of users\n");
             return;
         }
         memberList.getItems().clear();
         memberList.getItems().addAll(members);
     }
 
-    private void openMemberWindow(Member member) {
+    private void openUserWindow(CompositeMember member) {
         SceneManager.switchScene(
             new Stage(), 
             (MemberController controller) -> {
                 controller.setMember(member);
             },
-            "/com/betabase/views/member.fxml",
+            "/com/betabase/views/user.fxml",
             true
         );
         search.clear();

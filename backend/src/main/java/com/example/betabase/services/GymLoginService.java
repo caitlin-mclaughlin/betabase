@@ -1,11 +1,15 @@
 package com.example.betabase.services;
 
 import com.example.betabase.dtos.GymRegistrationRequest;
+import com.example.betabase.enums.GymLoginRole;
 import com.example.betabase.models.Gym;
 import com.example.betabase.models.GymLogin;
 import com.example.betabase.repositories.GymLoginRepository;
 
 import java.util.Optional;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -17,6 +21,8 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class GymLoginService implements UserDetailsService {
+
+    private static final Logger logger = LoggerFactory.getLogger(GymLoginService.class);
 
     private final GymLoginRepository repository;
     private final PasswordEncoder passwordEncoder;
@@ -39,24 +45,34 @@ public class GymLoginService implements UserDetailsService {
     }
 
     public GymLogin register(GymRegistrationRequest request) {
-        // Persist the gym first (if it’s new)
+        if (request.getGym() == null) {
+            throw new IllegalArgumentException("Gym information is required");
+        }
+
         Gym gym = request.getGym();
         Gym savedGym;
         Optional<Gym> existingGym = gymService.getByName(gym.getName());
+
         if (existingGym.isPresent()) {
             savedGym = existingGym.get();
-            System.out.println("Using existing gym: " + savedGym.getId());
+            logger.info("Using existing gym: {}", savedGym.getId());
         } else {
             savedGym = gymService.save(gym);
-            System.out.println("Saving new gym: " + savedGym.getId());
+            logger.info("Saving new gym: {}", savedGym.getId());
         }
 
-        GymLogin user = new GymLogin();
-        user.setUsername(request.getUsername());
-        user.setPasswordHash(passwordEncoder.encode(request.getPassword()));
-        user.setGym(savedGym);
+        if (repository.findByUsername(request.getUsername()).isPresent()) {
+            throw new IllegalArgumentException("Username already taken");
+        }
 
-        return repository.save(user);
+        GymLogin login = new GymLogin();
+        login.setUsername(request.getUsername());
+        login.setPasswordHash(passwordEncoder.encode(request.getPassword()));
+        login.setGym(savedGym);
+        login.setGroup(savedGym.getGroup());
+        login.setRole(GymLoginRole.ADMIN); // if appropriate
+
+        return repository.save(login);
     }
 
     public Optional<GymLogin> authenticate(String username, String rawPassword) {
@@ -70,6 +86,24 @@ public class GymLoginService implements UserDetailsService {
 
     public Optional<GymLogin> getById(Long id) {
         return repository.findById(id);
+    }
+
+    public GymLogin save(GymLogin login) {
+        return repository.save(login);
+    }
+    
+    public GymLogin update(Long id, GymLogin update) {
+        GymLogin existing = repository.findById(id).orElseThrow(() -> new RuntimeException("Login not found"));
+        existing.setUsername(update.getUsername());
+        existing.setPasswordHash(update.getPasswordHash());
+        existing.setRole(update.getRole());
+        existing.setGym(update.getGym());
+        existing.setGroup(update.getGroup());
+        return repository.save(existing);
+    }
+
+    public void delete(Long id) {
+        repository.deleteById(id);
     }
 
     @Override

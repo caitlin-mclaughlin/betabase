@@ -12,18 +12,25 @@ import java.util.function.Consumer;
 import java.net.URL;
 
 import com.betabase.interfaces.ServiceAware;
+import com.betabase.services.CompositeMemberService;
 import com.betabase.services.GymApiService;
-import com.betabase.services.MemberApiService;
+import com.betabase.services.MembershipApiService;
+import com.betabase.services.UserApiService;
 
 public class SceneManager {
 
-    private static MemberApiService memberService;
+    private static UserApiService userService;
+    private static MembershipApiService membershipService;
+    private static CompositeMemberService compositeMemberService;
     private static GymApiService gymService;
 
     private static final String defaultTitle = "Betabase";
 
-    public static void setServices(MemberApiService member, GymApiService gym) {
-        memberService = member;
+    public static void setServices(UserApiService user, MembershipApiService membership,
+                                   CompositeMemberService compositeMember, GymApiService gym) {
+        userService = user;
+        membershipService = membership;
+        compositeMemberService = compositeMember;
         gymService = gym;
     }
 
@@ -41,7 +48,7 @@ public class SceneManager {
 
             // Automatically inject services if setServices() method exists
             if (controller instanceof ServiceAware sa) {
-                sa.setServices(memberService, gymService);
+                sa.setServices(userService, membershipService, compositeMemberService, gymService);
             }
 
             if (controllerConfigurator != null) {

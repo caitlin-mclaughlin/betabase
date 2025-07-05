@@ -1,51 +1,34 @@
+package com.example.betabase.services;
+
+import java.util.List;
+
+import org.springframework.stereotype.Service;
+
+import com.example.betabase.models.Membership;
+import com.example.betabase.repositories.MembershipRepository;
+
 @Service
 public class MembershipService {
-    private final MembershipRepository membershipRepo;
-    private final UserRepository userRepo;
-    private final GymRepository gymRepo;
 
-    public MembershipService(MembershipRepository membershipRepo,
-                             UserRepository userRepo,
-                             GymRepository gymRepo) {
-        this.membershipRepo = membershipRepo;
-        this.userRepo = userRepo;
-        this.gymRepo = gymRepo;
+    private final MembershipRepository repository;
+    public MembershipService(MembershipRepository repository) {
+        this.repository = repository;
     }
 
-    public Membership createMembership(MembershipCreateDto dto) {
-        User user = userRepo.findByEmail(dto.getUserEmail())
-            .orElseGet(() -> {
-                User newUser = new User();
-                newUser.setEmail(dto.getUserEmail());
-                newUser.setFirstName(dto.getFirstName());
-                newUser.setLastName(dto.getLastName());
-                newUser.setPhoneNumber(dto.getPhoneNumber());
-                newUser.setDateOfBirth(dto.getDateOfBirth());
-                return userRepo.save(newUser);
-            });
-
-        Gym gym = gymRepo.findById(dto.getGymId())
-            .orElseThrow(() -> new RuntimeException("Gym not found"));
-
-        Membership membership = new Membership();
-        membership.setUser(user);
-        membership.setGym(gym);
-        membership.setType(dto.getType());
-        membership.setMemberSince(dto.getMemberSince());
-        membership.setActive(true);
-
-        return membershipRepo.save(membership);
-    }
-
-    public List<Membership> getMembershipsForGym(Long gymId) {
-        return membershipRepo.findByGymId(gymId);
+    public Membership save(Membership membership) {
+        return repository.save(membership);
     }
 
     public List<Membership> getMembershipsForUser(Long userId) {
-        return membershipRepo.findByUserId(userId);
+        return repository.findByUserId(userId);
     }
 
-    public Optional<Membership> getById(Long id) {
-        return membershipRepo.findById(id);
+    public List<Membership> getMembershipsForGym(Long gymGroupId) {
+        return repository.findByGymGroupId(gymGroupId);
+    }
+
+    public Membership getForUserAndGym(Long userId, Long gymGroupId) {
+        return repository.findByUserIdAndGymGroupId(userId, gymGroupId)
+            .orElseThrow(() -> new IllegalArgumentException("Membership not found"));
     }
 }

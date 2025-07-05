@@ -2,62 +2,66 @@ package com.example.betabase.controllers;
 
 import java.util.List;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
-import com.example.betabase.dtos.MemberDto;
 import com.example.betabase.dtos.MembershipCreateDto;
 import com.example.betabase.dtos.MembershipDto;
 import com.example.betabase.models.Membership;
+import com.example.betabase.services.GymGroupService;
 import com.example.betabase.services.MembershipService;
+import com.example.betabase.services.UserService;
 
 @RestController
-@RequestMapping("/api/memberships")
+@RequestMapping("/api/gym-users/memberships")
 public class MembershipController {
 
     private final MembershipService membershipService;
+    private final UserService userService;
+    private final GymGroupService gymService;
 
-    public MembershipController(MembershipService membershipService) {
+    public MembershipController(MembershipService membershipService, UserService userService, GymGroupService gymService) {
         this.membershipService = membershipService;
-    }
-
-    @GetMapping("/user/{userId}")
-    public ResponseEntity<List<MembershipDto>> getMembershipsForPerson(@PathVariable Long personId) {
-        List<Membership> memberships = membershipService.getMembershipsForUser(personId);
-        List<MembershipDto> dtoList = memberships.stream()
-            .map(this::toDto)
-            .toList();
-        return ResponseEntity.ok(dtoList);
-    }
-
-    @GetMapping("/gym/{gymId}")
-    public ResponseEntity<List<MembershipDto>> getMembershipsForGym(@PathVariable Long gymId) {
-        List<Membership> memberships = membershipService.getMembershipsForGym(gymId);
-        List<MembershipDto> dtoList = memberships.stream()
-            .map(this::toDto)
-            .toList();
-        return ResponseEntity.ok(dtoList);
+        this.userService = userService;
+        this.gymService = gymService;
     }
 
     @PostMapping
-    public ResponseEntity<MembershipDto> createMembership(@RequestBody Membership membership) {
-        return ResponseEntity.ok(toDto(membershipService.createMembership(membership)));
+    public ResponseEntity<MembershipDto> createMembership(@RequestBody MembershipCreateDto dto) {
+        Membership membership = new Membership();
+        membership.setUser(userService.getById(dto.userId())
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "User not found")));
+        membership.setGymGroup(gymService.getById(dto.gymGroupId())
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Gym group not found")));
+        membership.setType(dto.type());
+        membership.setUserSince(dto.userSince());
+        membership.setActive(dto.active());
+        membershipService.save(membership);
+        return ResponseEntity.status(HttpStatus.CREATED).body(toDto(membership));
+    }
+
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<List<MembershipDto>> getUserMemberships(@PathVariable Long userId) {
+        List<Membership> memberships = membershipService.getMembershipsForUser(userId);
+        return ResponseEntity.ok(memberships.stream().map(this::toDto).toList());
+    }
+
+    @GetMapping("/gym/{gymId}")
+    public ResponseEntity<List<MembershipDto>> getGymMemberships(@PathVariable Long gymId) {
+        List<Membership> memberships = membershipService.getMembershipsForGym(gymId);
+        return ResponseEntity.ok(memberships.stream().map(this::toDto).toList());
     }
 
     private MembershipDto toDto(Membership m) {
         return new MembershipDto(
-            m.getId(),
-            m.getUserId(),
-            m.getGymId(),
-            m.getType(),
-            m.getMemberSince(),
-            m.getActive()
+                m.getId(),
+                m.getUser().getId(),
+                m.getGymGroup().getId(),
+                m.getType(),
+                m.getUserSince(),
+                m.isActive()
         );
     }
 }
-

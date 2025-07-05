@@ -13,33 +13,33 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.betabase.models.CheckInLogEntry;
 import com.example.betabase.models.Gym;
-import com.example.betabase.models.Member;
+import com.example.betabase.models.User;
 import com.example.betabase.services.CheckInLogService;
-import com.example.betabase.services.MemberService;
+import com.example.betabase.services.UserService;
 
 @RestController
-@RequestMapping("/api/users/gym/logs")
+@RequestMapping("/api/checkins")
 public class CheckInLogController {
     
     private final CheckInLogService logService;
-    private final MemberService memberService;
+    private final UserService userService;
 
-    public CheckInLogController(CheckInLogService logService, MemberService memberService) {
+    public CheckInLogController(CheckInLogService logService, UserService userService) {
         this.logService = logService;
-        this.memberService = memberService;
+        this.userService = userService;
     }
 
-    @PostMapping("/checkin")
+    @PostMapping("/log")
     public ResponseEntity<CheckInLogEntry> logCheckIn(@RequestParam Gym gym,
-                                                      @RequestParam Long memberId) {
-        // Fetch or pass member through some service
-        Member member = memberService.getById(memberId).orElse(null);
-        CheckInLogEntry entry = logService.logMemberCheckIn(gym, member);
+                                                      @RequestParam Long userId) {
+        // Fetch or pass user through some service
+        User user = userService.getById(userId).orElse(null);
+        CheckInLogEntry entry = logService.logUserCheckIn(gym, user);
         return ResponseEntity.ok(entry);
     }
 
     @GetMapping
-    public ResponseEntity<List<CheckInLogEntry>> getLogForDay(
+    public ResponseEntity<List<CheckInLogEntry>> getTodayLog(
             @RequestParam Gym gym,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
 

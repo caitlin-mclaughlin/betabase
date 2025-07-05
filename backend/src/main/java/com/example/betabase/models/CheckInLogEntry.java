@@ -19,7 +19,7 @@ public class CheckInLogEntry {
     private Long id;
 
     @ManyToOne
-    private Member member;
+    private User user;
 
     @ManyToOne
     @JoinColumn(name = "gym_id")
@@ -38,8 +38,8 @@ public class CheckInLogEntry {
         return checkInTime.toLocalDate();
     }
 
-    public Member getMember() { return member; }
-    public void setMember(Member member) { this.member = member; }
+    public User getUser() { return user; }
+    public void setUser(User user) { this.user = user; }
 
     public Gym getGym() { return gym; }
     public void setGym(Gym gym) { this.gym = gym; }

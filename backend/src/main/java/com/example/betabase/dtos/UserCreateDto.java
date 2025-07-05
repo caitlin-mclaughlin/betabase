@@ -1,11 +1,24 @@
 package com.example.betabase.dtos;
 
 import java.time.LocalDate;
+import java.util.List;
+
+import com.example.betabase.enums.GenderType;
+import com.example.betabase.enums.PronounsType;
+import com.example.betabase.models.Address;
 
 public record UserCreateDto(
-    String firstName, 
+    String firstName,
+    String prefName,
     String lastName,
+    PronounsType pronouns,
+    GenderType gender,
+    String phoneNumber,
+    String email,
     LocalDate dateOfBirth,
-    String phone,
-    String email
+    Address address,
+    List<Long> membershipIds,
+    String emergencyContactName,
+    String emergencyContactPhone,
+    String emergencyContactEmail
 ) {}

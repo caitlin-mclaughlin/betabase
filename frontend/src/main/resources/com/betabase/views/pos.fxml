@@ -85,7 +85,7 @@
             <TabPane tabClosingPolicy="UNAVAILABLE">
                <tabs>
                   <Tab fx:id="freq_tab" text="Frequently Used" style="-fx-cursor: hand" />
-                  <Tab fx:id="member_tab" text="Memberships" style="-fx-cursor: hand">
+                  <Tab fx:id="user_tab" text="Memberships" style="-fx-cursor: hand">
                      <GridPane hgap="25" vgap="25" VBox.vgrow="NEVER">
                         <padding>
                            <Insets bottom="20" left="20" right="10" top="20" />
@@ -103,7 +103,7 @@
                               style="-fx-background-color: -fx-color-pos1" />
                         <Button GridPane.rowIndex="1" GridPane.columnIndex="1"
                               fx:id="monthly_service" styleClass="item-button"
-                              text="Monthly Membership (Service Member)"
+                              text="Monthly Membership (Service User)"
                               style="-fx-background-color: -fx-color-pos1" />
                         <Button GridPane.rowIndex="2" GridPane.columnIndex="0"
                               fx:id="punch" styleClass="item-button"

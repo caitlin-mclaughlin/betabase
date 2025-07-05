@@ -1,5 +1,6 @@
 package com.betabase.utils;
 
+import com.betabase.dtos.JwtResponseDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.util.Base64;
@@ -48,4 +49,17 @@ public class JwtUtils {
         Object gymId = payload.get("gymId");
         return gymId instanceof Number ? ((Number) gymId).longValue() : null;
     }
+
+    public static JwtResponseDto extractJwtDetails(String token) {
+        Map<String, Object> payload = decodePayload(token);
+
+        JwtResponseDto dto = new JwtResponseDto();
+        dto.setToken(token);
+        dto.setUsername((String) payload.get("sub"));
+        dto.setGymId(payload.get("gymId") instanceof Number ? ((Number) payload.get("gymId")).longValue() : null);
+        dto.setGymName((String) payload.get("gymName"));
+        dto.setExpiresAt(payload.get("exp") instanceof Number ? ((Number) payload.get("exp")).longValue() * 1000 : null);
+        return dto;
+    }
+
 }

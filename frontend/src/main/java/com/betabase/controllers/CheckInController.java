@@ -4,13 +4,18 @@ import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 
-import com.betabase.enums.MemberType;
+import com.betabase.enums.UserType;
 import com.betabase.enums.PronounsType;
 import com.betabase.interfaces.ServiceAware;
-import com.betabase.models.Member;
+import com.betabase.models.CompositeMember;
+import com.betabase.models.Membership;
+import com.betabase.models.User;
 import com.betabase.models.MemberLogEntry;
+import com.betabase.services.CompositeMemberService;
 import com.betabase.services.GymApiService;
-import com.betabase.services.MemberApiService;
+import com.betabase.services.MembershipApiService;
+import com.betabase.services.UserApiService;
+import com.betabase.utils.AuthSession;
 import com.betabase.utils.SceneManager;
 import javafx.animation.PauseTransition;
 import javafx.application.Platform;
@@ -52,40 +57,30 @@ public class CheckInController implements Initializable, ServiceAware {
     @FXML private ImageView logoImage;
     @FXML private TextField search;
     @FXML private HBox searchBox;
-    @FXML private Button checkInHeaderButton;
-    @FXML private Button checkOutHeaderButton;
-    @FXML private Label memberLabel;
+    @FXML private Button checkInHeaderButton, checkOutHeaderButton;
+    @FXML private Label userLabel;
 
     private VBox sidebar;
     private SidebarController sidebarController;
 
     @FXML private Pane floatingPane;
-    @FXML private ListView<Member> floatingListView;
+    @FXML private ListView<CompositeMember> floatingListView;
     @FXML private TableView<MemberLogEntry> checkInTable;
 
+    // Right Sidebar: User Info
+    @FXML private VBox userDisplay;
+    @FXML private Label nameLabel, phoneLabel, emailLabel, ageLabel, addressLabel, eNameLabel, ePhoneLabel, eEmailLabel;
+    @FXML private Label typeLabel, membershipIdLabel, userSinceLabel;
+    @FXML private Button checkInButton, checkOutButton;
 
-    // Right Sidebar: Member Info
-    @FXML private VBox memberDisplay;
-    @FXML private Label nameLabel;
-    @FXML private Label typeLabel;
-    @FXML private Label phoneLabel;
-    @FXML private Label emailLabel;
-    @FXML private Label ageLabel;
-    @FXML private Label memberIdLabel;
-    @FXML private Label memberSinceLabel;
-    @FXML private Label addressLabel;
-    @FXML private Label eNameLabel;
-    @FXML private Label ePhoneLabel;
-    @FXML private Button checkInButton;
-    @FXML private Button checkOutButton;
-
-    private Member currentMember;
+    private CompositeMember currentMember;
     private final ObservableList<MemberLogEntry> logEntries = FXCollections.observableArrayList();
-    private MemberApiService memberService;
+    private CompositeMemberService compositeMemberService;
 
     @Override
-    public void setServices(MemberApiService memberService, GymApiService gymService) {
-        this.memberService = memberService;
+    public void setServices(UserApiService userService, MembershipApiService membershipService,
+                            CompositeMemberService compositeMemberService, GymApiService gymService) {
+        this.compositeMemberService = compositeMemberService;
     }
 
     public void setMenuOpen(boolean menuOpen) {
@@ -102,40 +97,42 @@ public class CheckInController implements Initializable, ServiceAware {
 
             // Highlight POS sidebar button
             sidebarController = loader.getController();
-            sidebarController.setActiveSection("member");
+            sidebarController.setActiveSection("user");
 
             floatingListView.setCellFactory(lv -> new ListCell<>() {
                 private final Label nameLabel = new Label();
-                private final Label memberIdLabel = new Label();
+                private final Label membershipIdLabel = new Label();
                 private final Label phoneLabel = new Label();
                 private final HBox content = new HBox(15);
 
                 {
                     // Add style classes
                     nameLabel.getStyleClass().add("list-label");
-                    memberIdLabel.getStyleClass().add("list-label");
+                    membershipIdLabel.getStyleClass().add("list-label");
                     phoneLabel.getStyleClass().add("list-label");
 
                     // Consistent column widths
                     nameLabel.setPrefWidth(250);
-                    memberIdLabel.setPrefWidth(115);
+                    membershipIdLabel.setPrefWidth(115);
                     phoneLabel.setPrefWidth(125);
 
                     // Add labels to row
-                    content.getChildren().addAll(nameLabel, memberIdLabel, phoneLabel);
+                    content.getChildren().addAll(nameLabel, membershipIdLabel, phoneLabel);
                     content.setAlignment(Pos.CENTER_LEFT);
                 }
                 @Override
-                protected void updateItem(Member member, boolean empty) {
+                protected void updateItem(CompositeMember member, boolean empty) {
                     super.updateItem(member, empty);
-                    if (empty || member == null) {
+                    if (empty || member == null || member.getUser() == null || member.getMembership() == null) {
                         setText(null);
                         setGraphic(null);
                     } else {
-                        nameLabel.setText(member.getLastName() + ", " + member.getFirstName()
-                                          + " (" + member.getPrefName() + ")");
-                        memberIdLabel.setText(member.getMemberId());
-                        phoneLabel.setText(member.getPhoneNumber());
+                        User u = currentMember.getUser();
+                        Membership m = currentMember.getMembership();
+                        nameLabel.setText(u.getLastName() + ", " + u.getFirstName()
+                                          + " (" + u.getPrefName() + ")");
+                        membershipIdLabel.setText(m.getMembershipId());
+                        phoneLabel.setText(u.getPhoneNumber());
 
                         setText(null);
                         setGraphic(content);
@@ -144,16 +141,16 @@ public class CheckInController implements Initializable, ServiceAware {
             });
 
             floatingListView.setOnMouseClicked(event -> {
-                Member selected = floatingListView.getSelectionModel().getSelectedItem();
+                CompositeMember selected = floatingListView.getSelectionModel().getSelectedItem();
                 if (selected != null) {
-                    System.out.println("\nDEBUG: attempting to display member with id: "+ selected.getId()+"\n");
+                    System.out.println("\nDEBUG: attempting to display user with id: "+ selected.getId()+"\n");
                     showFloatingList(false);
-                    displayMember(selected.getId());
+                    displayUser(selected.getId());
 
                     // Force focus back to the search box
                     Platform.runLater(() -> {
                         search.requestFocus();
-                        search.setText(selected.getPrefName());
+                        search.setText(selected.getUser().getPrefName());
                         showFloatingList(false);
                         search.positionCaret(search.getText().length());
                     });
@@ -189,8 +186,8 @@ public class CheckInController implements Initializable, ServiceAware {
 
             checkInTable.setOnMouseClicked(event -> {
                 MemberLogEntry selectedLog = checkInTable.getSelectionModel().getSelectedItem();
-                if (selectedLog != null && selectedLog.getMemberId() != null) {
-                    displayMember(selectedLog.getMemberId());
+                if (selectedLog != null && selectedLog.getUserId() != null) {
+                    displayUser(selectedLog.getUserId());
                 }
             });
 
@@ -277,19 +274,22 @@ public class CheckInController implements Initializable, ServiceAware {
     }
 
     private void performSearch(String query) {
-        memberService.searchMembersAsync(query,
+        compositeMemberService.searchCompositeMembers(
+            query,
+            AuthSession.getCurrentGymId(),
             members -> updateListView(members),
             error -> {
                 System.out.println("\nDEBUG: Search failed\n");
                 error.printStackTrace();
-            });
+            }
+        );
     }
 
     @FXML
     private void handleCheckIn(MouseEvent event) {
         // Prevent duplicate check-ins
         for (MemberLogEntry entry : logEntries) {
-            if (currentMember != null && currentMember.getId().equals(entry.getMemberId())
+            if (currentMember != null && currentMember.getId().equals(entry.getUserId())
                     && entry.getCheckOutTime().equals(" — ")) {
                 return; // Already checked in
             }
@@ -299,7 +299,7 @@ public class CheckInController implements Initializable, ServiceAware {
         logEntries.add(0, entry);
         checkInTable.scrollTo(0);
 
-        // Update actively displayed member
+        // Update actively displayed user
         currentMember.setChecked(true);
         handleSave();
     }
@@ -309,7 +309,7 @@ public class CheckInController implements Initializable, ServiceAware {
         MemberLogEntry entry;
         for (int i=0; i < logEntries.size(); i++) {
             entry = logEntries.get(i);
-            if (currentMember != null && currentMember.getId().equals(entry.getMemberId())
+            if (currentMember != null && currentMember.getId().equals(entry.getUserId())
                     && entry.getCheckOutTime().equals(" — ")) {
                 entry.setCheckOutTime(LocalDateTime.now());
 
@@ -320,102 +320,112 @@ public class CheckInController implements Initializable, ServiceAware {
             }
         }
 
-        // Update actively displayed member
+        // Update actively displayed user
         currentMember.setChecked(false);
         handleSave();
     }
 
     @FXML
-    private void handleNewMember(MouseEvent event) {
+    private void handleNewUser(MouseEvent event) {
         SceneManager.switchScene(
             new Stage(), 
             (MemberController controller) -> {},
-            "/com/betabase/views/member.fxml",
+            "/com/betabase/views/user.fxml",
             true
         );
     }
 
     private void handleSave() {
         try {
-            boolean success = memberService.updateMember(currentMember);
-            if (success) {
-                // maybe show a confirmation
-                System.out.println("\nDEBUG: SUCCESS - member info saved\n");
-                if (currentMember != null) {
-                    displayMember(currentMember.getId());  // Refresh display
-                }
+            currentMember = compositeMemberService.updateCompositeMember(currentMember);
+            System.out.println("\nDEBUG: SUCCESS - user info saved\n");
+            if (currentMember != null) {
+                displayUser(currentMember.getId());
             } else {
-                // show error
-                System.out.println("\nDEBUG: member info could not be saved\n");
+                System.out.println("\nDEBUG: something went wrong saving user info\n");
             }
         } catch (Exception e) {
+            System.out.println("\nDEBUG: user info could not be saved\n");
             e.printStackTrace();
-            // show error dialog
         }
     }
 
-    private void displayMember(Long memberId) {
-        try {
-            currentMember = memberService.getMemberById(memberId);
+    private void displayUser(Long userId) {
+        Long gymId = AuthSession.getCurrentGymId();
+        compositeMemberService.getCompositeMemberById(
+            userId,
+            gymId,
+            member -> {
+                currentMember = member;
+                if (currentMember == null || !currentMember.exists()) {
+                    System.out.println("\nDEBUG: attempting to display null user\n");
+                    return;
+                }
+                User u = currentMember.getUser();
+                Membership m = currentMember.getMembership();
 
-            if (currentMember == null) {
-                System.out.println("\nDEBUG: attempting to display null member\n");
-                return;
+                // Display sidebar
+                userDisplay.setVisible(true);
+                userDisplay.setManaged(true);
+                
+                // Display user info
+                String prefName = !u.getPrefName().isBlank() ? " \"" + u.getPrefName() + "\"" : "";
+                String pronouns = u.getPronouns() != PronounsType.UNSET  ? " (" + u.getPrefName() + ")" : "";
+                
+                nameLabel.setText(u.getLastName() + ",  " + u.getFirstName() + prefName + pronouns);
+                phoneLabel.setText(u.getPhoneNumber());
+                emailLabel.setText(u.getEmail());
+                membershipIdLabel.setText(m.getMembershipId());
+                userSinceLabel.setText(m.getUserSince() != null ? m.getUserSince().toString()  : "MM/DD/YYYY");
+                addressLabel.setText(u.getAddress().toString());
+                eNameLabel.setText(u.getEmergencyContactName());
+                ePhoneLabel.setText(u.getEmergencyContactPhone());
+
+                // Calculate and display age and user since
+                LocalDate dob = u.getDateOfBirth();
+                String age = dob != null ? String.format("%s", Year.now().getValue() - dob.getYear()) : "Unknown";
+                ageLabel.setText(age);
+                LocalDate dom = m.getUserSince();
+                String memSince = dom != null ? String.format("%s", Year.now().getValue() - dom.getYear()) : "N/A";
+                userSinceLabel.setText(memSince);
+
+                // Style and display user type
+                UserType type = m.getType();
+                typeLabel.setText(type.toString().toUpperCase());
+                String bgColor = switch (type) {
+                    case ADMIN -> "-fx-color-pos3";
+                    case MEMBER -> "-fx-color-pos1";
+                    case STAFF -> "-fx-color-pos4";
+                    case VISITOR -> "-fx-color-pos2";
+                    default -> "-fx-accent-color";
+                };
+                typeLabel.setStyle(String.format(
+                    "-fx-background-color: %s;", bgColor
+                ));
+
+                // Swap visible button
+                setEditableState(currentMember.getChecked());
+            },
+            error -> {
+                System.out.println("\nDEBUG: Failed to load composite member by ID: " + userId);
+                error.printStackTrace();
+                // Optional: show user-facing error popup
             }
-            // Display sidebar
-            memberDisplay.setVisible(true);
-            memberDisplay.setManaged(true);
-            
-            // Display member info
-            String prefName = !currentMember.getPrefName().isBlank() ? " \"" + currentMember.getPrefName() + "\"" : "";
-            String pronouns = currentMember.getPronouns() != PronounsType.UNSET  ? " (" + currentMember.getPrefName() + ")" : "";
-            
-            nameLabel.setText(currentMember.getLastName() + ",  " + currentMember.getFirstName() + prefName + pronouns);
-            phoneLabel.setText(currentMember.getPhoneNumber());
-            emailLabel.setText(currentMember.getEmail());
-            memberIdLabel.setText(currentMember.getMemberId());
-            memberSinceLabel.setText(currentMember.getMemberSince() != null ? currentMember.getMemberSince().toString()  : "MM/DD/YYYY");
-            addressLabel.setText(currentMember.getAddress());
-            eNameLabel.setText(currentMember.getEmergencyContactName());
-            ePhoneLabel.setText(currentMember.getEmergencyContactPhone());
+        );
+    }
 
-            // Calculate and display age and member since
-            LocalDate dob = currentMember.getDateOfBirth();
-            String age = dob != null ? String.format("%s", Year.now().getValue() - dob.getYear()) : "Unknown";
-            ageLabel.setText(age);
-            LocalDate dom = currentMember.getMemberSince();
-            String memSince = dom != null ? String.format("%s", Year.now().getValue() - dom.getYear()) : "N/A";
-            memberSinceLabel.setText(memSince);
-
-            // Style and display member type
-            MemberType type = currentMember.getType();
-            typeLabel.setText(type.toString().toUpperCase());
-            String bgColor = switch (type) {
-                case ADMIN -> "-fx-color-pos3";
-                case MEMBER -> "-fx-color-pos1";
-                case STAFF -> "-fx-color-pos4";
-                case VISITOR -> "-fx-color-pos2";
-                default -> "-fx-accent-color";
-            };
-            typeLabel.setStyle(String.format(
-                "-fx-background-color: %s;", bgColor
-            ));
-
-            // Swap visible button
-            Boolean checkedIn = currentMember.getChecked();
-
-            checkInButton.setVisible(!checkedIn);
-            checkInButton.setManaged(!checkedIn);
-            checkInHeaderButton.setVisible(!checkedIn);
-            checkInHeaderButton.setManaged(!checkedIn);
-            checkOutButton.setVisible(checkedIn);
-            checkOutButton.setManaged(checkedIn);
-            checkOutHeaderButton.setVisible(checkedIn);
-            checkOutHeaderButton.setManaged(checkedIn);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            // show error dialog
+    private void setEditableState(boolean editable) {
+        for (Button button : new Button[]{
+            checkInButton, checkInHeaderButton
+        }) {
+            button.setVisible(!editable);
+            button.setManaged(!editable);
+        }
+        for (Button button : new Button[]{
+            checkOutButton, checkOutHeaderButton
+        }) {
+            button.setVisible(editable);
+            button.setManaged(editable);
         }
     }
 
@@ -439,16 +449,16 @@ public class CheckInController implements Initializable, ServiceAware {
         }
     }
 
-    private void updateListView(List<Member> members) {
-        floatingListView.getItems().setAll(members);
-        if (!members.isEmpty()) {
+    private void updateListView(List<CompositeMember> users) {
+        floatingListView.getItems().setAll(users);
+        if (!users.isEmpty()) {
             showFloatingList(true);
         } else {
             showFloatingList(false);
         }
     }
 
-    private void showFloatingList(Boolean show) {
+    private void showFloatingList(boolean show) {
         floatingPane.setMouseTransparent(!show);
         floatingListView.setVisible(show);
     }

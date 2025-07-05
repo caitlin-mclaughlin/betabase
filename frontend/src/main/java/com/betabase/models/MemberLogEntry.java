@@ -4,16 +4,16 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
-import com.betabase.enums.MemberType;
+import com.betabase.enums.UserType;
 
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 
 public class MemberLogEntry {
     private final LocalDate date;
-    private final Long memberId;
+    private final Long userId;
     private final SimpleStringProperty name;
-    private final SimpleObjectProperty<MemberType> membershipType;
+    private final SimpleObjectProperty<UserType> type;
     private final SimpleStringProperty phoneNumber;
     private final SimpleStringProperty email;
 
@@ -26,9 +26,9 @@ public class MemberLogEntry {
 
     public MemberLogEntry() {
         date = null;
-        memberId = null;
+        userId = null;
         name = new SimpleStringProperty("");
-        membershipType = new SimpleObjectProperty<MemberType>(MemberType.UNSET);
+        type = new SimpleObjectProperty<UserType>(UserType.UNSET);
         phoneNumber = new SimpleStringProperty("");
         email = new SimpleStringProperty("");
 
@@ -38,13 +38,14 @@ public class MemberLogEntry {
         format_12Hr = true; // Default to 12Hr clock
     }
 
-    public MemberLogEntry(Member member, LocalDateTime checkInTime) {
+    public MemberLogEntry(CompositeMember member, LocalDateTime checkInTime) {
+        User user = member.getUser();
         date = checkInTime.toLocalDate();
-        this.memberId = member.getId();
-        name = new SimpleStringProperty(member.getFirstName());
-        membershipType = new SimpleObjectProperty<MemberType>(member.getType());
-        phoneNumber = new SimpleStringProperty(member.getPhoneNumber());
-        email = new SimpleStringProperty(member.getEmail());
+        this.userId = user.getId();
+        name = new SimpleStringProperty(user.getFirstName());
+        type = new SimpleObjectProperty<UserType>(member.getMembership().getType());
+        phoneNumber = new SimpleStringProperty(user.getPhoneNumber());
+        email = new SimpleStringProperty(user.getEmail());
 
         this.checkInTime = checkInTime;
         checkOutTime = null;
@@ -92,9 +93,9 @@ public class MemberLogEntry {
     }
 
     // Getters
-    public Long getMemberId() { return memberId; }
+    public Long getUserId() { return userId; }
     public String getName() { return name.get(); }
-    public MemberType getMembershipType() { return membershipType.get(); }
+    public UserType getMembershipType() { return type.get(); }
     public String getPhoneNumber() { return phoneNumber.get(); }
     public String getEmail() { return email.get(); }
 }

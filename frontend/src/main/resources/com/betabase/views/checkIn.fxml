@@ -23,14 +23,14 @@
 
     <center>
         <StackPane>
-            <VBox fx:id="memberSearch" spacing="15" styleClass="default-background">
+            <VBox fx:id="userSearch" spacing="15" styleClass="default-background">
                 <padding>
                     <Insets bottom="15" left="10" right="10" top="10" />
                 </padding>
                 <HBox>
-                    <Label text="Member Check In" styleClass="member-header" />
+                    <Label text="User Check In" styleClass="user-header" />
                     <Region HBox.hgrow="ALWAYS" />
-                    <Button text="New Member" styleClass="new-member" onMouseClicked="#handleNewMember"/>
+                    <Button text="New User" styleClass="new-user" onMouseClicked="#handleNewUser"/>
                 </HBox>
                 <HBox spacing="15">
                     <Button text="Guest Pass" styleClass="alt-check-in" />
@@ -38,7 +38,7 @@
                     <Button text="Event Check In" styleClass="alt-check-in" />
                 </HBox>
                 <HBox alignment="CENTER_LEFT" styleClass="search-bar">
-                    <Label text="Member Lookup" styleClass="member-search" HBox.hgrow="NEVER" />
+                    <Label text="User Lookup" styleClass="user-search" HBox.hgrow="NEVER" />
                     <HBox fx:id="searchBox" maxWidth="600" HBox.hgrow="ALWAYS" alignment="CENTER_LEFT"
                           style="-fx-border-color: -fx-base-color; -fx-border-radius: 15px;">
                         <ImageView fx:id="search_logo" fitHeight="30.0" preserveRatio="true">
@@ -46,7 +46,7 @@
                                 <Image url="@/com/betabase/images/search.png" />
                             </image>
                         </ImageView>
-                        <TextField fx:id="search" promptText="Search members..." styleClass="search-field" HBox.hgrow="ALWAYS" />
+                        <TextField fx:id="search" promptText="Search users..." styleClass="search-field" HBox.hgrow="ALWAYS" />
                         <StackPane onMouseClicked="#handleCancelClick" style="-fx-cursor: hand; -fx-padding: 1px;">
                             <ImageView fx:id="cancel_logo" fitHeight="30.0" preserveRatio="true">
                                 <image>
@@ -70,7 +70,7 @@
     </center>
 
     <right>
-        <VBox fx:id="memberDisplay" alignment="TOP_CENTER" spacing="15" styleClass="member-sidebar"
+        <VBox fx:id="userDisplay" alignment="TOP_CENTER" spacing="15" styleClass="user-sidebar"
               visible="false" managed="false">
             <padding>
                 <Insets bottom="15" left="10" top="5" right="10" />
@@ -78,7 +78,7 @@
             <Label fx:id="nameLabel" styleClass="name-label" text="Name" HBox.hgrow="ALWAYS" />
             <StackPane alignment="CENTER" maxWidth="225.0" prefHeight="275.0" 
                        style="-fx-border-color: -fx-base-color; -fx-border-width: 2px;">
-                <ImageView fx:id="memberPhoto" fitWidth="225.0" pickOnBounds="true" preserveRatio="true" />
+                <ImageView fx:id="userPhoto" fitWidth="225.0" pickOnBounds="true" preserveRatio="true" />
             </StackPane>
             <Button mnemonicParsing="false" styleClass="photo-button" text="Change Photo" />
             <VBox alignment="CENTER_LEFT" spacing="15">
@@ -86,11 +86,11 @@
                     <Insets left="10" right="10" />
                 </padding>
                 <HBox spacing="5">
-                    <Label text="Member ID:" styleClass="prompt" />
-                    <Label fx:id="memberIdLabel" styleClass="info" />
+                    <Label text="User ID:" styleClass="prompt" />
+                    <Label fx:id="userIdLabel" styleClass="info" />
                     <Region HBox.hgrow="ALWAYS" />
-                    <Label text="Member Since:" styleClass="prompt" />
-                    <Label fx:id="memberSinceLabel" styleClass="info" />
+                    <Label text="User Since:" styleClass="prompt" />
+                    <Label fx:id="userSinceLabel" styleClass="info" />
                 </HBox>
                 <HBox spacing="5">
                     <Label text="Phone Number:" styleClass="prompt" />

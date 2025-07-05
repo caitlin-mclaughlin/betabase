@@ -8,7 +8,6 @@ import com.example.betabase.security.JwtService;
 import com.example.betabase.services.GymLoginService;
 
 import jakarta.validation.Valid;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -22,34 +21,39 @@ public class AuthController {
 
     private final AuthenticationManager authManager;
     private final JwtService jwtService;
-    private final GymLoginService gymUserService;
+    private final GymLoginService gymLoginService;
 
-    public AuthController(AuthenticationManager authManager, JwtService jwtService,
-                          GymLoginService gymUserService) {
+    public AuthController(
+            AuthenticationManager authManager,
+            JwtService jwtService,
+            GymLoginService gymLoginService) {
         this.authManager = authManager;
         this.jwtService = jwtService;
-        this.gymUserService = gymUserService;
+        this.gymLoginService = gymLoginService;
     }
 
     @PostMapping("/login")
     public ResponseEntity<JwtResponse> login(@Valid @RequestBody LoginRequest request) {
-        // Use Spring Security to authenticate
-        UsernamePasswordAuthenticationToken authToken =
-            new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword());
-        Authentication authentication = authManager.authenticate(authToken); // Will throw if invalid
+        // Authenticate credentials
+        Authentication authentication = authManager.authenticate(
+            new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword())
+        );
 
-        // Get full user info to generate JWT
-        GymLogin user = gymUserService.getByUsername(request.getUsername())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+        // Load user and generate token
+        GymLogin login = gymLoginService.getByUsername(request.getUsername())
+                .orElseThrow(() -> new RuntimeException("Gym login not found"));
 
-        String token = jwtService.generateToken(user);
-        return ResponseEntity.ok(new JwtResponse(token));
+        String jwt = jwtService.generateToken(login);
+        return ResponseEntity.ok(new JwtResponse(jwt));
     }
 
     @PostMapping("/register")
     public ResponseEntity<JwtResponse> register(@Valid @RequestBody GymRegistrationRequest request) {
-        GymLogin newUser = gymUserService.register(request);
-        String token = jwtService.generateToken(newUser);
-        return ResponseEntity.status(HttpStatus.CREATED).body(new JwtResponse(token));
+        // Register the gym and create associated GymLogin
+        GymLogin newLogin = gymLoginService.register(request);
+
+        // Return token for immediate login
+        String jwt = jwtService.generateToken(newLogin);
+        return ResponseEntity.status(HttpStatus.CREATED).body(new JwtResponse(jwt));
     }
 }

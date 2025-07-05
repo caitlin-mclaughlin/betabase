@@ -2,7 +2,7 @@ package com.example.betabase.models;
 
 import java.time.LocalDate;
 
-import com.example.betabase.enums.MemberType;
+import com.example.betabase.enums.UserType;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -18,18 +18,18 @@ public class Membership {
     @GeneratedValue 
     private Long id;
 
-    @JoinColumn
     @ManyToOne (fetch = FetchType.LAZY)
-    private Long userId;
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 
-    @JoinColumn
     @ManyToOne(fetch = FetchType.LAZY)
-    private Long gymId;
+    @JoinColumn(name = "group_id", nullable = false)
+    private GymGroup gymGroup;
 
     @Enumerated(EnumType.STRING)
-    private MemberType type; // ADMIN, STAFF, MEMBER, VISITOR
+    private UserType type; // ADMIN, STAFF, USER, VISITOR
 
-    private LocalDate memberSince;
-    private Boolean active;
+    private LocalDate userSince;
+    private boolean active;
     
 }

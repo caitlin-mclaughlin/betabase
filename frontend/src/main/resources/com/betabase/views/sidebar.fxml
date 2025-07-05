@@ -27,13 +27,13 @@
       </image>
    </ImageView>
    <Region prefHeight="10.0" />
-   <HBox fx:id="member" styleClass="nav-hbox" onMouseClicked="#handleMemberClick">
+   <HBox fx:id="user" styleClass="nav-hbox" onMouseClicked="#handleUserClick">
       <ImageView fx:id="posLogo" fitWidth="45.0" preserveRatio="true">
             <image>
                <Image url="@/com/betabase/images/person2.png" />
             </image>
       </ImageView>
-      <Label fx:id="memberLabel" styleClass="nav-label" text="Member Home" />
+      <Label fx:id="userLabel" styleClass="nav-label" text="User Home" />
    </HBox>
    <HBox fx:id="pos" styleClass="nav-hbox" onMouseClicked="#handlePosClick">
       <ImageView fx:id="posLogo" fitWidth="45.0" preserveRatio="true">

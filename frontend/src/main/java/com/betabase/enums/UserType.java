@@ -1,6 +1,6 @@
 package com.betabase.enums;
 
-public enum MemberType {
+public enum UserType {
     ADMIN("Admin"),
     STAFF("Staff"),
     MEMBER("Member"),
@@ -9,7 +9,7 @@ public enum MemberType {
 
     private final String display;
 
-    MemberType(String display) {
+    UserType(String display) {
         this.display = display;
     }
 
@@ -18,10 +18,10 @@ public enum MemberType {
         return display;
     }
 
-    public static MemberType fromString(String value) {
+    public static UserType fromString(String value) {
         if (value == null) return UNSET;
         try {
-            return MemberType.valueOf(value.trim().toUpperCase());
+            return UserType.valueOf(value.trim().toUpperCase());
         } catch (IllegalArgumentException e) {
             return UNSET;
         }

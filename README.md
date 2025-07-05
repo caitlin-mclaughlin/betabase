@@ -1,5 +1,5 @@
 # BetaBase
-A new climbing gym member management system
+A new climbing gym user management system
 
 Created by Caitlin McLaughlin
 
@@ -7,8 +7,8 @@ Created by Caitlin McLaughlin
 - [x] Sidebar control
 - [ ] Staff Clock In / Out
   - [ ] Prompt for verification: Pin?
-- [ ] Member Check In / Out
-  - [x] Member info display
+- [ ] User Check In / Out
+  - [x] User info display
   - [x] Search bar
   - [ ] Check in log
 - [x] User Information Pop Up
@@ -16,8 +16,8 @@ Created by Caitlin McLaughlin
   - [x] Date of birth
   - [x] Phone number
   - [ ] Photo
-  - [x] Member ID
-  - [x] Member since (optional)
+  - [x] User ID
+  - [x] User since (optional)
   - [x] Account type
   - [ ] Billing info
     - [ ] Setup Stripe
@@ -42,7 +42,7 @@ Created by Caitlin McLaughlin
   - [ ] Add events (Admin only)
 - [ ] Analytics (Admin only?)
   - [x] General display
-  - [ ] Member breakdown (punch cards / day passes / birthdays / staff / monthly membership)
+  - [ ] User breakdown (punch cards / day passes / birthdays / staff / monthly membership)
   - [ ] Sales
 - [ ] Settings
   - [x] Toggle Defualt Info
