@@ -20,22 +20,22 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/gym-logins")
+@RequestMapping("/api")
 public class GymLoginController {
 
-    private final GymLoginService loginService;
+    private final GymLoginService gymLoginService;
     private final GymService gymService;
-    private final GymGroupService groupService;
+    private final GymGroupService gymGroupService;
 
-    public GymLoginController(GymLoginService loginService, GymService gymService, GymGroupService groupService) {
-        this.loginService = loginService;
+    public GymLoginController(GymLoginService gymLoginService, GymService gymService, GymGroupService gymGroupService) {
+        this.gymLoginService = gymLoginService;
         this.gymService = gymService;
-        this.groupService = groupService;
+        this.gymGroupService = gymGroupService;
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<GymLoginDto> getLoginById(@PathVariable Long id) {
-        return loginService.getById(id)
+        return gymLoginService.getById(id)
                 .map(this::toDto)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
@@ -44,7 +44,7 @@ public class GymLoginController {
     @PostMapping
     public ResponseEntity<GymLoginDto> createLogin(@RequestBody @Valid GymLoginCreateDto dto) {
         Optional<Gym> gym = gymService.getById(dto.gymId());
-        Optional<GymGroup> group = groupService.getById(dto.gymGroupId());
+        Optional<GymGroup> group = gymGroupService.getById(dto.gymGroupId());
 
         if (gym.isEmpty() || group.isEmpty()) {
             return ResponseEntity.badRequest().build();
@@ -57,7 +57,7 @@ public class GymLoginController {
         login.setGroup(group.get());
         login.setRole(dto.role());
 
-        GymLogin saved = loginService.save(login);
+        GymLogin saved = gymLoginService.save(login);
         return ResponseEntity.status(HttpStatus.CREATED).body(toDto(saved));
     }
 
@@ -71,13 +71,13 @@ public class GymLoginController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
 
-        Optional<GymLogin> existingOpt = loginService.getById(id);
+        Optional<GymLogin> existingOpt = gymLoginService.getById(id);
         if (existingOpt.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
 
         Optional<Gym> gym = gymService.getById(updateDto.gymId());
-        Optional<GymGroup> group = groupService.getById(updateDto.gymGroupId());
+        Optional<GymGroup> group = gymGroupService.getById(updateDto.gymGroupId());
 
         if (gym.isEmpty() || group.isEmpty()) {
             return ResponseEntity.badRequest().build();
@@ -90,7 +90,7 @@ public class GymLoginController {
         login.setGroup(group.get());
         login.setRole(updateDto.role());
 
-        GymLogin updated = loginService.update(id, login);
+        GymLogin updated = gymLoginService.update(id, login);
         return ResponseEntity.ok(toDto(updated));
     }
 
@@ -103,7 +103,7 @@ public class GymLoginController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
 
-        loginService.delete(id);
+        gymLoginService.delete(id);
         return ResponseEntity.noContent().build();
     }
 
@@ -118,7 +118,7 @@ public class GymLoginController {
         login.setGroup(savedGym.getGroup());
         login.setRole(GymLoginRole.ADMIN);
 
-        GymLogin savedLogin = loginService.save(login);
+        GymLogin savedLogin = gymLoginService.save(login);
         return ResponseEntity.status(HttpStatus.CREATED).body(toDto(savedLogin));
     }
 

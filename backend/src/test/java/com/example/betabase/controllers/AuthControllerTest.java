@@ -9,6 +9,7 @@ import com.example.betabase.security.JwtService;
 import com.example.betabase.services.GymLoginService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -32,8 +33,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.mockito.Mockito.*;
 
 import java.time.LocalDate;
-
-import org.hamcrest.Matchers;
 
 @WebMvcTest(AuthController.class)
 @AutoConfigureMockMvc

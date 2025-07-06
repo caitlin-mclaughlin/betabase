@@ -21,17 +21,17 @@ import java.util.stream.Collectors;
 @RequestMapping("/api/gym-groups")
 public class GymGroupController {
 
-    private final GymGroupService groupService;
+    private final GymGroupService gymGroupService;
     private final GymService gymService;
 
-    public GymGroupController(GymGroupService groupService, GymService gymService) {
-        this.groupService = groupService;
+    public GymGroupController(GymGroupService gymGroupService, GymService gymService) {
+        this.gymGroupService = gymGroupService;
         this.gymService = gymService;
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<GymGroupDto> getGroup(@PathVariable Long id) {
-        return groupService.getById(id)
+        return gymGroupService.getById(id)
             .map(this::toDto)
             .map(ResponseEntity::ok)
             .orElse(ResponseEntity.notFound().build());
@@ -52,7 +52,7 @@ public class GymGroupController {
         List<Gym> gyms = gymService.getByIds(createDto.gymIds());
         group.setGyms(gyms);
 
-        GymGroup saved = groupService.save(group);
+        GymGroup saved = gymGroupService.save(group);
         return ResponseEntity.status(HttpStatus.CREATED).body(toDto(saved));
     }
 
@@ -66,7 +66,7 @@ public class GymGroupController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
 
-        Optional<GymGroup> existing = groupService.getById(id);
+        Optional<GymGroup> existing = gymGroupService.getById(id);
         if (existing.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
@@ -75,7 +75,7 @@ public class GymGroupController {
         group.setName(updateDto.name());
         group.setGyms(gymService.getByIds(updateDto.gymIds()));
 
-        GymGroup updated = groupService.save(group);
+        GymGroup updated = gymGroupService.save(group);
         return ResponseEntity.ok(toDto(updated));
     }
 
@@ -88,13 +88,13 @@ public class GymGroupController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
 
-        groupService.delete(id);
+        gymGroupService.delete(id);
         return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/search")
     public ResponseEntity<List<GymGroupDto>> search(@RequestParam String name) {
-        List<GymGroupDto> results = groupService.searchByName(name).stream()
+        List<GymGroupDto> results = gymGroupService.searchByName(name).stream()
                 .map(this::toDto)
                 .collect(Collectors.toList());
         return ResponseEntity.ok(results);

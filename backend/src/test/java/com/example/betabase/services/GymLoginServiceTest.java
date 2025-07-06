@@ -16,30 +16,37 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import java.time.LocalDate;
 import java.util.Optional;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 class GymLoginServiceTest {
 
-    private GymLoginRepository repo;
+    private Address address;
+    private Gym gym;
+    private GymGroup group;
+    private GymLoginRepository repository;
     private GymService gymService;
-    private PasswordEncoder encoder;
     private GymLoginService service;
+    private PasswordEncoder encoder;
 
     @BeforeEach
     void setup() {
-        repo = mock(GymLoginRepository.class);
+        repository = mock(GymLoginRepository.class);
         gymService = mock(GymService.class);
         encoder = mock(PasswordEncoder.class);
-        service = new GymLoginService(repo, encoder, gymService);
+        service = new GymLoginService(repository, encoder, gymService);
+
+        address = new Address("123", "Main St", "Madison", "WI", "53703", "USA");
+        group = new GymGroup(1L, "Test Group", null);
+        gym = new Gym(null, "Climb Gym", group, address, LocalDate.now());
     }
 
     @Test
     void testRegisterNewGym() {
         // Arrange
-        Address address = new Address("123", "Main St", "Madison", "WI", "53703", "USA");
-        GymGroup group = new GymGroup(1L, "Test Group", null);
-        Gym gym = new Gym(null, "Climb Gym", group, address, LocalDate.now());
         Gym savedGym = new Gym(10L, "Climb Gym", group, address, LocalDate.now());
 
         GymRegistrationRequest request = new GymRegistrationRequest();
@@ -52,7 +59,7 @@ class GymLoginServiceTest {
         when(encoder.encode("secret123")).thenReturn("hashed_pw");
 
         GymLogin expectedLogin = new GymLogin(null, "kiosk01", "hashed_pw", savedGym, group, GymLoginRole.KIOSK);
-        when(repo.save(any(GymLogin.class))).thenReturn(expectedLogin);
+        when(repository.save(any(GymLogin.class))).thenReturn(expectedLogin);
 
         // Act
         GymLogin result = service.register(request);
@@ -63,15 +70,12 @@ class GymLoginServiceTest {
         assertEquals(10L, result.getGym().getId());
         assertEquals(group, result.getGroup());
         verify(gymService).save(gym);
-        verify(repo).save(any(GymLogin.class));
+        verify(repository).save(any(GymLogin.class));
     }
 
     @Test
     void testRegisterExistingGym() {
         // Arrange
-        Address address = new Address("123", "Main St", "Madison", "WI", "53703", "USA");
-        GymGroup group = new GymGroup(1L, "Test Group", null);
-        Gym gym = new Gym(null, "Climb Gym", group, address, LocalDate.now());
         Gym existingGym = new Gym(5L, "Climb Gym", group, address, LocalDate.now());
 
         GymRegistrationRequest request = new GymRegistrationRequest();
@@ -83,7 +87,7 @@ class GymLoginServiceTest {
         when(encoder.encode("secret456")).thenReturn("hashed_pw_2");
 
         GymLogin expectedLogin = new GymLogin(null, "admin01", "hashed_pw_2", existingGym, group, GymLoginRole.ADMIN);
-        when(repo.save(any(GymLogin.class))).thenReturn(expectedLogin);
+        when(repository.save(any(GymLogin.class))).thenReturn(expectedLogin);
 
         // Act
         GymLogin result = service.register(request);
@@ -94,6 +98,51 @@ class GymLoginServiceTest {
         assertEquals(5L, result.getGym().getId());
         assertEquals(group, result.getGroup());
         verify(gymService, never()).save(any());
-        verify(repo).save(any(GymLogin.class));
+        verify(repository).save(any(GymLogin.class));
+    }
+
+    @Test
+    void testAuthenticate_Valid() {
+        String username = "username";
+        String password = "password";
+
+        GymLogin login = new GymLogin();
+        login.setPasswordHash(password);
+
+        when(repository.findByUsername(username)).thenReturn(Optional.of(login));
+        when(encoder.matches(eq(password), anyString())).thenReturn(true);
+
+        Optional<GymLogin> result = service.authenticate(username, password);
+        assertTrue(result.isPresent());
+        assertEquals("password", result.get().getPasswordHash());
+    }
+
+    @Test
+    void testAuthenticate_InvalidUsername() {
+        String username = "username";
+        String password = "password";
+
+        when(repository.findByUsername(username)).thenReturn(Optional.empty());
+        
+        Optional<GymLogin> result = service.authenticate(username, password);
+        assertFalse(result.isPresent());
+        // Verify no password check was done
+        verify(encoder, never()).matches(anyString(), anyString());
+    }
+
+    @Test
+    void testAuthenticate_InvalidPassword() {
+        String username = "user";
+        String password = "wrongPass";
+
+        GymLogin login = new GymLogin();
+        login.setUsername(username);
+        login.setPasswordHash("hashedPass");
+
+        when(repository.findByUsername(username)).thenReturn(Optional.of(login));
+        when(encoder.matches(password, "hashedPass")).thenReturn(false);
+
+        Optional<GymLogin> result = service.authenticate(username, password);
+        assertFalse(result.isPresent());
     }
 }

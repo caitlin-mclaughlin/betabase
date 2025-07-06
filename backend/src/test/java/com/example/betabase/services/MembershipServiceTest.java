@@ -5,6 +5,7 @@ import com.example.betabase.models.GymGroup;
 import com.example.betabase.models.Membership;
 import com.example.betabase.models.User;
 import com.example.betabase.repositories.MembershipRepository;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -22,6 +23,7 @@ public class MembershipServiceTest {
 
     private User user;
     private GymGroup group;
+    private Membership membership;
 
     @BeforeEach
     void setup() {
@@ -30,60 +32,72 @@ public class MembershipServiceTest {
 
         user = new User();
         user.setId(1L);
-        user.setFirstName("John");
+        user.setFirstName("Alice");
 
         group = new GymGroup();
         group.setId(1L);
-        group.setName("Test Group");
+        group.setName("BetaBase Group");
+
+        membership = new Membership();
+        membership.setId(10L);
+        membership.setUser(user);
+        membership.setGymGroup(group);
+        membership.setType(UserType.MEMBER);
+        membership.setUserSince(LocalDate.now());
+        membership.setActive(true);
     }
 
     @Test
     void testSaveMembership() {
-        Membership expected = new Membership();
-        expected.setUser(user);
-        expected.setGymGroup(group);
-        expected.setType(UserType.MEMBER);
-        expected.setUserSince(LocalDate.now());
-        expected.setActive(true);
+        when(membershipRepo.save(any(Membership.class))).thenReturn(membership);
 
-        when(membershipRepo.save(any(Membership.class))).thenReturn(expected);
-
-        Membership result = membershipService.save(expected);
+        Membership result = membershipService.save(membership);
 
         assertNotNull(result);
+        assertEquals(membership.getId(), result.getId());
+        assertEquals(UserType.MEMBER, result.getType());
         assertEquals(user, result.getUser());
         assertEquals(group, result.getGymGroup());
-        assertEquals(UserType.MEMBER, result.getType());
         assertTrue(result.isActive());
     }
 
     @Test
     void testGetMembershipsForUser() {
-        when(membershipRepo.findByUserId(1L)).thenReturn(List.of(new Membership()));
+        when(membershipRepo.findByUserId(1L)).thenReturn(List.of(membership));
+
         List<Membership> result = membershipService.getMembershipsForUser(1L);
+
         assertEquals(1, result.size());
+        assertEquals(user.getId(), result.get(0).getUser().getId());
     }
 
     @Test
     void testGetMembershipsForGymGroup() {
-        when(membershipRepo.findByGymGroupId(1L)).thenReturn(List.of(new Membership()));
+        when(membershipRepo.findByGymGroupId(1L)).thenReturn(List.of(membership));
+
         List<Membership> result = membershipService.getMembershipsForGym(1L);
+
         assertEquals(1, result.size());
+        assertEquals(group.getId(), result.get(0).getGymGroup().getId());
     }
 
     @Test
     void testGetForUserAndGymGroup() {
-        Membership mock = new Membership();
-        when(membershipRepo.findByUserIdAndGymGroupId(1L, 1L)).thenReturn(Optional.of(mock));
-        Membership result = membershipService.getForUserAndGym(1L, 1L);
-        assertNotNull(result);
+        when(membershipRepo.findByUserIdAndGymGroupId(1L, 1L)).thenReturn(Optional.of(membership));
+
+        Optional<Membership> result = membershipService.getByUserIdAndGymGroupId(1L, 1L);
+
+        assertTrue(result.isPresent());
+        assertEquals(user, result.get().getUser());
+        assertEquals(group, result.get().getGymGroup());
     }
 
     @Test
-    void testGetForUserAndGymGroup_notFound() {
+    void testGetForUserAndGymGroup_NotFound() {
         when(membershipRepo.findByUserIdAndGymGroupId(1L, 1L)).thenReturn(Optional.empty());
-        assertThrows(IllegalArgumentException.class, () -> {
-            membershipService.getForUserAndGym(1L, 1L);
-        });
+
+        Optional<Membership> result = membershipService.getByUserIdAndGymGroupId(1L, 1L);
+
+        assertFalse(result.isPresent());
     }
 }

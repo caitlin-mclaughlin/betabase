@@ -1,6 +1,7 @@
 package com.example.betabase.controllers;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,20 +21,25 @@ public class MembershipController {
 
     private final MembershipService membershipService;
     private final UserService userService;
-    private final GymGroupService gymService;
+    private final GymGroupService gymGroupService;
 
-    public MembershipController(MembershipService membershipService, UserService userService, GymGroupService gymService) {
+    public MembershipController(MembershipService membershipService, UserService userService, GymGroupService gymGroupService) {
         this.membershipService = membershipService;
         this.userService = userService;
-        this.gymService = gymService;
+        this.gymGroupService = gymGroupService;
     }
 
     @PostMapping
     public ResponseEntity<MembershipDto> createMembership(@RequestBody MembershipCreateDto dto) {
+        Optional<Membership> membershipOpt = membershipService.getByUserIdAndGymGroupId(dto.userId(), dto.gymGroupId());
+        if (membershipOpt.isPresent()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Membership already exists");
+        }
+        
         Membership membership = new Membership();
         membership.setUser(userService.getById(dto.userId())
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "User not found")));
-        membership.setGymGroup(gymService.getById(dto.gymGroupId())
+        membership.setGymGroup(gymGroupService.getById(dto.gymGroupId())
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Gym group not found")));
         membership.setType(dto.type());
         membership.setUserSince(dto.userSince());
@@ -45,13 +51,39 @@ public class MembershipController {
     @GetMapping("/user/{userId}")
     public ResponseEntity<List<MembershipDto>> getUserMemberships(@PathVariable Long userId) {
         List<Membership> memberships = membershipService.getMembershipsForUser(userId);
+        if (memberships == null || memberships.size() == 0){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User not found");
+        }
         return ResponseEntity.ok(memberships.stream().map(this::toDto).toList());
     }
 
     @GetMapping("/gym/{gymId}")
     public ResponseEntity<List<MembershipDto>> getGymMemberships(@PathVariable Long gymId) {
         List<Membership> memberships = membershipService.getMembershipsForGym(gymId);
+        if (memberships == null || memberships.size() == 0){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Gym not found");
+        }
         return ResponseEntity.ok(memberships.stream().map(this::toDto).toList());
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteMembership(@PathVariable Long id) {
+        try {
+            membershipService.deleteById(id);
+            return ResponseEntity.noContent().build();
+        } catch (IllegalArgumentException ex) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, ex.getMessage());
+        }
+    }
+
+    @GetMapping("/user/{userId}/gym/{gymGroupId}")
+    public ResponseEntity<MembershipDto> getMembershipByUserAndGym(
+            @PathVariable Long userId,
+            @PathVariable Long gymGroupId) {
+        Membership membership = membershipService.getByUserIdAndGymGroupId(userId, gymGroupId)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Membership not found"));
+
+        return ResponseEntity.ok(toDto(membership));
     }
 
     private MembershipDto toDto(Membership m) {

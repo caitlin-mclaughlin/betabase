@@ -1,8 +1,6 @@
 package com.example.betabase.controllers;
 
 import com.example.betabase.dtos.GymCreateDto;
-import com.example.betabase.dtos.GymRegistrationRequest;
-import com.example.betabase.dtos.LoginRequest;
 import com.example.betabase.models.Gym;
 import com.example.betabase.models.GymGroup;
 import com.example.betabase.models.GymLogin;
@@ -16,22 +14,22 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 @RestController
-@RequestMapping("/api/gyms")
+@RequestMapping("/api")
 public class GymController {
 
     private final GymService gymService;
-    private final GymGroupService groupService;
-    private final GymLoginService loginService;
+    private final GymGroupService gymGroupService;
+    private final GymLoginService gymLoginService;
 
-    public GymController(GymService gymService, GymGroupService groupService, GymLoginService gymLoginService) {
+    public GymController(GymService gymService, GymGroupService gymGroupService, GymLoginService gymLoginService) {
         this.gymService = gymService;
-        this.groupService = groupService;
-        this.loginService = gymLoginService;
+        this.gymGroupService = gymGroupService;
+        this.gymLoginService = gymLoginService;
     }
 
     @PostMapping
     public ResponseEntity<Gym> createGym(@RequestBody GymCreateDto dto) {
-        GymGroup group = groupService.getById(dto.groupId())
+        GymGroup group = gymGroupService.getById(dto.groupId())
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "GymGroup not found"));
 
         Gym gym = new Gym();
@@ -45,12 +43,12 @@ public class GymController {
 
     @GetMapping("/{id}")
     public ResponseEntity<GymLogin> getGymLoginById(@PathVariable Long id) {
-        return loginService.getById(id)
+        return gymLoginService.getById(id)
             .map(ResponseEntity::ok)
             .orElse(ResponseEntity.notFound().build());
     }
 
-    @GetMapping("/gym/{id}")
+    @GetMapping("/gyms/{id}")
     public ResponseEntity<Gym> getGymById(@PathVariable Long id) {
         return gymService.getById(id)
             .map(ResponseEntity::ok)

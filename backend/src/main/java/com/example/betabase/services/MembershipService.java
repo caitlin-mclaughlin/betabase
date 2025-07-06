@@ -1,6 +1,7 @@
 package com.example.betabase.services;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
@@ -19,6 +20,10 @@ public class MembershipService {
         return repository.save(membership);
     }
 
+    public void deleteById(Long id) {
+        repository.deleteById(id);
+    }
+
     public List<Membership> getMembershipsForUser(Long userId) {
         return repository.findByUserId(userId);
     }
@@ -27,8 +32,7 @@ public class MembershipService {
         return repository.findByGymGroupId(gymGroupId);
     }
 
-    public Membership getForUserAndGym(Long userId, Long gymGroupId) {
-        return repository.findByUserIdAndGymGroupId(userId, gymGroupId)
-            .orElseThrow(() -> new IllegalArgumentException("Membership not found"));
+    public Optional<Membership> getByUserIdAndGymGroupId(Long userId, Long gymGroupId) {
+        return repository.findByUserIdAndGymGroupId(userId, gymGroupId);
     }
 }

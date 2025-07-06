@@ -83,15 +83,15 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(ResponseStatusException.class)
     public ResponseEntity<ErrorResponse> handleResponseStatusException(ResponseStatusException ex,
-                                                                       HttpServletRequest request) {
+                                                                    HttpServletRequest request) {
         ErrorResponse errorResponse = new ErrorResponse(
                 LocalDateTime.now(),
-                HttpStatus.BAD_REQUEST.value(),
+                ex.getStatusCode().value(), // Use actual status
                 "Bad Response Status",
                 ex.getMessage(),
                 request.getRequestURI()
         );
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+        return ResponseEntity.status(ex.getStatusCode()).body(errorResponse);
     }
 
     @ExceptionHandler(AccessDeniedException.class)
@@ -106,4 +106,30 @@ public class GlobalExceptionHandler {
         );
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(errorResponse);
     }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ErrorResponse> handleIllegalArgument(IllegalArgumentException ex,
+                                                            HttpServletRequest request) {
+        String message = ex.getMessage() != null ? ex.getMessage() : "Invalid request";
+
+        HttpStatus status;
+        if (message.toLowerCase().contains("not found")) {
+            status = HttpStatus.NOT_FOUND;
+        } else if (message.toLowerCase().contains("already exists")) {
+            status = HttpStatus.BAD_REQUEST;
+        } else {
+            status = HttpStatus.BAD_REQUEST;
+        }
+
+        ErrorResponse errorResponse = new ErrorResponse(
+                LocalDateTime.now(),
+                status.value(),
+                "Illegal Argument",
+                message,
+                request.getRequestURI()
+        );
+
+        return ResponseEntity.status(status).body(errorResponse);
+    }
+
 }

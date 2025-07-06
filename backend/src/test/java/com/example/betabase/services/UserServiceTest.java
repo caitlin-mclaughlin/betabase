@@ -63,7 +63,7 @@ public class UserServiceTest {
 
     @Test
     void testSearchUsers() {
-        when(userRepo.findByQueryAndGymId("Test", 1L)).thenReturn(List.of(user));
+        when(userRepo.findByQueryAndGymGroupId("Test", 1L)).thenReturn(List.of(user));
         List<User> results = userService.searchUsers("Test", 1L);
         assertEquals(1, results.size());
         assertEquals("Test", results.get(0).getFirstName());
