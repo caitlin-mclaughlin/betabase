@@ -1,0 +1,198 @@
+/** checkInStyles.css **/
+
+.alt-check-in {
+    -fx-background-color: -fx-base-color;
+    -fx-text-fill: -fx-light-color;
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-border-radius: 10px;
+    -fx-background-radius: 10px;
+    -fx-cursor: hand;
+    -fx-min-width: 130px;
+    -fx-min-height: 40px;
+    -fx-max-height: 40px;
+}
+
+.alt-check-in:hover {
+    -fx-background-color: -fx-color-select;
+}
+
+.info {
+    -fx-text-fill: -fx-base-color;
+    -fx-font-size: 16px;
+}
+
+.user-search {
+    -fx-text-fill: -fx-base-color;
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-wrap-text: false;
+    -fx-min-width: -1;
+    -fx-pref-width: -1;
+    -fx-max-width: -1;
+}
+
+.user-header {
+    -fx-text-fill: -fx-base-color;
+    -fx-font-size: 30px;
+    -fx-font-weight: bold;
+}
+
+.user-sidebar {
+    -fx-background-color: -fx-color-shadow;
+    -fx-text-fill: -fx-base-color;
+    -fx-min-width: 425px;
+}
+
+.name-label {
+    -fx-background-color: -fx-base-color;
+    -fx-text-fill: -fx-light-color;
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+    -fx-padding: 5px;
+    -fx-min-height: 50px;
+    -fx-max-height: 50px;
+    -fx-max-width: Infinity;
+    -fx-alignment: CENTER;
+}
+
+.new-user {
+    -fx-background-color: -fx-accent-color;
+    -fx-text-fill: -fx-light-color;
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+    -fx-border-radius: 10px;
+    -fx-background-radius: 10px;
+    -fx-cursor: hand;
+    -fx-min-width: 150px;
+    -fx-min-height: 40px;
+    -fx-max-height: 40px;
+    -fx-alignment: CENTER;
+}
+
+.new-user:hover {
+    -fx-background-color: -fx-color-selecta;
+}
+
+.prompt {
+    -fx-text-fill: -fx-base-color;
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+}
+
+.table-view {
+    -fx-background-color: -fx-color-shadow;
+    -fx-border-color: transparent;
+    -fx-border-radius: 0;
+    -fx-background-radius: 0;
+    -fx-padding: 5px;
+    -fx-border-radius: 15px;
+    -fx-background-radius: 15px;
+}
+
+.table-view .column-header {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent transparent transparent -fx-base-color;
+    -fx-border-width: 0 0 0 1;
+    -fx-text-fill: -fx-base-color;
+    -fx-font-size: 16px;
+    -fx-padding: 0 5 0 5;
+    -fx-border-insets: 0;
+    -fx-background-insets: 0;
+    -fx-alignment: CENTER;
+    -fx-min-width: 115px;
+}
+
+.table-view .column-header.first-visible-column {
+    -fx-border-color: transparent;
+    -fx-border-width: 0px;
+}
+
+.table-view .column-header-background {
+    -fx-background-color: -fx-light-color;
+    -fx-border-color: transparent;
+    -fx-border-insets: 0;
+    -fx-background-insets: 0;
+    -fx-padding: 0;
+    -fx-border-radius: 15px;
+    -fx-background-radius: 15px;
+}
+
+.table-view .column-drag-header {
+    -fx-background-color: -fx-base-color;
+    -fx-text-fill: -fx-light-color;;
+}
+
+.table-view .filler {
+    -fx-background-color: transparent;
+}
+
+.table-row-cell {
+    -fx-background-color: -fx-color-shadow;
+    -fx-border-color: transparent;
+    -fx-border-insets: 0;
+    -fx-background-insets: 0;
+    -fx-padding: 0;
+    -fx-border-radius: 15px;
+    -fx-background-radius: 15px;
+}
+
+.table-row-cell:hover {
+    -fx-border-color: -fx-base-color;
+    -fx-text-fill: -fx-base-color;
+}
+
+.table-row-cell:odd {
+    -fx-background-color: -fx-light-color;
+}
+
+.table-cell {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent -fx-base-color transparent transparent;
+    -fx-border-width: 0 1 0 0;
+    -fx-text-fill: -fx-base-color;
+    -fx-font-size: 16px;
+    -fx-padding: 0 5 0 5;
+    -fx-border-insets: 0;
+    -fx-background-insets: 0;
+    -fx-alignment: CENTER;
+    -fx-min-width: 115px;
+}
+
+.table-cell:last-visible {
+    -fx-border-color: transparent;
+}
+
+.table-view .scroll-bar:horizontal {
+    -fx-background-color: -fx-base-color;
+    -fx-padding: 1 2 1 2;
+    -fx-border-radius: 10px;
+    -fx-background-radius: 10px;
+    -fx-unit-increment: 100;
+}
+
+.table-view .scroll-bar:vertical {
+    -fx-background-color: -fx-base-color;
+    -fx-padding: 1 2 1 2;
+    -fx-border-radius: 10px;
+    -fx-background-radius: 10px;
+    -fx-unit-increment: 100;
+}
+
+.table-view .scroll-bar .thumb {
+    -fx-background-color: -fx-light-color;
+    -fx-border-radius: 6px;
+    -fx-background-radius: 6px;
+}
+
+.table-view .scroll-bar .increment-button,
+.table-view .scroll-bar .decrement-button {
+    -fx-background-color: transparent;
+    -fx-focus-color: transparent;
+    -fx-faint-focus-color: transparent;
+}
+
+.table-view .scroll-bar .increment-arrow,
+.table-view .scroll-bar .decrement-arrow {
+    -fx-background-color: -fx-light-color;
+}

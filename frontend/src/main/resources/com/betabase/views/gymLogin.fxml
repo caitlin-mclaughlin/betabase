@@ -75,7 +75,7 @@
                 </HBox>
                 <Label styleClass="field-prompt" text="Create an account for your gym to get started." />
                 <Region VBox.vgrow="ALWAYS" />
-                <Button onAction="#handleAccountCreation" styleClass="login-button" text="CREATE ACCOUNT" VBox.vgrow="ALWAYS" />
+                <Button onMouseClicked="#handleAccountCreation" styleClass="login-button" text="CREATE ACCOUNT" VBox.vgrow="ALWAYS" />
             </VBox>
         </HBox>
     </center>

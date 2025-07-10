@@ -2,6 +2,7 @@ package com.example.betabase.controllers;
 
 import com.example.betabase.dtos.MembershipCreateDto;
 import com.example.betabase.enums.UserType;
+import com.example.betabase.exceptions.DuplicateMembershipException;
 import com.example.betabase.models.GymGroup;
 import com.example.betabase.models.Membership;
 import com.example.betabase.models.User;
@@ -22,8 +23,10 @@ import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Import;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
 import java.util.Optional;
@@ -32,6 +35,7 @@ import java.util.List;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.hamcrest.Matchers.*;
+import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -196,12 +200,12 @@ public class MembershipControllerTest {
         when(userService.getById(1L)).thenReturn(Optional.of(user));
         when(gymGroupService.getById(2L)).thenReturn(Optional.of(group));
         when(membershipService.save(any(Membership.class)))
-            .thenThrow(new IllegalArgumentException("Membership already exists"));
+            .thenThrow(new DuplicateMembershipException("Membership already exists"));
 
         mockMvc.perform(post("/api/gym-users/memberships")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(dto)))
-                .andExpect(status().isBadRequest())
+                .andExpect(status().isConflict())
                 .andExpect(jsonPath("$.message").value(containsString("Membership already exists")));
     }
 
@@ -246,7 +250,7 @@ public class MembershipControllerTest {
 
     @Test
     void testDeleteMembership_notFound_returns404() throws Exception {
-        Mockito.doThrow(new IllegalArgumentException("Membership not found"))
+        Mockito.doThrow(new ResponseStatusException(HttpStatus.NOT_FOUND, "Membership not found"))
                 .when(membershipService).deleteById(999L);
 
         mockMvc.perform(delete("/api/gym-users/memberships/999"))

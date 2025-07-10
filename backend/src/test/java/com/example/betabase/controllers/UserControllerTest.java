@@ -64,7 +64,7 @@ public class UserControllerTest {
         user.setEmergencyContactName("EC");
         user.setEmergencyContactEmail("ec@example.com");
         user.setEmergencyContactPhone("9876543210");
-        user.setAddress(new Address("123", "Main", "City", "State", "12345", "Country", "1A"));
+        user.setAddress(new Address("123 Main St", "City", "State", "12345", "Country", "1A"));
 
         createDto = new UserCreateDto(
             "Test", "", "User", PronounsType.UNSET, GenderType.UNSET,

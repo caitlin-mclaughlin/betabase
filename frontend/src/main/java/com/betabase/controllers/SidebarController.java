@@ -2,11 +2,6 @@ package com.betabase.controllers;
 
 import java.util.List;
 
-import com.betabase.interfaces.ServiceAware;
-import com.betabase.services.CompositeMemberService;
-import com.betabase.services.GymApiService;
-import com.betabase.services.MembershipApiService;
-import com.betabase.services.UserApiService;
 import com.betabase.utils.SceneManager;
 
 import javafx.fxml.FXML;

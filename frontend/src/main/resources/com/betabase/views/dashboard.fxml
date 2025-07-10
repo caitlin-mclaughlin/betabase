@@ -86,7 +86,7 @@
                 </HBox>
                 <Button text="Check In/Out" styleClass="search-button" />
             </HBox>
-            <ListView fx:id="userList" VBox.vgrow="ALWAYS" />
+            <ListView fx:id="memberList" VBox.vgrow="ALWAYS" />
         </VBox>
     </center>
 </BorderPane>

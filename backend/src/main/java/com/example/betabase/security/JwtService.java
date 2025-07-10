@@ -21,7 +21,7 @@ public class JwtService {
     private String base64SecretKey;
 
     @Value("${jwt.expiration-ms}")
-    private long expirationMs;
+    private Long expirationMs;
     
     @PostConstruct
     public void debug() {

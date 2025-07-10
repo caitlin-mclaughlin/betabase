@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.Tooltip?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+
+<BorderPane fx:id="mainPane"
+            styleClass="colors, default-background"
+            xmlns="http://javafx.com/javafx/23.0.1"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.betabase.controllers.CreateAccountController"
+            stylesheets="@../styles/colors.css, @../styles/loginStyles.css, @../styles/shared.css">
+    <padding>
+      <Insets bottom="50" right="150" top="5" left="150" />
+    </padding>
+
+    <top>
+        <VBox alignment="CENTER">
+            <ImageView fx:id="logo" fitWidth="140.0" preserveRatio="true">
+                <image>
+                    <Image url="@/com/betabase/images/logo2.png" />
+                </image>
+            </ImageView>
+            <Label text="Create a New Gym Account" styleClass="header" />
+            <Region style="-fx-min-height: 5px;" />
+        </VBox>
+    </top>
+
+    <center>
+        <VBox alignment="CENTER_LEFT" styleClass="options">
+                <padding>
+                    <Insets top="20" right="25" bottom="20" left="25"/>
+                </padding>
+            <GridPane hgap="10" vgap="5">
+                <columnConstraints>
+                    <ColumnConstraints hgrow="ALWAYS"/>
+                    <ColumnConstraints hgrow="ALWAYS" percentWidth="10" />
+                    <ColumnConstraints hgrow="ALWAYS" percentWidth="40" />
+                </columnConstraints>
+
+                <!-- Row 0: Gym Name + Gym Group -->
+                <HBox spacing="5" GridPane.rowIndex="0" GridPane.columnIndex="0">
+                    <Label text="Gym Name" styleClass="field-prompt"/>
+                    <Label text="*" styleClass="field-prompt" style="-fx-text-fill: -fx-accent-color;">
+                        <tooltip><Tooltip text="Gym name is required" styleClass="warning"/></tooltip>
+                    </Label>
+                </HBox>
+                <TextField fx:id="nameField" GridPane.rowIndex="1" GridPane.columnIndex="0" 
+                        GridPane.columnSpan="2" styleClass="field"/>
+
+                <HBox spacing="5" GridPane.rowIndex="0" GridPane.columnIndex="2">
+                    <Label text="Gym Group" styleClass="field-prompt"/>
+                    <Label text="*" styleClass="field-prompt" style="-fx-text-fill: -fx-accent-color;">
+                        <tooltip><Tooltip text="Gym group is required" styleClass="warning"/></tooltip>
+                    </Label>
+                </HBox>
+                <ComboBox fx:id="groupField" value="New Group" GridPane.rowIndex="1" GridPane.columnIndex="2" 
+                        GridPane.columnSpan="2" style="-fx-border-color: -fx-base-color;" styleClass="field" />
+
+                <!-- Row 2: Address -->
+                <HBox spacing="5" GridPane.rowIndex="2" GridPane.columnIndex="0">
+                    <Label text="Address" styleClass="field-prompt"/>
+                    <Label text="*" styleClass="field-prompt" style="-fx-text-fill: -fx-accent-color;">
+                        <tooltip><Tooltip text="Gym address is required" styleClass="warning"/></tooltip>
+                    </Label>
+                </HBox>
+                <TextField fx:id="streetField1" promptText="Street Address" GridPane.rowIndex="3" GridPane.columnIndex="0"
+                        GridPane.columnSpan="4" styleClass="field" />
+                <TextField fx:id="streetField2" promptText="Street Address (Optional)" GridPane.rowIndex="4"
+                        GridPane.columnIndex="0" GridPane.columnSpan="4" styleClass="field" />
+
+                <!-- Row 5: City / State / Zip / Country -->
+                <TextField fx:id="cityField" promptText="City" GridPane.rowIndex="5" GridPane.columnIndex="0" styleClass="field" />
+                <ComboBox fx:id="stateField" value="State" GridPane.rowIndex="5" GridPane.columnIndex="1" 
+                          style="-fx-border-color: -fx-base-color;" styleClass="field" />
+                <TextField fx:id="zipField" promptText="Zipcode" GridPane.rowIndex="5" GridPane.columnIndex="2" styleClass="field" />
+<!--                <ComboBox fx:id="countryField" value="USA" GridPane.rowIndex="5" GridPane.columnIndex="3" 
+                        style="-fx-border-color: -fx-base-color;" styleClass="field"/> -->
+
+                <!-- Row 6–7: Username -->
+                <HBox spacing="5" GridPane.rowIndex="6" GridPane.columnIndex="0">
+                    <Label text="Username" styleClass="field-prompt"/>
+                    <Label text="*" styleClass="field-prompt" style="-fx-text-fill: -fx-accent-color;">
+                        <tooltip><Tooltip text="Username is required" styleClass="warning"/></tooltip>
+                    </Label>
+                </HBox>
+                <TextField fx:id="usernameField" GridPane.rowIndex="7" GridPane.columnIndex="0" 
+                        GridPane.columnSpan="4" GridPane.hgrow="ALWAYS" styleClass="field"/>
+
+                <!-- Row 8–9: Password -->
+                <HBox spacing="5" GridPane.rowIndex="8" GridPane.columnIndex="0">
+                    <Label text="Password" styleClass="field-prompt"/>
+                    <Label text="*" styleClass="field-prompt" style="-fx-text-fill: -fx-accent-color;">
+                        <tooltip><Tooltip text="Password is required" styleClass="warning"/></tooltip>
+                    </Label>
+                </HBox>
+                <PasswordField fx:id="passwordField" GridPane.rowIndex="9" GridPane.columnIndex="0" GridPane.columnSpan="4"
+                            styleClass="field"/>
+
+                <HBox spacing="5" GridPane.rowIndex="10" GridPane.columnIndex="0">
+                    <Label text="Confirm Password" styleClass="field-prompt"/>
+                    <Label text="*" styleClass="field-prompt" style="-fx-text-fill: -fx-accent-color;">
+                        <tooltip><Tooltip text="Password confirmation is required" styleClass="warning"/></tooltip>
+                    </Label>
+                </HBox>
+                <PasswordField fx:id="confirmPasswordField" GridPane.rowIndex="11" GridPane.columnIndex="0" 
+                            GridPane.columnSpan="4" styleClass="field"/>
+
+                <!-- Row 12: Submit -->
+                <Button text="CREATE ACCOUNT AND LOGIN" onMouseClicked="#handleCreateAccount"
+                        GridPane.rowIndex="12" GridPane.columnIndex="0" GridPane.columnSpan="4" styleClass="login-button"/>
+
+            </GridPane>
+            <Region VBox.vgrow="ALWAYS" />
+            <!-- Login Redirect -->
+            <HBox spacing="40" alignment="CENTER_LEFT">
+                <Label text="Already have an account?" styleClass="field-prompt"/>
+                <Button text="LOGIN" onMouseClicked="#handleReturnToLogin" styleClass="return-button"/>
+            </HBox>
+        </VBox>
+    </center>
+
+</BorderPane>

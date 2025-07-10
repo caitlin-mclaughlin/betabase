@@ -1,5 +1,6 @@
 package com.example.betabase.models;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import jakarta.persistence.*;
@@ -23,8 +24,8 @@ public class GymGroup {
     @Column(unique = true, nullable = false)
     private String name;
 
-    @NotNull
-    @OneToMany(mappedBy = "group")
-    private List<Gym> gyms;
+    @NotNull  
+    @OneToMany(mappedBy = "group", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Gym> gyms = new ArrayList<>();
     
 }

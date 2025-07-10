@@ -1,7 +1,6 @@
 package com.betabase.services;
 
 import com.betabase.models.Membership;
-import com.betabase.models.User;
 import com.betabase.utils.AuthSession;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -11,15 +10,19 @@ import java.net.http.*;
 import java.util.List;
 
 public class MembershipApiService {
-    private static final String BASE_URL = "http://localhost:8080/api/memberships";
+    private final String baseUrl;
     private final HttpClient client = HttpClient.newHttpClient();
     private final ObjectMapper mapper = new ObjectMapper();
 
+    public MembershipApiService(String baseUrl) {
+        this.baseUrl = baseUrl.endsWith("/") ? baseUrl.substring(0, baseUrl.length() - 1) : baseUrl;
+    }
+    
     public Membership createMembership(Membership membership) throws Exception {
         String json = mapper.writeValueAsString(membership);
 
         HttpRequest request = HttpRequest.newBuilder()
-            .uri(URI.create(BASE_URL))
+            .uri(URI.create(baseUrl))
             .header("Authorization", "Bearer " + AuthSession.getToken())
             .header("Content-Type", "application/json")
             .POST(HttpRequest.BodyPublishers.ofString(json))
@@ -44,7 +47,7 @@ public class MembershipApiService {
         String token = AuthSession.getToken();
         
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(BASE_URL + "/" + membership.getId()))
+                .uri(URI.create(baseUrl + "/" + membership.getId()))
                 .POST(HttpRequest.BodyPublishers.ofString(requestBody))
                 .header("Content-Type", "application/json")
                 .header("Authorization", "Bearer " + token)
@@ -61,7 +64,7 @@ public class MembershipApiService {
 
     public List<Membership> getForGym(Long gymId) throws Exception {
         HttpRequest request = HttpRequest.newBuilder()
-            .uri(URI.create(BASE_URL + "/gym/" + gymId))
+            .uri(URI.create(baseUrl + "/gym/" + gymId))
             .header("Authorization", "Bearer " + AuthSession.getToken())
             .GET()
             .build();
@@ -77,7 +80,7 @@ public class MembershipApiService {
 
     public Membership getForUserAndGym(Long userId, Long gymId) throws Exception {
         HttpRequest request = HttpRequest.newBuilder()
-            .uri(URI.create(BASE_URL + "/gym/" + gymId + "/user/" + userId))
+            .uri(URI.create(baseUrl + "/gym/" + gymId + "/user/" + userId))
             .header("Authorization", "Bearer " + AuthSession.getToken())
             .GET()
             .build();

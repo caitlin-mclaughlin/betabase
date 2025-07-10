@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.String?>
+
+<?import javafx.collections.FXCollections?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.Tooltip?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox fx:id="mainPane" styleClass="colors, default-background"
+        prefHeight="800.0" prefWidth="1000.0"
+        xmlns="http://javafx.com/javafx/23.0.1"
+        xmlns:fx="http://javafx.com/fxml/1"
+        fx:controller="com.betabase.controllers.UserController"
+        stylesheets="@../styles/colors.css, @../styles/userStyles.css, @../styles/shared.css">
+
+    <HBox alignment="CENTER" spacing="20.0" styleClass="user-header">
+        <padding>
+            <Insets bottom="10" left="15" top="10" right="15" />
+        </padding>
+        <Label fx:id="nameLabel" styleClass="user-header" />
+        <TextField fx:id="lastNameField" styleClass="user-header-edit" promptText="Last Name" visible="false" managed="false" />
+        <TextField fx:id="firstNameField" styleClass="user-header-edit" promptText="First Name" visible="false" managed="false" />
+        <TextField fx:id="prefNameField" styleClass="user-header-edit" promptText="Preferred Name" visible="false" managed="false" />
+        <ComboBox fx:id="pronounsField" value="Prefer Not to Answer" visible="false" managed="false" />
+    </HBox>
+
+    <HBox style="-fx-max-height: Infinity;" VBox.vgrow="ALWAYS">
+        <VBox alignment="TOP_CENTER" spacing="15" style="-fx-background-color: -fx-color-shadow; -fx-pref-width: 275px">
+            <padding>
+                <Insets bottom="15" left="15" right="15" top="15" />
+            </padding>
+
+            <StackPane alignment="CENTER" prefHeight="275.0" maxWidth="225.0" 
+                        style="-fx-border-color: -fx-base-color; -fx-border-width: 2px;">
+                <ImageView fx:id="userPhoto" fitWidth="225.0" pickOnBounds="true" preserveRatio="true" />
+            </StackPane>
+            <Button mnemonicParsing="false" styleClass="photo-button" text="Change Photo" />
+            <Region VBox.vgrow="ALWAYS" />
+            <HBox fx:id="staffButtons" spacing="15.0" visible="false" alignment="CENTER">
+                <Button text="Clock In" onMouseClicked="#handleClockIn" styleClass="check-in-button" />
+                <Button text="Clock Out" onMouseClicked="#handleClockOut" styleClass="check-out-button" />
+            </HBox>
+            <Label fx:id="typeLabel" styleClass="type" text="label" />
+            <ComboBox fx:id="typeField" value="Unset" styleClass="type" visible="false" managed="false" />
+        </VBox>
+        
+        <VBox style="-fx-background-color: -fx-light-color;" HBox.hgrow="ALWAYS" spacing="5.0">
+            <padding>
+                <Insets bottom="15" left="10" right="5" top="10" />
+            </padding>
+
+            <Label styleClass="user-prompt" text="Gender:" />
+            <VBox spacing="2">
+            <Label fx:id="genderLabel" alignment="CENTER" styleClass="user-info" text="Label" />
+            <ComboBox fx:id="genderField" value="Prefer Not to Answer" style="-fx-border-color: -fx-base-color;"
+                        visible="false" managed="false" />
+            <Region style="-fx-background-color: -fx-color-shadow;" styleClass="separator-horiz" />
+            </VBox>
+
+            <HBox spacing="5" styleClass="user-prompt" >
+                <Label text="Phone Number" />
+                <Label text="*" style="-fx-text-fill: -fx-accent-color;" mouseTransparent="false">
+                    <tooltip>
+                        <Tooltip text="Phone number is required" styleClass="warning" />
+                    </tooltip>
+                </Label>
+            </HBox>
+            <VBox spacing="2">
+                <Label fx:id="phoneLabel" alignment="CENTER" styleClass="user-info" text="Label" />
+                <TextField fx:id="phoneField" styleClass="user-info-edit" text="" visible="false" managed="false" />
+                <Region style="-fx-background-color: -fx-color-shadow;" styleClass="separator-horiz" />
+            </VBox>
+
+            <HBox spacing="5" styleClass="user-prompt">
+                <Label text="Email" />
+                <Label text="*" style="-fx-text-fill: -fx-accent-color;" mouseTransparent="false">
+                    <tooltip>
+                        <Tooltip text="Email is required" styleClass="warning" />
+                    </tooltip>
+                </Label>
+            </HBox>
+            <VBox spacing="2">
+                <Label fx:id="emailLabel" alignment="CENTER" styleClass="user-info" text="Label" />
+                <TextField fx:id="emailField" styleClass="user-info-edit" text="" visible="false" managed="false" />
+                <Region style="-fx-background-color: -fx-color-shadow;" styleClass="separator-horiz" />
+            </VBox>
+
+            <HBox spacing="5" styleClass="user-prompt">
+                <Label text="Date of Birth" />
+                <Label text="*" style="-fx-text-fill: -fx-accent-color;" mouseTransparent="false">
+                    <tooltip>
+                        <Tooltip text="Date of birth is required" styleClass="warning" />
+                    </tooltip>
+                </Label>
+            </HBox>
+            <VBox spacing="2">
+                <Label fx:id="dobLabel" alignment="CENTER" styleClass="user-info" text="Label" />
+                <DatePicker fx:id="dobField" visible="false" managed="false" HBox.hgrow="ALWAYS"/>
+                <Region style="-fx-background-color: -fx-color-shadow;" styleClass="separator-horiz" />
+            </VBox>
+
+            <Label text="User ID:" styleClass="user-prompt" />
+            <VBox spacing="2">
+                <Label fx:id="userIdLabel" alignment="CENTER" styleClass="user-info" text="Label" />
+                <TextField fx:id="userIdField" styleClass="user-info-edit" text="" visible="false" managed="false" />
+                <Region style="-fx-background-color: -fx-color-shadow;" styleClass="separator-horiz" />
+            </VBox>
+
+            <Label text="User Since:" styleClass="user-prompt" />
+            <VBox spacing="2">
+                <Label fx:id="userSinceLabel" alignment="CENTER" styleClass="user-info" text="Label" />
+                <Region style="-fx-background-color: -fx-color-shadow;" styleClass="separator-horiz" />
+            </VBox>
+        </VBox>
+        
+        <VBox style="-fx-background-color: -fx-light-color;" HBox.hgrow="ALWAYS" spacing="5.0">
+            <padding>
+                <Insets bottom="15" left="5" right="15" top="10" />
+            </padding>
+        
+            <HBox spacing="5" styleClass="user-prompt">
+                <Label text="Address:" />
+                <Label text="*" style="-fx-text-fill: -fx-accent-color;" mouseTransparent="false">
+                    <tooltip>
+                        <Tooltip text="Address is required" styleClass="warning" />
+                    </tooltip>
+                </Label>
+            </HBox>
+            <VBox spacing="2">
+                <Label fx:id="addressLabel1" alignment="CENTER" styleClass="user-info" text="Label" />
+                <Label fx:id="addressLabel2" alignment="CENTER" styleClass="user-info" text="Label" />
+                <TextField fx:id="streetField1" promptText="Street Address" styleClass="user-info-edit" 
+                           visible="false" managed="false" />
+                <TextField fx:id="streetField2" promptText="Street Address (Optional)" 
+                           styleClass="user-info-edit" visible="false" managed="false" />
+                <HBox spacing="15">
+                    <TextField fx:id="cityField" promptText="City" styleClass="user-info-edit" 
+                               visible="false" managed="false" HBox.hgrow="ALWAYS" />
+                    <TextField fx:id="stateField" promptText="State" styleClass="user-info-edit" 
+                               visible="false" managed="false" />
+                    <TextField fx:id="zipField" promptText="Zipcode" styleClass="user-info-edit" 
+                               visible="false" managed="false" />
+                </HBox>
+                <Region style="-fx-background-color: -fx-color-shadow;" styleClass="separator-horiz" />
+            </VBox>
+            
+            <HBox spacing="5" styleClass="user-prompt">
+                <Label text="Emergency Contact Name:" />
+                <Label text="*" style="-fx-text-fill: -fx-accent-color;" mouseTransparent="false">
+                    <tooltip>
+                        <Tooltip text="Emergency contact name is required" styleClass="warning" />
+                    </tooltip>
+                </Label>
+            </HBox>
+            <VBox spacing="2">
+                <Label fx:id="eNameLabel" alignment="CENTER" styleClass="user-info" text="Label" />
+                <TextField fx:id="eNameField" styleClass="user-info-edit" text="" visible="false" managed="false" />
+                <Region style="-fx-background-color: -fx-color-shadow;" styleClass="separator-horiz" />
+            </VBox>
+
+            <HBox spacing="5" styleClass="user-prompt">
+                <Label text="Emergency Contact Phone Number:" />
+                <Label text="*" style="-fx-text-fill: -fx-accent-color;" mouseTransparent="false">
+                    <tooltip>
+                        <Tooltip text="Emergency contact phone number is required" styleClass="warning" />
+                    </tooltip>
+                </Label>
+            </HBox>
+            <VBox spacing="2">
+                <Label fx:id="ePhoneLabel" alignment="CENTER" styleClass="user-info" text="Label" />
+                <TextField fx:id="ePhoneField" styleClass="user-info-edit" text="" visible="false" managed="false" />
+                <Region style="-fx-background-color: -fx-color-shadow;" styleClass="separator-horiz" />
+            </VBox>
+
+            <HBox spacing="5" styleClass="user-prompt">
+                <Label text="Emergency Contact Email:" />
+                <Label text="*" style="-fx-text-fill: -fx-accent-color;" mouseTransparent="false">
+                    <tooltip>
+                        <Tooltip text="Emergency contact email is required" styleClass="warning" />
+                    </tooltip>
+                </Label>
+            </HBox>
+            <VBox spacing="2">
+                <Label fx:id="eEmailLabel" alignment="CENTER" styleClass="user-info" text="Label" />
+                <TextField fx:id="eEmailField" styleClass="user-info-edit" text="" visible="false" managed="false" />
+                <Region style="-fx-background-color: -fx-color-shadow;" styleClass="separator-horiz" />
+            </VBox>
+
+            <Region VBox.vgrow="ALWAYS" />
+            <HBox alignment="CENTER_RIGHT" spacing="15.0">
+                <Button fx:id="checkInButton" styleClass="check-in-button" text="Check In" />
+                <Button fx:id="saveButton" onMouseClicked="#handleSave" styleClass="check-in-button" text="Save"
+                        visible="false" managed="false" />
+                <Button fx:id="checkOutButton" styleClass="check-out-button" text="Check Out" />
+                <Button fx:id="cancelButton" onMouseClicked="#handleCancel" styleClass="check-out-button" text="Cancel"
+                        visible="false" managed="false" />
+                <Button fx:id="editButton" onMouseClicked="#handleEdit" styleClass="edit-button">
+                <graphic> 
+                    <ImageView fx:id="editLogo" fitHeight="35.0" preserveRatio="true">
+                        <image>
+                            <Image url="@/com/betabase/images/edit.png" />
+                        </image>
+                    </ImageView>
+                </graphic>
+                </Button>
+            </HBox>
+        </VBox>
+    </HBox>
+</VBox>

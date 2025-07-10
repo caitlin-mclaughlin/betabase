@@ -10,6 +10,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import com.example.betabase.dtos.MembershipCreateDto;
 import com.example.betabase.dtos.MembershipDto;
+import com.example.betabase.exceptions.DuplicateMembershipException;
 import com.example.betabase.models.Membership;
 import com.example.betabase.services.GymGroupService;
 import com.example.betabase.services.MembershipService;
@@ -33,7 +34,7 @@ public class MembershipController {
     public ResponseEntity<MembershipDto> createMembership(@RequestBody MembershipCreateDto dto) {
         Optional<Membership> membershipOpt = membershipService.getByUserIdAndGymGroupId(dto.userId(), dto.gymGroupId());
         if (membershipOpt.isPresent()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Membership already exists");
+            throw new DuplicateMembershipException("Membership already exists");
         }
         
         Membership membership = new Membership();
@@ -52,7 +53,7 @@ public class MembershipController {
     public ResponseEntity<List<MembershipDto>> getUserMemberships(@PathVariable Long userId) {
         List<Membership> memberships = membershipService.getMembershipsForUser(userId);
         if (memberships == null || memberships.size() == 0){
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User not found");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found");
         }
         return ResponseEntity.ok(memberships.stream().map(this::toDto).toList());
     }
@@ -68,12 +69,8 @@ public class MembershipController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteMembership(@PathVariable Long id) {
-        try {
-            membershipService.deleteById(id);
-            return ResponseEntity.noContent().build();
-        } catch (IllegalArgumentException ex) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, ex.getMessage());
-        }
+        membershipService.deleteById(id);
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/user/{userId}/gym/{gymGroupId}")

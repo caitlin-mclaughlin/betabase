@@ -24,10 +24,10 @@
             </padding>
             
             <HBox spacing="10" styleClass="date-header">
-                <Button fx:id="prevButton" text="&lt;" onAction="#handlePrevMonth"
+                <Button fx:id="prevButton" text="&lt;" onMouseClicked="#handlePrevMonth"
                         styleClass="month-button" />
                 <Label fx:id="monthYearLabel" />
-                <Button fx:id="nextButton" text="&gt;" onAction="#handleNextMonth"
+                <Button fx:id="nextButton" text="&gt;" onMouseClicked="#handleNextMonth"
                         styleClass="month-button" />
             </HBox>
             <GridPane fx:id="calendarGrid" styleClass="cal-grid" VBox.vgrow="ALWAYS" style="-fx-max-height: Infinity">

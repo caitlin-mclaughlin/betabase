@@ -6,74 +6,61 @@ import java.util.regex.Pattern;
 import com.betabase.enums.*;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+import javafx.beans.property.LongProperty;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleLongProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 
 @JsonIgnoreProperties(value = {"gym"}, allowSetters = true)
 public class User {
     
-    private Long id;
+    private LongProperty id = new SimpleLongProperty();
 
-    private Gym gym;
+    private ObjectProperty<Gym> gym = new SimpleObjectProperty<>();
 
-    private SimpleStringProperty firstName;
-    private SimpleStringProperty prefName;
-    private SimpleStringProperty lastName;
-    private SimpleObjectProperty<PronounsType> pronouns;
-    private SimpleObjectProperty<GenderType> gender;
-    private SimpleObjectProperty<LocalDate> dateOfBirth;
-    private SimpleStringProperty phoneNumber;
-    private SimpleStringProperty email;
-    private SimpleObjectProperty<Address> address;
+    private StringProperty firstName = new SimpleStringProperty();
+    private StringProperty prefName = new SimpleStringProperty();
+    private StringProperty lastName = new SimpleStringProperty();
+    private ObjectProperty<PronounsType> pronouns = new SimpleObjectProperty<>(PronounsType.UNSET);
+    private ObjectProperty<GenderType> gender = new SimpleObjectProperty<>(GenderType.UNSET);
+    private ObjectProperty<LocalDate> dateOfBirth = new SimpleObjectProperty<>();
+    private StringProperty phoneNumber = new SimpleStringProperty();
+    private StringProperty email = new SimpleStringProperty();
+    private ObjectProperty<Address> address = new SimpleObjectProperty<>();
 
     // Emergency Contact
-    private SimpleStringProperty emergencyContactName;
-    private SimpleStringProperty emergencyContactPhone;
-    private SimpleStringProperty emergencyContactEmail;
-
-    public User() {
-        this.firstName = new SimpleStringProperty("");
-        this.prefName = new SimpleStringProperty("");
-        this.lastName = new SimpleStringProperty("");
-        this.pronouns = new SimpleObjectProperty<>(PronounsType.UNSET);
-        this.gender = new SimpleObjectProperty<>(GenderType.UNSET);
-        this.dateOfBirth = new SimpleObjectProperty<>(null);
-        this.phoneNumber = new SimpleStringProperty("");
-        this.email = new SimpleStringProperty("");
-
-        this.address = new SimpleObjectProperty<>(null);
-
-        this.emergencyContactName = new SimpleStringProperty("");
-        this.emergencyContactPhone = new SimpleStringProperty("");
-        this.emergencyContactEmail = new SimpleStringProperty("");
-    }
+    private StringProperty emergencyContactName = new SimpleStringProperty();
+    private StringProperty emergencyContactPhone = new SimpleStringProperty();
+    private StringProperty emergencyContactEmail = new SimpleStringProperty();
 
     /** Getters and setters  **/
     // Id
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
+    public Long getId() { return id.get(); }
+    public void setId(Long id) { this.id.set(id); }
 
     // Gym
-    public Gym getGym() { return gym; }
-    public void setGym(Gym gym) { this.gym = gym; }
+    public Gym getGym() { return gym.get(); }
+    public void setGym(Gym gym) { this.gym.set(gym); }
 
     // First Name
-    public SimpleStringProperty firstNameProperty() { return firstName; }
+    public StringProperty firstNameProperty() { return firstName; }
     public String getFirstName() { return firstName.get(); }
     public void setFirstName(String firstName) { this.firstName.set(firstName); }
 
     // Last Name
-    public SimpleStringProperty lastNameProperty() { return lastName; }
+    public StringProperty lastNameProperty() { return lastName; }
     public String getLastName() { return lastName.get(); }
     public void setLastName(String lastName) { this.lastName.set(lastName); }
 
     // Preferred Name
-    public SimpleStringProperty prefNameProperty() { return prefName; }
+    public StringProperty prefNameProperty() { return prefName; }
     public String getPrefName() { return prefName.get(); }
     public void setPrefName(String prefName) { this.prefName.set(prefName); }
 
     // Pronouns
-    public SimpleObjectProperty<PronounsType> pronounsProperty() { return pronouns; }
+    public ObjectProperty<PronounsType> pronounsProperty() { return pronouns; }
 
     public PronounsType getPronouns() { return pronouns.get(); }
     public void setPronouns(PronounsType pronouns) { this.pronouns.set(pronouns); }
@@ -83,7 +70,7 @@ public class User {
     }
 
     // Gender
-    public SimpleObjectProperty<GenderType> genderProperty() { return gender; }
+    public ObjectProperty<GenderType> genderProperty() { return gender; }
 
     public GenderType getGender() { return gender.get(); }
     public void setGender(GenderType gender) { this.gender.set(gender); }
@@ -93,7 +80,7 @@ public class User {
     }
 
     // Phone Number (validated)
-    public SimpleStringProperty phoneNumberProperty() { return phoneNumber; }
+    public StringProperty phoneNumberProperty() { return phoneNumber; }
 
     public String getPhoneNumber() { return phoneNumber.get(); }
     public void setPhoneNumber(String phoneNumber) { 
@@ -106,7 +93,7 @@ public class User {
     }
 
     // Email (validated)
-    public SimpleStringProperty emailProperty() { return email; }
+    public StringProperty emailProperty() { return email; }
 
     public String getEmail() { return email.get(); }
     public void setEmail(String email) { 
@@ -120,7 +107,7 @@ public class User {
      }
 
     // Birthday
-    public SimpleObjectProperty<LocalDate> dateOfBirthProperty() { return dateOfBirth; }
+    public ObjectProperty<LocalDate> dateOfBirthProperty() { return dateOfBirth; }
 
     public LocalDate getDateOfBirth() { return dateOfBirth.get(); }
     public void setDateOfBirth(LocalDate dateOfBirth) { this.dateOfBirth.set(dateOfBirth); }
@@ -130,13 +117,13 @@ public class User {
     public void setAddress(Address address) { this.address.set(address); }
 
     // Emergency Contact Name
-    public SimpleStringProperty eNameProperty() { return emergencyContactName; }
+    public StringProperty eNameProperty() { return emergencyContactName; }
 
     public String getEmergencyContactName() { return emergencyContactName.get(); }
     public void setEmergencyContactName(String emergencyContactName) { this.emergencyContactName.set(emergencyContactName); }
 
     // Emergency Contact Phone Number (validated)
-    public SimpleStringProperty ePhoneProperty() { return emergencyContactPhone; }
+    public StringProperty ePhoneProperty() { return emergencyContactPhone; }
 
     public String getEmergencyContactPhone() { return emergencyContactPhone.get(); }
     public void setEmergencyContactPhone(String emergencyContactPhone) { 
@@ -149,7 +136,7 @@ public class User {
      }
 
     // Emergency Contact Email (validated)
-    public SimpleStringProperty eEmailProperty() { return emergencyContactEmail; }
+    public StringProperty eEmailProperty() { return emergencyContactEmail; }
 
     public String getEmergencyContactEmail() { return emergencyContactEmail.get(); }
     public void setEmergencyContactEmail(String emergencyContactEmail) { 

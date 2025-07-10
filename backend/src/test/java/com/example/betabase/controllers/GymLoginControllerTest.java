@@ -7,11 +7,13 @@ import com.example.betabase.models.Address;
 import com.example.betabase.models.Gym;
 import com.example.betabase.models.GymGroup;
 import com.example.betabase.models.GymLogin;
+import com.example.betabase.repositories.GymLoginRepository;
 import com.example.betabase.security.JwtService;
 import com.example.betabase.services.GymGroupService;
 import com.example.betabase.services.GymLoginService;
 import com.example.betabase.services.GymService;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -24,11 +26,14 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDate;
 import java.util.Optional;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -40,7 +45,7 @@ class GymLoginControllerTest {
 
     @Autowired private MockMvc mockMvc;
     @Autowired private ObjectMapper objectMapper;
-    @Autowired private GymLoginService gymLoginService;
+    @Autowired private GymLoginRepository repo;
     @Autowired private GymService gymService;
     @Autowired private GymGroupService gymGroupService;
 
@@ -64,13 +69,16 @@ class GymLoginControllerTest {
 
         login.setGym(gym);
         login.setGroup(group);
+
+        // Default behavior for username checks
+        when(repo.findByUsername(eq("frontdesk"))).thenReturn(Optional.empty());
     }
 
     @Test
     void testGetGymLoginById_returns200() throws Exception {
-        when(gymLoginService.getById(1L)).thenReturn(Optional.of(login));
+        when(repo.findById(1L)).thenReturn(Optional.of(login));
 
-        mockMvc.perform(get("/api/1"))
+        mockMvc.perform(get("/api/gym-logins/1"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.username").value("frontdesk"))
             .andExpect(jsonPath("$.role").value("STAFF"))
@@ -80,9 +88,9 @@ class GymLoginControllerTest {
 
     @Test
     void testGetGymLoginById_notFound_returns404() throws Exception {
-        when(gymLoginService.getById(1L)).thenReturn(Optional.empty());
+        when(repo.findById(1L)).thenReturn(Optional.empty());
 
-        mockMvc.perform(get("/api/1"))
+        mockMvc.perform(get("/api/gym-logins/1"))
             .andExpect(status().isNotFound());
     }
 
@@ -92,9 +100,10 @@ class GymLoginControllerTest {
 
         when(gymService.getById(10L)).thenReturn(Optional.of(gym));
         when(gymGroupService.getById(20L)).thenReturn(Optional.of(group));
-        when(gymLoginService.save(Mockito.any())).thenReturn(login);
+        when(repo.findByUsername(eq("frontdesk"))).thenReturn(Optional.empty());
+        when(repo.save(any(GymLogin.class))).thenReturn(login);
 
-        mockMvc.perform(post("/api")
+        mockMvc.perform(post("/api/gym-logins")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(dto)))
             .andExpect(status().isCreated())
@@ -110,7 +119,7 @@ class GymLoginControllerTest {
         when(gymService.getById(10L)).thenReturn(Optional.of(gym));
         when(gymGroupService.getById(20L)).thenReturn(Optional.empty());
 
-        mockMvc.perform(post("/api")
+        mockMvc.perform(post("/api/gym-logins")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(dto)))
             .andExpect(status().isBadRequest());
@@ -144,9 +153,10 @@ class GymLoginControllerTest {
         request.setGym(gym);
 
         when(gymService.save(Mockito.any())).thenReturn(gym);
-        when(gymLoginService.save(Mockito.any())).thenReturn(login);
+        when(repo.findByUsername(eq("frontdesk"))).thenReturn(Optional.empty());
+        when(repo.save(any(GymLogin.class))).thenReturn(login);
 
-        mockMvc.perform(post("/api/register")
+        mockMvc.perform(post("/api/gym-logins/register")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)))
             .andExpect(status().isCreated())
@@ -155,13 +165,91 @@ class GymLoginControllerTest {
             .andExpect(jsonPath("$.gymId").value(1));
     }
 
+    @Test
+    void testRegisterGym_missingUsername_returns400() throws Exception {
+        GymRegistrationRequest request = new GymRegistrationRequest();
+        request.setPassword("hashedpw");
+        request.setGym(gym);
+
+        mockMvc.perform(post("/api/gym-logins/register")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
+            .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void testRegisterGym_shortPassword_returns400() throws Exception {
+        GymRegistrationRequest request = new GymRegistrationRequest();
+        request.setUsername("frontdesk");
+        request.setPassword("123");
+        request.setGym(gym);
+
+        mockMvc.perform(post("/api/gym-logins/register")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
+            .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void testRegisterGym_missingGym_returns400() throws Exception {
+        GymRegistrationRequest request = new GymRegistrationRequest();
+        request.setUsername("frontdesk");
+        request.setPassword("hashedpw");
+        request.setGym(null);
+
+        mockMvc.perform(post("/api/gym-logins/register")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
+            .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void testRegisterGym_invalidAddress_returns400() throws Exception {
+        Address invalidAddress = new Address(); // all fields null
+        Gym invalidGym = new Gym();
+        invalidGym.setName("NoAddress Gym");
+        invalidGym.setAddress(invalidAddress);
+
+        GymRegistrationRequest request = new GymRegistrationRequest();
+        request.setUsername("frontdesk");
+        request.setPassword("hashedpw");
+        request.setGym(invalidGym);
+
+        mockMvc.perform(post("/api/gym-logins/register")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
+            .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void testRegisterGym_duplicateUsername_returns400() throws Exception {
+        GymRegistrationRequest request = new GymRegistrationRequest();
+        request.setUsername("frontdesk");
+        request.setPassword("hashedpw");
+        request.setGym(gym);
+
+        when(gymService.save(Mockito.any())).thenReturn(gym);
+        when(repo.findByUsername(eq("frontdesk"))).thenReturn(Optional.of(login));
+
+        mockMvc.perform(post("/api/gym-logins/register")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
+            .andExpect(status().isBadRequest());
+    }
+
     @TestConfiguration
     static class TestConfig {
 
         @Bean
         @Primary
-        public GymLoginService gymLoginService() {
-            return Mockito.mock(GymLoginService.class);
+        public GymLoginRepository gymLoginRepository() {
+            return Mockito.mock(GymLoginRepository.class);
+        }
+
+        @Bean
+        @Primary
+        public GymLoginService gymLoginService(GymLoginRepository repository, GymService gymService, PasswordEncoder encoder) {
+            return new GymLoginService(repository, encoder, gymService);
         }
 
         @Bean
@@ -174,6 +262,12 @@ class GymLoginControllerTest {
         @Primary
         public GymGroupService gymGroupService() {
             return Mockito.mock(GymGroupService.class);
+        }
+
+        @Bean
+        @Primary
+        public PasswordEncoder passwordEncoder() {
+            return Mockito.mock(PasswordEncoder.class);
         }
 
         @Bean

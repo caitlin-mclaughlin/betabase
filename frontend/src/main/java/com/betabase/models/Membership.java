@@ -4,66 +4,44 @@ import java.time.LocalDate;
 
 import com.betabase.enums.UserType;
 
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.LongProperty;
+import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleLongProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 
 public class Membership {
     
-    private Long id;
-    private Long userId;
-    private Long gymId;
-    private SimpleObjectProperty<UserType> type;
-    private SimpleObjectProperty<LocalDate> userSince;
+    private final LongProperty id = new SimpleLongProperty();
+    private final LongProperty userId = new SimpleLongProperty();
+    private final LongProperty gymId = new SimpleLongProperty();
+    private final ObjectProperty<UserType> type= new SimpleObjectProperty<>();
+    private final ObjectProperty<LocalDate> userSince = new SimpleObjectProperty<>();
 
-    private SimpleStringProperty membershipId;
-    private SimpleStringProperty photoUrl;
+    private final StringProperty membershipId = new SimpleStringProperty();
+    private final StringProperty photoUrl = new SimpleStringProperty();
 
-    private SimpleBooleanProperty active;
+    private final BooleanProperty active = new SimpleBooleanProperty();
     
-    private SimpleBooleanProperty clocked;
-    private SimpleBooleanProperty checked;
-    private SimpleBooleanProperty loggedIn;
-
-    public Membership() {
-        this.type = new SimpleObjectProperty<>();
-        this.userSince = new SimpleObjectProperty<>(null);
-        this.membershipId = new SimpleStringProperty("");
-        this.photoUrl = new SimpleStringProperty("");
-
-        this.active = new SimpleBooleanProperty(true);
-        this.clocked = new SimpleBooleanProperty(false);
-        this.checked = new SimpleBooleanProperty(false);
-        this.loggedIn = new SimpleBooleanProperty(false);
-    }
-
-    public Membership(Long userId, Long gymId, UserType type, LocalDate userSince) {
-        this.userId = userId;
-        this.gymId = gymId;
-        
-        this.type = new SimpleObjectProperty<>(type);
-        this.userSince = new SimpleObjectProperty<>(userSince);
-        this.membershipId = new SimpleStringProperty("");
-        this.photoUrl = new SimpleStringProperty("");
-
-        this.active = new SimpleBooleanProperty(true);
-        this.clocked = new SimpleBooleanProperty(false);
-        this.checked = new SimpleBooleanProperty(false);
-        this.loggedIn = new SimpleBooleanProperty(false);
-    }
+    private final BooleanProperty clocked = new SimpleBooleanProperty();
+    private final BooleanProperty checked = new SimpleBooleanProperty();
+    private final BooleanProperty loggedIn = new SimpleBooleanProperty();
 
     /** Getters and setters  **/
     // Id
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
+    public Long getId() { return id.get(); }
+    public void setId(Long id) { this.id.set(id); }
     
     // User Id
-    public Long getUserId() { return userId; }
-    public void setUserId(Long userId) { this.userId = userId; }
+    public Long getUserId() { return userId.get(); }
+    public void setUserId(Long userId) { this.userId.set(userId); }
     
     // Gym Id
-    public Long getGymId() { return gymId; }
-    public void setGymId(Long gymId) { this.gymId = gymId; }
+    public Long getGymId() { return gymId.get(); }
+    public void setGymId(Long gymId) { this.gymId.set(gymId); }
 
     // Membership Type
     public UserType getType() { return type.get(); }

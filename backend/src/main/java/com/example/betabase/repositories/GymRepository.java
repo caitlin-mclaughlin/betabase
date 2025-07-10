@@ -14,5 +14,5 @@ public interface GymRepository extends JpaRepository<Gym, Long> {
     @NonNull
     Optional<Gym> findById(@NonNull Long id);
     Optional<Gym> findByName(String name);
-    long countByGroupId(Long groupId);
+    Long countByGroupId(Long groupId);
 }

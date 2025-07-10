@@ -1,0 +1,76 @@
+/** dashStyles.css **/
+
+.check-in-narrow {
+    -fx-background-color: -fx-base-color;
+    -fx-text-fill: -fx-light-color;
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 10px;
+    -fx-border-radius: 10px;
+    -fx-min-height: 30px;
+    -fx-max-height: 30px;
+    -fx-pref-width: 110px;
+    -fx-cursor: hand;
+    -fx-alignment: CENTER;
+    -fx-text-alignment: CENTER;
+}
+
+.check-in-narrow:hover {
+    -fx-background-color: -fx-color-select;
+}
+
+.check-out-narrow {
+    -fx-background-color: -fx-accent-color;
+    -fx-text-fill: -fx-light-color;
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 10px;
+    -fx-border-radius: 10px;
+    -fx-min-height: 30px;
+    -fx-max-height: 30px;
+    -fx-pref-width: 110px;
+    -fx-cursor: hand;
+    -fx-alignment: CENTER;
+    -fx-text-alignment: CENTER;
+}
+
+.check-out-narrow:hover {
+    -fx-background-color: -fx-color-selecta;
+}
+
+.clock-in-button {
+    -fx-background-color: -fx-base-color;
+    -fx-text-fill:  -fx-light-color;
+    -fx-font-size: 22px;
+    -fx-font-weight: bold;
+    -fx-min-width: 150px;
+    -fx-max-width: 150px;
+    -fx-background-radius: 10;
+    -fx-cursor: hand;
+}
+
+.clock-in-button:hover {
+    -fx-background-color:-fx-color-select;
+}
+
+.clock-out-button {
+    -fx-background-color: -fx-accent-color;
+    -fx-text-fill:  -fx-light-color;
+    -fx-font-size: 22px;
+    -fx-font-weight: bold;
+    -fx-in-width: 150px;
+    -fx-max-width: 150px;
+    -fx-background-radius: 10;
+    -fx-cursor: hand;
+}
+
+.clock-out-button:hover {
+    -fx-background-color: -fx-color-selecta;
+}
+
+.schedule-label {
+    -fx-text-fill: -fx-base-color;
+    -fx-font-size: 25px;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+}

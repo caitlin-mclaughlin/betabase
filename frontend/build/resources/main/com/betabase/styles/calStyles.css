@@ -1,0 +1,67 @@
+/** calStyles.css **/
+
+.cal-grid {
+    -fx-background-color: -fx-base-color;
+    -fx-text-fill: -fx-base-color;
+    -fx-hgap: 2px;
+    -fx-vgap: 2px;
+    -fx-padding: 2px;
+}
+
+.date-header {
+    -fx-background-color: -fx-light-color;
+    -fx-text-fill: -fx-base-color;
+    -fx-font-size: 25px;
+    -fx-font-weight: bold;
+    -fx-alignment: CENTER;
+}
+
+.day-label {
+    -fx-alignment: TOP_LEFT;
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-padding: 5px;
+}
+
+.calendar-cell {
+    -fx-background-color: -fx-light-color;
+    -fx-alignment: TOP_LEFT;
+    -fx-padding: 5px;
+    -fx-min-height: 100px;
+}
+
+.calendar-cell:hover {
+    -fx-background-color: -fx-color-shadow;
+}
+
+.current-day-cell {
+    -fx-background-color: -fx-color-today;
+    -fx-text-fill: -fx-base-color;
+}
+
+.current-day-cell:hover {
+    -fx-background-color: -fx-color-today;
+}
+
+.month-button {
+    -fx-background-color: -fx-light-color;
+    -fx-text-fill: -fx-base-color;
+    -fx-focus-color: transparent;
+    -fx-faint-focus-color: transparent;
+    -fx-font-size: 25px;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+}
+
+.month-button:hover {
+    -fx-background-color: -fx-base-color;
+    -fx-text-fill: -fx-light-color;
+}
+
+.week-header {
+    -fx-background-color: -fx-light-color;
+    -fx-text-fill: -fx-base-color;
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+    -fx-alignment: CENTER;
+}

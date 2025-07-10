@@ -29,8 +29,8 @@ public class SecurityConfig {
         return http
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/gyms/register", "/api/auth/**").permitAll()
-                .requestMatchers("/api/**").authenticated()      
+                .requestMatchers("/api/gym-logins/register", "/api/auth/**", "/api/gym-groups/public-names").permitAll() // add your new public endpoint here
+                .requestMatchers("/api/**").authenticated()
             )
             .userDetailsService(userDetailsService)
             .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)

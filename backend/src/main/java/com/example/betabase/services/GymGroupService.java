@@ -10,7 +10,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.List;
 import java.util.Optional;
 
-import static org.springframework.http.HttpStatus.*;
+import static org.springframework.http.HttpStatus.BAD_REQUEST;
 
 @Service
 public class GymGroupService {
@@ -33,7 +33,7 @@ public class GymGroupService {
 
     public void delete(Long id) {
         // Prevent deletion if any gyms still belong to the group
-        long gymCount = gymRepository.countByGroupId(id);
+        Long gymCount = gymRepository.countByGroupId(id);
         if (gymCount > 0) {
             throw new ResponseStatusException(BAD_REQUEST, "Cannot delete group with associated gyms.");
         }
@@ -42,6 +42,10 @@ public class GymGroupService {
 
     public boolean exists(Long id) {
         return groupRepository.existsById(id);
+    }
+
+    public Optional<GymGroup> findByName(String name) {
+        return groupRepository.findByName(name);
     }
 
     public List<GymGroup> searchByName(String name) {

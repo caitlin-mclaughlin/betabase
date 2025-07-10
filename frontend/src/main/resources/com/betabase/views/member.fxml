@@ -5,7 +5,7 @@
 <?import javafx.collections.FXCollections?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
-<?import javafx.scene.control.ChoiceBox?>
+<?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.DatePicker?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TextField?>
@@ -32,7 +32,7 @@
         <TextField fx:id="lastNameField" styleClass="user-header-edit" promptText="Last Name" visible="false" managed="false" />
         <TextField fx:id="firstNameField" styleClass="user-header-edit" promptText="First Name" visible="false" managed="false" />
         <TextField fx:id="prefNameField" styleClass="user-header-edit" promptText="Preferred Name" visible="false" managed="false" />
-        <ChoiceBox fx:id="pronounsField" value="Prefer Not to Answer" visible="false" managed="false" />
+        <ComboBox fx:id="pronounsField" value="Prefer Not to Answer" visible="false" managed="false" />
     </HBox>
 
     <HBox style="-fx-max-height: Infinity;" VBox.vgrow="ALWAYS">
@@ -52,7 +52,7 @@
                 <Button text="Clock Out" onMouseClicked="#handleClockOut" styleClass="check-out-button" />
             </HBox>
             <Label fx:id="typeLabel" styleClass="type" text="label" />
-            <ChoiceBox fx:id="typeField" value="Unset" styleClass="type" visible="false" managed="false" />
+            <ComboBox fx:id="typeField" value="Unset" styleClass="type" visible="false" managed="false" />
         </VBox>
         
         <VBox style="-fx-background-color: -fx-light-color;" HBox.hgrow="ALWAYS" spacing="5.0">
@@ -63,7 +63,7 @@
             <Label styleClass="user-prompt" text="Gender:" />
             <VBox spacing="2">
             <Label fx:id="genderLabel" alignment="CENTER" styleClass="user-info" text="Label" />
-            <ChoiceBox fx:id="genderField" value="Prefer Not to Answer" style="-fx-border-color: -fx-base-color;"
+            <ComboBox fx:id="genderField" value="Prefer Not to Answer" style="-fx-border-color: -fx-base-color;"
                         visible="false" managed="false" />
             <Region style="-fx-background-color: -fx-color-shadow;" styleClass="separator-horiz" />
             </VBox>
@@ -205,7 +205,7 @@
                 <Button fx:id="checkOutButton" styleClass="check-out-button" text="Check Out" />
                 <Button fx:id="cancelButton" onMouseClicked="#handleCancel" styleClass="check-out-button" text="Cancel"
                         visible="false" managed="false" />
-                <Button fx:id="editButton" onAction="#handleEdit" styleClass="edit-button">
+                <Button fx:id="editButton" onMouseClicked="#handleEdit" styleClass="edit-button">
                 <graphic> 
                     <ImageView fx:id="editLogo" fitHeight="35.0" preserveRatio="true">
                         <image>

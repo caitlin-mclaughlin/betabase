@@ -1,6 +1,8 @@
 package com.betabase.services;
 
+import com.betabase.dtos.GymRegistrationRequestDto;
 import com.betabase.dtos.JwtResponseDto;
+import com.betabase.dtos.GymLoginRequestDto;
 import com.betabase.models.Gym;
 import com.betabase.utils.AuthSession;
 import com.betabase.utils.JwtUtils;
@@ -14,15 +16,19 @@ import java.util.Map;
 import java.util.Optional;
 
 public class GymApiService {
-    private static final String BASE_URL = "http://localhost:8080/api/gym-login";
+    private final String baseUrl;
     private final HttpClient client = HttpClient.newHttpClient();
     private final ObjectMapper mapper = new ObjectMapper();
 
+    public GymApiService(String baseUrl) {
+        this.baseUrl = baseUrl.endsWith("/") ? baseUrl.substring(0, baseUrl.length() - 1) : baseUrl;
+    }
+/*
     public String registerGym(Gym gym, String username, String password) throws Exception {
-        String body = mapper.writeValueAsString(new GymRegistrationRequest(gym, username, password));
+        String body = mapper.writeValueAsString(new GymRegistrationRequestDto(username, password, gym));
 
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(BASE_URL + "/register"))
+                .uri(URI.create(baseUrl + "/register"))
                 .header("Content-Type", "application/json")
                 .POST(HttpRequest.BodyPublishers.ofString(body))
                 .build();
@@ -37,12 +43,12 @@ public class GymApiService {
             return null;
         }
     }
-
+*/
     public Optional<JwtResponseDto> login(String username, String password) throws Exception {
-        String requestBody = mapper.writeValueAsString(new LoginRequest(username, password));
+        String requestBody = mapper.writeValueAsString(new GymLoginRequestDto(username, password));
 
         HttpRequest request = HttpRequest.newBuilder()
-            .uri(URI.create(BASE_URL + "/login"))
+            .uri(URI.create(baseUrl + "/login"))
             .POST(HttpRequest.BodyPublishers.ofString(requestBody))
             .header("Content-Type", "application/json")
             .build();
@@ -77,7 +83,7 @@ public class GymApiService {
 
     public Optional<Gym> getGymById(Long gymId) throws Exception {
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(BASE_URL + "/" + gymId))
+                .uri(URI.create(baseUrl + "/" + gymId))
                 .header("Authorization", "Bearer " + AuthSession.getToken())
                 .build();
 
@@ -86,28 +92,6 @@ public class GymApiService {
             return Optional.of(mapper.readValue(response.body(), Gym.class));
         }
         return Optional.empty();
-    }
-
-    public static class GymRegistrationRequest {
-        public Gym gym;
-        public String username;
-        public String password;
-
-        public GymRegistrationRequest(Gym gym, String username, String password) {
-            this.gym = gym;
-            this.username = username;
-            this.password = password;
-        }
-    }
-
-    public static class LoginRequest {
-        public String username;
-        public String password;
-
-        public LoginRequest(String username, String password) {
-            this.username = username;
-            this.password = password;
-        }
     }
 
     public static class LoginException extends Exception {

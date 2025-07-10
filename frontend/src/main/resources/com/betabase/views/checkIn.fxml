@@ -55,8 +55,8 @@
                             </ImageView>
                         </StackPane>
                     </HBox>
-                    <Button fx:id="checkInHeaderButton" styleClass="search-button" text="Check In"  onAction="#handleCheckIn" />
-                    <Button fx:id="checkOutHeaderButton" styleClass="search-button" text="Check Out"  onAction="#handleCheckOut" 
+                    <Button fx:id="checkInHeaderButton" styleClass="search-button" text="Check In"  onMouseClicked="#handleCheckIn" />
+                    <Button fx:id="checkOutHeaderButton" styleClass="search-button" text="Check Out"  onMouseClicked="#handleCheckOut" 
                             visible="false" managed="false" style="-fx-background-color: -fx-accent-color;" />
                 </HBox>
                 <TableView fx:id="checkInTable" styleClass="table-view" VBox.vgrow="ALWAYS" />
@@ -120,8 +120,8 @@
                 </VBox>
             </VBox>
             <Region VBox.vgrow="ALWAYS" />
-            <Button fx:id="checkInButton" text="Check In" styleClass="check-in-button" onAction="#handleCheckIn"/>
-            <Button fx:id="checkOutButton" text="Check Out" styleClass="check-out-button" onAction="#handleCheckOut" 
+            <Button fx:id="checkInButton" text="Check In" styleClass="check-in-button" onMouseClicked="#handleCheckIn"/>
+            <Button fx:id="checkOutButton" text="Check Out" styleClass="check-out-button" onMouseClicked="#handleCheckOut" 
                     visible="false" managed="false" />
             <Label fx:id="typeLabel" styleClass="type" />
         </VBox>

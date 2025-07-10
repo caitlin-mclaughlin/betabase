@@ -7,6 +7,8 @@ import java.util.ResourceBundle;
 import com.betabase.interfaces.ServiceAware;
 import com.betabase.services.CompositeMemberService;
 import com.betabase.services.GymApiService;
+import com.betabase.services.GymGroupApiService;
+import com.betabase.services.GymLoginApiService;
 import com.betabase.services.MembershipApiService;
 import com.betabase.services.UserApiService;
 import com.betabase.utils.SceneManager;
@@ -30,7 +32,8 @@ public class SettingsController implements Initializable, ServiceAware {
 
     @Override
     public void setServices(UserApiService userService, MembershipApiService membershipService,
-                            CompositeMemberService compositeMemberService, GymApiService gymService) {
+                            CompositeMemberService compositeMemberService, GymApiService gymService,
+                            GymGroupApiService gymGroupApiService, GymLoginApiService gymLoginApiService){
         this.gymService = gymService;
     }
 

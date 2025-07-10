@@ -55,22 +55,35 @@ public class GlobalExceptionHandler {
         return ResponseEntity.badRequest().body(errorResponse);
     }
 
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<ErrorResponse> handleGeneralException(Exception ex,
-                                                                HttpServletRequest request) {
+    @ExceptionHandler(DuplicateMembershipException.class)
+    public ResponseEntity<ErrorResponse> handleDuplicateMembership(DuplicateMembershipException ex,
+                                                                   HttpServletRequest request) {
         ErrorResponse errorResponse = new ErrorResponse(
                 LocalDateTime.now(),
-                HttpStatus.INTERNAL_SERVER_ERROR.value(),
-                "Internal Server Error",
+                HttpStatus.CONFLICT.value(),
+                "Membership Conflict",
                 ex.getMessage(),
                 request.getRequestURI()
         );
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
+    }
+
+    @ExceptionHandler(DuplicateUsernameException.class)
+    public ResponseEntity<ErrorResponse> handleDuplicateUsername(DuplicateUsernameException ex,
+                                                                 HttpServletRequest request) {
+        ErrorResponse errorResponse = new ErrorResponse(
+                LocalDateTime.now(),
+                HttpStatus.CONFLICT.value(),
+                "Username Conflict",
+                ex.getMessage(),
+                request.getRequestURI()
+        );
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
     }
 
     @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity<ErrorResponse> handleBadCredentials(BadCredentialsException ex,
-                                                            HttpServletRequest request) {
+                                                              HttpServletRequest request) {
         ErrorResponse errorResponse = new ErrorResponse(
                 LocalDateTime.now(),
                 HttpStatus.UNAUTHORIZED.value(),
@@ -83,10 +96,10 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(ResponseStatusException.class)
     public ResponseEntity<ErrorResponse> handleResponseStatusException(ResponseStatusException ex,
-                                                                    HttpServletRequest request) {
+                                                                      HttpServletRequest request) {
         ErrorResponse errorResponse = new ErrorResponse(
                 LocalDateTime.now(),
-                ex.getStatusCode().value(), // Use actual status
+                ex.getStatusCode().value(),
                 "Bad Response Status",
                 ex.getMessage(),
                 request.getRequestURI()
@@ -109,14 +122,14 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<ErrorResponse> handleIllegalArgument(IllegalArgumentException ex,
-                                                            HttpServletRequest request) {
+                                                               HttpServletRequest request) {
         String message = ex.getMessage() != null ? ex.getMessage() : "Invalid request";
 
         HttpStatus status;
         if (message.toLowerCase().contains("not found")) {
             status = HttpStatus.NOT_FOUND;
         } else if (message.toLowerCase().contains("already exists")) {
-            status = HttpStatus.BAD_REQUEST;
+            status = HttpStatus.CONFLICT;  // 409 for duplicates
         } else {
             status = HttpStatus.BAD_REQUEST;
         }
@@ -132,4 +145,16 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(status).body(errorResponse);
     }
 
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ErrorResponse> handleGeneralException(Exception ex,
+                                                                HttpServletRequest request) {
+        ErrorResponse errorResponse = new ErrorResponse(
+                LocalDateTime.now(),
+                HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                "Internal Server Error",
+                ex.getMessage(),
+                request.getRequestURI()
+        );
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+    }
 }

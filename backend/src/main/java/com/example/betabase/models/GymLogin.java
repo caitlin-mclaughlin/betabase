@@ -38,7 +38,8 @@ public class GymLogin implements UserDetails {
     @JoinColumn(name = "gym_id")
     private Gym gym;
 
-    @ManyToOne(optional = true)
+    @ManyToOne
+    @NotNull
     @JoinColumn(name = "group_id")
     private GymGroup group;
 

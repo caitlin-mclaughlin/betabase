@@ -3,7 +3,11 @@ package com.example.betabase.controllers;
 import com.example.betabase.dtos.GymLoginCreateDto;
 import com.example.betabase.dtos.GymLoginDto;
 import com.example.betabase.dtos.GymRegistrationRequest;
+import com.example.betabase.dtos.GymRegistrationResponseDto;
+import com.example.betabase.dtos.simple.GymRegistrationRequestDto;
 import com.example.betabase.enums.GymLoginRole;
+import com.example.betabase.mappers.AddressMapper;
+import com.example.betabase.mappers.GymLoginMapper;
 import com.example.betabase.models.Gym;
 import com.example.betabase.models.GymGroup;
 import com.example.betabase.models.GymLogin;
@@ -17,10 +21,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/gym-logins")
 public class GymLoginController {
 
     private final GymLoginService gymLoginService;
@@ -36,7 +41,7 @@ public class GymLoginController {
     @GetMapping("/{id}")
     public ResponseEntity<GymLoginDto> getLoginById(@PathVariable Long id) {
         return gymLoginService.getById(id)
-                .map(this::toDto)
+                .map(GymLoginMapper::toDto)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
@@ -46,7 +51,10 @@ public class GymLoginController {
         Optional<Gym> gym = gymService.getById(dto.gymId());
         Optional<GymGroup> group = gymGroupService.getById(dto.gymGroupId());
 
-        if (gym.isEmpty() || group.isEmpty()) {
+        if (!gym.isPresent()) {
+            return ResponseEntity.badRequest().build();
+        }
+        if (!group.isPresent()) {
             return ResponseEntity.badRequest().build();
         }
 
@@ -58,7 +66,7 @@ public class GymLoginController {
         login.setRole(dto.role());
 
         GymLogin saved = gymLoginService.save(login);
-        return ResponseEntity.status(HttpStatus.CREATED).body(toDto(saved));
+        return ResponseEntity.status(HttpStatus.CREATED).body(GymLoginMapper.toDto(saved));
     }
 
     @PutMapping("/{id}")
@@ -71,27 +79,24 @@ public class GymLoginController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
 
-        Optional<GymLogin> existingOpt = gymLoginService.getById(id);
-        if (existingOpt.isEmpty()) {
-            return ResponseEntity.notFound().build();
-        }
-
         Optional<Gym> gym = gymService.getById(updateDto.gymId());
         Optional<GymGroup> group = gymGroupService.getById(updateDto.gymGroupId());
 
-        if (gym.isEmpty() || group.isEmpty()) {
+        if (!gym.isPresent()) {
+            return ResponseEntity.badRequest().build();
+        }
+        if (!group.isPresent()) {
             return ResponseEntity.badRequest().build();
         }
 
-        GymLogin login = existingOpt.get();
+        GymLogin login = new GymLogin();
         login.setUsername(updateDto.username());
         login.setPasswordHash(updateDto.passwordHash());
         login.setGym(gym.get());
         login.setGroup(group.get());
         login.setRole(updateDto.role());
 
-        GymLogin updated = gymLoginService.update(id, login);
-        return ResponseEntity.ok(toDto(updated));
+        return ResponseEntity.ok(GymLoginMapper.toDto(gymLoginService.update(id, login)));
     }
 
     @DeleteMapping("/{id}")
@@ -105,32 +110,6 @@ public class GymLoginController {
 
         gymLoginService.delete(id);
         return ResponseEntity.noContent().build();
-    }
-
-    @PostMapping("/register")
-    public ResponseEntity<GymLoginDto> registerGym(@RequestBody @Valid GymRegistrationRequest request) {
-        Gym savedGym = gymService.save(request.getGym());
-
-        GymLogin login = new GymLogin();
-        login.setUsername(request.getUsername());
-        login.setPasswordHash(request.getPassword());
-        login.setGym(savedGym);
-        login.setGroup(savedGym.getGroup());
-        login.setRole(GymLoginRole.ADMIN);
-
-        GymLogin savedLogin = gymLoginService.save(login);
-        return ResponseEntity.status(HttpStatus.CREATED).body(toDto(savedLogin));
-    }
-
-    private GymLoginDto toDto(GymLogin login) {
-        return new GymLoginDto(
-                login.getId(),
-                login.getUsername(),
-                login.getPasswordHash(),
-                login.getGym().getId(),
-                login.getGroup() != null ? login.getGroup().getId() : null,
-                login.getRole()
-        );
     }
 
     private boolean isAdmin(GymLogin login) {

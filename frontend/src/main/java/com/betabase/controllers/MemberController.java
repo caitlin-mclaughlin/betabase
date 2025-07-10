@@ -13,6 +13,8 @@ import com.betabase.models.Membership;
 import com.betabase.models.User;
 import com.betabase.services.CompositeMemberService;
 import com.betabase.services.GymApiService;
+import com.betabase.services.GymGroupApiService;
+import com.betabase.services.GymLoginApiService;
 import com.betabase.services.MembershipApiService;
 import com.betabase.services.UserApiService;
 import com.betabase.utils.AuthSession;
@@ -33,9 +35,9 @@ public class MemberController implements Initializable, ServiceAware {
     @FXML private TextField firstNameField, lastNameField, prefNameField, phoneField, emailField, userIdField;
     @FXML private TextField streetField1, streetField2, cityField, zipField, stateField;
     @FXML private TextField eNameField, ePhoneField, eEmailField;
-    @FXML private ChoiceBox<UserType> typeField;
-    @FXML private ChoiceBox<GenderType> genderField;
-    @FXML private ChoiceBox<PronounsType> pronounsField;
+    @FXML private ComboBox<UserType> typeField;
+    @FXML private ComboBox<GenderType> genderField;
+    @FXML private ComboBox<PronounsType> pronounsField;
     @FXML private DatePicker dobField;
     @FXML private Button editButton, checkInButton, checkOutButton, saveButton, cancelButton;
     @FXML private HBox staffButtons;
@@ -47,7 +49,8 @@ public class MemberController implements Initializable, ServiceAware {
 
     @Override
     public void setServices(UserApiService userService, MembershipApiService membershipService,
-                            CompositeMemberService compositeMemberService, GymApiService gymService) {
+                            CompositeMemberService compositeMemberService, GymApiService gymService,
+                            GymGroupApiService gymGroupApiService, GymLoginApiService gymLoginApiService){
         this.userService = userService;
         this.membershipService = membershipService;
         this.compositeMemberService = compositeMemberService;
@@ -99,9 +102,13 @@ public class MemberController implements Initializable, ServiceAware {
             if (isNew) {
                 User createdUser = userService.createUser(currentMember.getUser());
 
-                Membership membership = new Membership(createdUser.getId(), AuthSession.getCurrentGymId(), 
-                                                       UserType.MEMBER, LocalDate.now());
+                Membership membership = new Membership();
+                membership.setId(createdUser.getId());
+                membership.setGymId(AuthSession.getCurrentGymId());
+                membership.setType(UserType.MEMBER);
+                membership.setUserSince(LocalDate.now());
                 membershipService.createMembership(membership);
+                
                 currentMember = new CompositeMember(createdUser, membership);
             } else {
                 currentMember = compositeMemberService.updateCompositeMember(currentMember);
@@ -144,9 +151,7 @@ public class MemberController implements Initializable, ServiceAware {
         u.setEmail(emailField.getText());
         u.setDateOfBirth(dobField.getValue());
         m.setMembershipId(userIdField.getText());
-        u.setAddress(new Address(
-            streetField1.getText(), streetField2.getText(), cityField.getText(), stateField.getText(), zipField.getText(), "USA"
-        ));
+        u.setAddress(new Address(streetField1.getText(), streetField2.getText(), cityField.getText(), stateField.getText(), zipField.getText()));
         u.setEmergencyContactName(eNameField.getText());
         u.setEmergencyContactPhone(ePhoneField.getText().replaceAll("[^\\d]", ""));
         u.setEmergencyContactEmail(eEmailField.getText());

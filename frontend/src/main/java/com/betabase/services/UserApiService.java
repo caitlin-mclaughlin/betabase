@@ -17,13 +17,12 @@ import java.net.URI;
 import java.net.URLEncoder;
 
 public class UserApiService {
-    private static final String BASE_URL = "http://localhost:8080/api/users";
-    private final HttpClient client;
-    private final ObjectMapper mapper;
+    private final String baseUrl;
+    private final HttpClient client = HttpClient.newHttpClient();
+    private final ObjectMapper mapper = new ObjectMapper();
 
-    public UserApiService() {
-        this.client = HttpClient.newHttpClient();
-        this.mapper = new ObjectMapper();
+    public UserApiService(String baseUrl) {
+        this.baseUrl = baseUrl.endsWith("/") ? baseUrl.substring(0, baseUrl.length() - 1) : baseUrl;
         mapper.registerModule(new JavaTimeModule());
         mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
     }
@@ -33,7 +32,7 @@ public class UserApiService {
         String token = AuthSession.getToken();
 
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(BASE_URL + "/" + id))
+                .uri(URI.create(baseUrl + "/" + id))
                 .GET()
                 .header("Accept", "application/json")
                 .header("Authorization", "Bearer " + token)
@@ -52,7 +51,7 @@ public class UserApiService {
         String json = mapper.writeValueAsString(user);
 
         HttpRequest request = HttpRequest.newBuilder()
-            .uri(URI.create(BASE_URL))
+            .uri(URI.create(baseUrl))
             .header("Authorization", "Bearer " + AuthSession.getToken())
             .header("Content-Type", "application/json")
             .POST(HttpRequest.BodyPublishers.ofString(json))
@@ -78,7 +77,7 @@ public class UserApiService {
         String token = AuthSession.getToken();
         
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(BASE_URL + "/" + user.getId()))
+                .uri(URI.create(baseUrl + "/" + user.getId()))
                 .POST(HttpRequest.BodyPublishers.ofString(requestBody))
                 .header("Content-Type", "application/json")
                 .header("Authorization", "Bearer " + token)
@@ -98,7 +97,7 @@ public class UserApiService {
         String encoded = URLEncoder.encode(query, StandardCharsets.UTF_8);
 
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(BASE_URL + "/search?query=" + encoded))
+                .uri(URI.create(baseUrl + "/search?query=" + encoded))
                 .header("Authorization", "Bearer " + AuthSession.getToken())
                 .GET()
                 .build();

@@ -1,13 +1,18 @@
 package com.example.betabase.controllers;
 
-import com.example.betabase.dtos.GymGroupCreateDto;
 import com.example.betabase.dtos.GymGroupDto;
+import com.example.betabase.dtos.simple.GymGroupCreateDto;
+import com.example.betabase.dtos.simple.GymGroupNameDto;
 import com.example.betabase.enums.GymLoginRole;
-import com.example.betabase.models.Gym;
+import com.example.betabase.mappers.GymGroupMapper;
 import com.example.betabase.models.GymGroup;
 import com.example.betabase.models.GymLogin;
+import com.example.betabase.repositories.GymGroupRepository;
 import com.example.betabase.services.GymGroupService;
 import com.example.betabase.services.GymService;
+
+import jakarta.annotation.security.PermitAll;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -21,18 +26,21 @@ import java.util.stream.Collectors;
 @RequestMapping("/api/gym-groups")
 public class GymGroupController {
 
+    private final GymGroupRepository gymGroupRepository;
+
     private final GymGroupService gymGroupService;
     private final GymService gymService;
 
-    public GymGroupController(GymGroupService gymGroupService, GymService gymService) {
+    public GymGroupController(GymGroupService gymGroupService, GymService gymService, GymGroupRepository gymGroupRepository) {
         this.gymGroupService = gymGroupService;
         this.gymService = gymService;
+        this.gymGroupRepository = gymGroupRepository;
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<GymGroupDto> getGroup(@PathVariable Long id) {
         return gymGroupService.getById(id)
-            .map(this::toDto)
+            .map(GymGroupMapper::toDto)
             .map(ResponseEntity::ok)
             .orElse(ResponseEntity.notFound().build());
     }
@@ -49,11 +57,11 @@ public class GymGroupController {
         GymGroup group = new GymGroup();
         group.setName(createDto.name());
 
-        List<Gym> gyms = gymService.getByIds(createDto.gymIds());
-        group.setGyms(gyms);
+        //List<Gym> gyms = gymService.getByIds(createDto.gymIds());
+        //group.setGyms(gyms);
 
         GymGroup saved = gymGroupService.save(group);
-        return ResponseEntity.status(HttpStatus.CREATED).body(toDto(saved));
+        return ResponseEntity.status(HttpStatus.CREATED).body(GymGroupMapper.toDto(saved));
     }
 
     @PutMapping("/{id}")
@@ -73,10 +81,10 @@ public class GymGroupController {
 
         GymGroup group = existing.get();
         group.setName(updateDto.name());
-        group.setGyms(gymService.getByIds(updateDto.gymIds()));
+        //group.setGyms(gymService.getByIds(updateDto.gymIds()));
 
         GymGroup updated = gymGroupService.save(group);
-        return ResponseEntity.ok(toDto(updated));
+        return ResponseEntity.ok(GymGroupMapper.toDto(updated));
     }
 
     @DeleteMapping("/{id}")
@@ -95,28 +103,21 @@ public class GymGroupController {
     @GetMapping("/search")
     public ResponseEntity<List<GymGroupDto>> search(@RequestParam String name) {
         List<GymGroupDto> results = gymGroupService.searchByName(name).stream()
-                .map(this::toDto)
+                .map(GymGroupMapper::toDto)
                 .collect(Collectors.toList());
         return ResponseEntity.ok(results);
     }
 
-    private GymGroupDto toDto(GymGroup group) {
-        List<Long> gymIds = group.getGyms().stream()
-                .map(Gym::getId)
-                .collect(Collectors.toList());
-
-        return new GymGroupDto(
-            group.getId(),
-            group.getName(),
-            gymIds
-        );
+    @GetMapping("/public-names")
+    @PermitAll  // <- allows public access
+    public List<GymGroupNameDto> getPublicGroupNames() {
+        return gymGroupRepository.findAll().stream()
+            .map(g -> new GymGroupNameDto(g.getId(), g.getName()))
+            .toList();
     }
+
 
     private boolean isAdmin(GymLogin login) {
         return login.getRole() == GymLoginRole.ADMIN;
-    }
-
-    private boolean isKiosk(GymLogin login) {
-        return login.getRole() == GymLoginRole.KIOSK;
     }
 }

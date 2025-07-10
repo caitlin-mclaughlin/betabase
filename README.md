@@ -29,7 +29,7 @@ Created by Caitlin McLaughlin
     - [x] Monthly
     - [x] Punch Card
     - [x] Rentals (shoes, chalk)
-  - [ ] Merch (Examples)
+  - [ ] Retail (Examples)
     - [ ] Shirts
     - [ ] Sweatshirts
     - [ ] Various Gear
@@ -51,25 +51,20 @@ Created by Caitlin McLaughlin
 ## Model Relationships
 ```mermaid
 graph LR;
-  GymUser-->GymGroup
+  GymLogin-->GymGroup;
   GymGroup-->Gym;
-  Gym-->GymLogin;
   Gym-->User;
   User-->Membership;
   GymGroup-->Membership;
 ```
 ```
-GymUser       Many --> 1    GymGroup
+GymLogin      Many --> 1    GymGroups
 
-GymGroup      1 --> Many    GymUsers
-              1 --> Many    Gym
+GymGroup      1 --> Any     Gym
 
-Gym           Many --> 1    GymGroup
-              1 --> Many    GymLogins
+Gym           Any --> 1     GymGroup
               1 --> Many    Memberships
             
-GymLogin      Many --> 1    Gyms
-
 User          1 --> Many    Memberships
 
 Membership    Many --> 1    Gym
@@ -95,16 +90,22 @@ BetaBase
           - [x] UserController.java
         - dtos
           - [x] ErrorResponse.java
+          - [x] GymCreateDto.java
           - [x] GymDto.java
+          - [x] GymGroupCreateDto.java
+          - [x] GymGroupDto.java
+          - [x] GymLoginCreateDto.java
+          - [x] GymLoginDto.java
           - [x] GymRegistrationRequest.java
           - [x] JwtResponse.java
-          - [x] LoginRequest.java
+          - [x] GymLoginRequestDto.java
           - [x] MembershipCreateDto.java
           - [x] MembershipDto.java
           - [x] UserCreateDto.java
           - [x] UserDto.java
         - enums
           - [x] GenderType.java
+          - [x] GymLoginRole.java
           - [x] PronounsType.java
           - [x] UserType.java
         - exceptions
@@ -131,6 +132,7 @@ BetaBase
         - services
           - [ ] CheckInLogService.java
           - [x] CurrentUserService.java
+          - [x] GymGroupService.java
           - [x] GymLoginService.java
           - [x] GymService.java
           - [x] MembershipService.java
@@ -207,7 +209,8 @@ Priority:
 - [x] Replace Member models and dtos with separate User and Membership models / dtos
   - Goal: Allow gym-goer to hold memberships at multiple gyms without creating new User entity
     - Gym can "pull" user infromation if they hold a membership at a different gym using BetaBase
-- [ ] Finish incorporating new User / Membership structure into backend
+- [x] Finish incorporating new User / Membership structure into backend
+    - [x] Test backend
 - [ ] Finish incorporating new User / Membership structure into frontend
 
 Small Things:
@@ -229,3 +232,4 @@ Big Things:
 - expand customization
 	- POS options
 	- visible member info
+- analytics page
